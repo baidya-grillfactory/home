@@ -293,12 +293,13 @@ function svSt(s){var b=$('svbtn');if(!b)return;clearTimeout(b._h);b.className='b
 function svNow(){var a=document.activeElement;if(a&&a.blur)a.blur();svSt('busy');setTimeout(function(){lastJ='';if(!save())svSt('err')},400)}
 function peDi(j){var d=pCur().ds[j];if(!d||!confirm('ছবি মুছবেন?'))return;d.i='';d.wmv=0;save();rf('g');toast('🗑 ছবি মুছে গেছে, নতুন ছবি দিন')}
 
-var W4=new Set();
+var W4=new Set(),MWB=0;
 function migW2(r){if(!sessionStorage.getItem('adm'))return;var list=[],k=0;function add(u,s,f){if(u&&u.length>200&&!W4.has(u))list.push([u,s,f])}
 if(!S.cfg.wm4)S.products.forEach(function(p){(p.ds||[]).forEach(function(d){add(d.i,function(o){d.i=o});(d.gal||[]).forEach(function(u,n){add(u,function(o){d.gal[n]=o})})})});
 if(!S.cfg.wm5){(S.banners||[]).forEach(function(b){add(b.i,function(o){b.i=o},1)});S.products.forEach(function(p){add(p.i,function(o){p.i=o},1)});add(S.cfg.abimg,function(o){S.cfg.abimg=o},1);add(S.cfg.owimg,function(o){S.cfg.owimg=o},1)}
 (S.gal||[]).forEach(function(g){if(!g.v4)add(g.u,function(o){g.u=o;g.v4=1})});
-function nx(){if(k>=list.length){S.cfg.wm4=1;S.cfg.wm5=1;if(list.length||r){save();render()}return}
+if(list.length)toast('⏳ পুরোনো ছবিতে watermark বসানো হচ্ছে… পেজ বন্ধ করবেন না');
+function nx(){if(k>=list.length){S.cfg.wm4=1;S.cfg.wm5=1;MWB=0;if(list.length||r){save();render();toast('✅ সব ছবিতে লোগো watermark বসেছে')}return}
 var it=list[k++],im=new Image();im.onload=function(){var cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;var cx=cv.getContext('2d');cx.drawImage(im,0,0);wmark(cx,cv.width,cv.height,function(){var o=cv.toDataURL('image/jpeg',.6);if(o.length>200){W4.add(o);it[1](o)}nx()},it[2]?0:1)};im.onerror=nx;im.src=it[0]}
 nx()}
 var L='bn';try{if(sessionStorage.getItem('boidya_lang')==='en')L='en'}catch(e){}
@@ -365,7 +366,7 @@ if(WMC&&WMC.k===lg.length){go(WMC.c);return}
 var im=new Image();im.onload=function(){var c=document.createElement('canvas'),m=Math.min(220,im.width);c.width=m;c.height=Math.round(m*im.height/im.width);var x=c.getContext('2d');x.drawImage(im,0,0,c.width,c.height);var d=x.getImageData(0,0,c.width,c.height),p=d.data;
 for(var i=0;i<p.length;i+=4){var mn=Math.min(p[i],p[i+1],p[i+2]);if(mn>225)p[i+3]=0;else if(mn>170)p[i+3]=Math.round(p[i+3]*(225-mn)/55)}
 x.putImageData(d,0,0);WMC={k:lg.length,c:c};go(c)};im.onerror=function(){go(null)};im.src=lg}
-function migW(){if(!sessionStorage.getItem('adm'))return;var list=[],k=0;S.products.forEach(function(p){(p.ds||[]).forEach(function(d){if(d.i&&d.i.length>200&&!d.wmv)list.push([d,'i',0]);(d.gal||[]).forEach(function(u,n){if(u&&u.length>200&&n>=(d.gwm||0))list.push([d,'gal',n])})})});
+function migW(){if(!sessionStorage.getItem('adm')||MWB)return;MWB=1;var list=[],k=0;S.products.forEach(function(p){(p.ds||[]).forEach(function(d){if(d.i&&d.i.length>200&&!d.wmv)list.push([d,'i',0]);(d.gal||[]).forEach(function(u,n){if(u&&u.length>200&&n>=(d.gwm||0))list.push([d,'gal',n])})})});
 function nx(){if(k>=list.length){S.products.forEach(function(p){(p.ds||[]).forEach(function(d){d.wmv=1;d.gwm=(d.gal||[]).length})});if(list.length){save()}migW2(list.length);return}
 var it=list[k++],d=it[0],u=it[1]==='i'?d.i:d.gal[it[2]],im=new Image();
 im.onload=function(){var cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;var cx=cv.getContext('2d');cx.drawImage(im,0,0);wmark(cx,cv.width,cv.height,function(){var o=cv.toDataURL('image/jpeg',.6);if(o.length>200){W4.add(o);if(it[1]==='i')d.i=o;else d.gal[it[2]]=o}nx()})};im.onerror=nx;im.src=u}
@@ -398,7 +399,7 @@ ensureNo()}
 
 mig();
 function save(){ensureNo();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){if(!API()){alert('ছবি বেশি বড় — ছোট বা কম ছবি দিন');return false}}
-if(A){if(API()){var j=JSON.stringify(pub_());if(j!==lastJ){lastJ=j;pushCfg();svSt(pw()?'busy':'ok')}else svSt('ok')}else svSt('ok')}return true}
+if(A||sessionStorage.getItem('adm')){if(API()){var j=JSON.stringify(pub_());if(j!==lastJ){lastJ=j;pushCfg();svSt(pw()?'busy':'ok')}else svSt('ok')}else svSt('ok')}return true}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 var $=function(i){return document.getElementById(i)},A=false,tab='orders',lastErr='',of_='সব',dsOpen=-1;
 function dn(s){return String(s==null?'':s).replace(/[০-৯]/g,function(c){return '০১২৩৪৫৬৭৮৯'.indexOf(c)})}
@@ -687,7 +688,7 @@ function apiCall(b){var u=API();if(!u)return Promise.reject(new Error('no api'))
 function pw(){try{return sessionStorage.getItem('adm')?(sessionStorage.getItem('admpw')||''):''}catch(e){return ''}}
 function pub_(){var c=cl(S.cfg);SECRET.forEach(function(k){delete c[k]});return{cfg:c,feats:S.feats,stats:S.stats,revs:S.revs,banners:S.banners,hrs:S.hrs,pay:S.pay,products:S.products}}
 function pushCfg(){if(!API()||!pw())return;clearTimeout(syncT);syncT=setTimeout(function(){apiCall({action:'saveConfig',pass:pw(),config:pub_()}).then(function(r){toast(r.ok?'☁️ Google Drive-এ সেভ হয়েছে':'❌ Drive: '+(r.error||'সমস্যা'));svSt(r.ok?'ok':'err')}).catch(function(){toast('❌ Drive-এ সেভ হয়নি');svSt('err')})},1200)}
-function pullCfg(){if(!API())return;var u=API();fetch(u+(u.indexOf('?')<0?'?':'&')+'action=config').then(function(r){return r.json()}).then(function(d){if(!d||!d.cfg)return;var keep={ah:S.cfg.ah,api:S.cfg.api};['feats','stats','revs','banners','hrs','pay','products'].forEach(function(a){if(d[a])S[a]=d[a]});for(var k in d.cfg)S.cfg[k]=d.cfg[k];for(var k2 in keep)S.cfg[k2]=keep[k2];mig();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}lastJ=JSON.stringify(pub_());render()}).catch(function(){}).then(trackVisit)}
+function pullCfg(){if(!API())return;var u=API();fetch(u+(u.indexOf('?')<0?'?':'&')+'action=config').then(function(r){return r.json()}).then(function(d){if(!d||!d.cfg)return;var keep={ah:S.cfg.ah,api:S.cfg.api};['feats','stats','revs','banners','hrs','pay','products'].forEach(function(a){if(d[a])S[a]=d[a]});for(var k in d.cfg)S.cfg[k]=d.cfg[k];for(var k2 in keep)S.cfg[k2]=keep[k2];mig();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}lastJ=JSON.stringify(pub_());render()}).catch(function(){}).then(trackVisit).then(function(){setTimeout(migW,300)})}
 function ok_(p){try{sessionStorage.setItem('adm','1');sessionStorage.setItem('admpw',p)}catch(e){}lastErr='';loadOrders();render();setTimeout(migW,800)}
 function loadOrders(){if(!API()||!pw())return;apiCall({action:'getOrders',pass:pw()}).then(function(r){if(r.ok){S.orders=r.orders;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(A)render();toast('🔄 অর্ডার আপডেট হয়েছে')}else toast('❌ '+(r.error||'অর্ডার আনা যায়নি'))}).catch(function(){toast('❌ Drive থেকে অর্ডার আনা যায়নি')})}
 function cloud(){var on=!!API();return'<div class="box"><h3>Google Drive ব্যাকএন্ড</h3><p>'+(API_URL?'✅ Web App URL ফাইলের ভেতরে বসানো আছে — সব ভিজিটরের জন্য চালু।':on?'⚠️ URL শুধু এই ব্রাউজারে আছে। সব কাস্টমারের জন্য চালু করতে HTML ফাইলের শুরুর API_URL লাইনে URL বসান।':'❌ এখনো সংযোগ নেই।')+'</p>'+F('Web App URL (টেস্টের জন্য)','cfg.api',{ph:'https://script.google.com/macros/s/.../exec'})+'<div class="row" style="margin-top:10px"><button class="btn s" onclick="tc()">🔌 সংযোগ টেস্ট</button><button class="btn" onclick="pushNow()">☁️ এখনই Drive-এ সেভ</button><button class="btn s" onclick="pullCfg();toast(\'Drive থেকে আনা হচ্ছে…\')">⬇ Drive থেকে আনুন</button></div><p style="color:var(--mut);font-size:13px">অর্ডার Google Sheet-এ জমা হয়; সাইটের সেটিং, পণ্য ও ছবি Drive-এর JSON ফাইলে থাকে। অ্যাডমিন পাসওয়ার্ড থাকে Apps Script-এর ভেতরে।</p></div>'}
@@ -721,5 +722,5 @@ h+='<div class="box"><h3>সাম্প্রতিক ভিজিট</h3>'+(s
 return h}
 lastJ=JSON.stringify(pub_());
 pullCfg();
-route();setTimeout(migW,1500);document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault()});
+route();if(!API())setTimeout(migW,1500);document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault()});
 </script></body></html>
