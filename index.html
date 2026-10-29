@@ -793,7 +793,7 @@ function glPS() {
 }
 function glHas(a, i, j) { return a.some(function (x) { return x.i === i && x.j === j }) }
 function glAdd(i, j) {
-  if (!GLU) return ''; return '<button class="btn sm" onclick="glTo(\'cart\',' + i + ',' + j + ',this)">🛒 ' + (glHas(GLU.cart, i, j) ? 'কার্টে আছে ✓' : 'কার্টে যোগ') + '</button> <button class="btn s sm" onclick="glTo(\'wish\',' + i + ',' + j + ',this)">' + (glHas(GLU.wish, i, j) ? '❤️' : '🤍') + '</button> '
+  if (!GLU) return ''; return '<button class="btn sm glcart" onclick="glTo(\'cart\',' + i + ',' + j + ',this)">🛒 ' + (glHas(GLU.cart, i, j) ? 'কার্টে আছে ✓' : 'কার্টে যোগ') + '</button> <button class="btn s sm" onclick="glTo(\'wish\',' + i + ',' + j + ',this)">' + (glHas(GLU.wish, i, j) ? '❤️' : '🤍') + '</button> '
 }
 function glTo(k, i, j, b) {
   var p = S.products[i], d = (p.ds || [])[j]; if (!d) return; var a = GLU[k], x = a.filter(function (y) { return y.i === i && y.j === j })[0];
@@ -826,7 +826,7 @@ function glCk() {
 }
 function glFab() {
   var f = $('glf'); if (!GLU || A) { if (f) f.remove(); return }
-  if (!f) { f = document.createElement('button'); f.id = 'glf'; f.className = 'btn'; f.style.cssText = 'position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:60;border-radius:30px;box-shadow:var(--sh)'; f.onclick = function () { glAcc('cart') }; document.body.appendChild(f) }
+  if (!f) { f = document.createElement('button'); f.id = 'glf'; f.className = 'btn glcart'; f.style.cssText = 'position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:60;border-radius:30px;box-shadow:var(--sh)'; f.onclick = function () { glAcc('cart') }; document.body.appendChild(f) }
   f.textContent = '🛒 কার্ট (' + GLU.cart.length + ')'
 }
 function glAfter() {
@@ -840,7 +840,7 @@ function glAfter() {
   var g = $('gls'); if (g) g.innerHTML = GLU ? (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:6px">' : '👤 ') + '<b>' + esc(GLU.name || '') + '</b>' : '🔐 <b>Google দিয়ে লগইন করুন</b>';
   glFab()
 }
-(function () { var st = document.createElement('style'); st.textContent = '.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
+(function () { var st = document.createElement('style'); st.textContent = '.glcart{background:#2b8a3e!important;background-image:none!important;color:#fff!important;border:2px solid #fff;font-weight:700}.glcart:active{background:#237032!important}.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
 var _glr = render; render = function () { _glr(); glAfter() };
 setTimeout(function () { if (GLT && glApi()) glCall({ action: 'me', tok: GLT }).then(function (d) { if (glChk(d)) { GLU = d.user; glSave(); glFab() } }).catch(function () {}) }, 1500);
 /* অ্যাডমিন ট্যাব */
