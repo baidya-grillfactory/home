@@ -343,7 +343,7 @@ function IMG2(u,e){return u?'<img src="'+u+'" alt="">':esc(e||'🔧')}
 function cvr(p){if(p.i)return p.i;var r='';(p.ds||[]).some(function(d){r=gal(d)[0]||'';return r});return r}
 function gal(d){return [d.i].concat(d.gal||[]).filter(function(u){return u&&u.length>200})}
 function openDt(i,j,k){k=k||0;var p=S.products[i],d=p.ds[j],g=gal(d),m=$('mod');if(!m){m=document.createElement('div');m.id='mod';document.body.appendChild(m)}m.className='ov2';var R=FD.map(function(f){return[f[1],dspec(d,f[0])]}).filter(function(r){return r[1]});if(d.no)R.unshift(['কোড',bn(d.no)]);
-m.innerHTML=tr('<div class="mb"><button class="x" onclick="ckx()">✕</button><h3>'+esc(X(p,'n'))+' — '+esc(X(d,'n'))+'</h3>'+(g.length?'<div class="im2 zi" onclick="openZ('+i+','+j+','+k+')"><img src="'+g[k]+'" alt=""></div>'+(g.length>1?'<div class="thg">'+g.map(function(u,n){return'<div class="'+(n===k?'on':'')+'" onclick="openDt('+i+','+j+','+n+')"><img src="'+u+'" alt=""></div>'}).join('')+'</div>':''):'<div class="im2">'+esc(p.e||'🔧')+'</div>')+(d.pr?'<div style="color:var(--p);font-weight:700;font-size:20px;margin:8px 0">'+esc(d.pr)+'</div>':'')+(R.length?'<table class="dtb">'+R.map(function(r){return'<tr><td>'+r[0]+'</td><td>'+esc(r[1])+'</td></tr>'}).join('')+'</table>':'')+(estT(p)?'<div class="sm">🚚 '+estT(p)+'</div>':'')+'<button class="btn sm" onclick="openCk('+i+','+j+')">অর্ডার করুন</button> '+'<a class="btn wab sm" target="_blank" rel="noopener" href="'+waL2(p,d)+'">'+WAI+' WhatsApp</a> <a class="btn sm" href="tel:'+telN()+'">📞 কল করুন</a> <button class="btn s sm" onclick="'+(FRM==='g'?'openGal(GC)':'openDs('+i+',\'\')')+'">'+(FRM==='g'?'← গ্যালারি':'← সব নকশা')+'</button></div>')}
+m.innerHTML=tr('<div class="mb"><button class="x" onclick="ckx()">✕</button><h3>'+esc(X(p,'n'))+' — '+esc(X(d,'n'))+'</h3>'+(g.length?'<div class="im2 zi" onclick="openZ('+i+','+j+','+k+')"><img src="'+g[k]+'" alt=""></div>'+(g.length>1?'<div class="thg">'+g.map(function(u,n){return'<div class="'+(n===k?'on':'')+'" onclick="openDt('+i+','+j+','+n+')"><img src="'+u+'" alt=""></div>'}).join('')+'</div>':''):'<div class="im2">'+esc(p.e||'🔧')+'</div>')+(d.pr?'<div style="color:var(--p);font-weight:700;font-size:20px;margin:8px 0">'+esc(d.pr)+'</div>':'')+(R.length?'<table class="dtb">'+R.map(function(r){return'<tr><td>'+r[0]+'</td><td>'+esc(r[1])+'</td></tr>'}).join('')+'</table>':'')+(estT(p)?'<div class="sm">🚚 '+estT(p)+'</div>':'')+glAdd(i,j)+'<button class="btn sm" onclick="openCk('+i+','+j+')">অর্ডার করুন</button> '+'<a class="btn wab sm" target="_blank" rel="noopener" href="'+waL2(p,d)+'">'+WAI+' WhatsApp</a> <a class="btn sm" href="tel:'+telN()+'">📞 কল করুন</a> <button class="btn s sm" onclick="'+(FRM==='g'?'openGal(GC)':'openDs('+i+',\'\')')+'">'+(FRM==='g'?'← গ্যালারি':'← সব নকশা')+'</button></div>')}
 var Z={g:[],k:0,s:1,x:0,y:0},P={};
 function openZ(i,j,k){var dd=S.products[i].ds[j];Z.g=gal(dd);Z.cap=esc(X(dd,'n'))+(dd.no?' · '+(L==='en'?'Code ':'কোড ')+dd.no:'');Z.k=k||0;Z.s=1;Z.x=0;Z.y=0;var m=$('zm');if(!m){m=document.createElement('div');m.id='zm';document.body.appendChild(m)}m.className='zm';zr()}
 function zr(){var m=$('zm');m.innerHTML='<img id="zi" src="'+Z.g[Z.k]+'" draggable="false"><div class="zcap">'+Z.cap+'</div><button class="x" onclick="zx()">✕</button><div class="zc">'+(Z.g.length>1?'<button onclick="zs(-1)">‹</button>':'')+'<button onclick="zz(1/1.5)">−</button><button onclick="zz(1.5)">+</button>'+(Z.g.length>1?'<button onclick="zs(1)">›</button>':'')+'</div>';zt();bz()}
@@ -519,7 +519,7 @@ if(DF.so){var nl=DF.so==='a'?1e12:-1;R.sort(function(a,b){var x=a.v==null?nl:a.v
 if(!R.length)return'<p>'+((p.ds||[]).length?'কিছু পাওয়া যায়নি':'এখনো কোনো নকশা যোগ করা হয়নি।')+'</p>';
 var c=S.cfg,ab=(c.ab||[]).filter(function(r){return r.l==='প্রতিষ্ঠা'})[0],em=ab&&dn(ab.v).match(/\d{4}/),yr=em?new Date().getFullYear()-em[0]:0,shop='🏭 '+esc(X(c,'name'))+' · '+esc(X(c,'area')||(function(a){return(a[1]||a[0]).trim()})(String(X(c,'addr')||'').split(',')))+(yr>0?' · '+bn(yr)+' বছর':'');
 return R.map(function(o){var d=o.d,j=o.j,g=gal(d),sp=FD.map(function(f){return[f[0],f[1],dspec(d,f[0])]}).filter(function(f){return f[0]!=='nt'&&f[2]}).slice(0,4).map(function(f){return'<li><span>'+f[1]+':</span> '+esc(f[2])+'</li>'}).join(''),go='openDt('+i+','+j+')',x=subOf(p,d.s),sc=x?scol(x,subIdx(p,d.s)):'';
-return'<div class="lc"><div class="lt'+(g.length?' zi':'')+'" onclick="'+(g.length?'openZ('+i+','+j+',0)':go)+'">'+IMG2(g[0],p.e)+'</div><div><b class="ln" onclick="'+go+'">'+esc(X(d,'n'))+'</b> <span class="sno">কোড '+bn(d.no)+'</span>'+(x?'<div class="sbt"><i style="background:'+sc+'22;border:1px solid '+sc+'">'+esc(subLb(x))+'</i></div>':'')+(d.pr?'<div class="lp">'+esc(d.pr)+'</div>':'')+(sp?'<ul class="lu">'+sp+'</ul>':'')+'</div><div class="ls">'+shop+'</div><div class="lb"><a class="btn wab sm" target="_blank" rel="noopener" href="'+waL2(p,d)+'">'+WAI+' WhatsApp</a>'+(S.cfg.waOrder?'':'<button class="btn sm" onclick="openCk('+i+','+j+')">অর্ডার করুন</button>')+'<a class="btn s sm" href="tel:'+telN()+'">📞 কল করুন</a></div></div>'}).join('')}
+return'<div class="lc"><div class="lt'+(g.length?' zi':'')+'" onclick="'+(g.length?'openZ('+i+','+j+',0)':go)+'">'+IMG2(g[0],p.e)+'</div><div><b class="ln" onclick="'+go+'">'+esc(X(d,'n'))+'</b> <span class="sno">কোড '+bn(d.no)+'</span>'+(x?'<div class="sbt"><i style="background:'+sc+'22;border:1px solid '+sc+'">'+esc(subLb(x))+'</i></div>':'')+(d.pr?'<div class="lp">'+esc(d.pr)+'</div>':'')+(sp?'<ul class="lu">'+sp+'</ul>':'')+'</div><div class="ls">'+shop+'</div><div class="lb"><a class="btn wab sm" target="_blank" rel="noopener" href="'+waL2(p,d)+'">'+WAI+' WhatsApp</a>'+(S.cfg.waOrder?'':'<button class="btn sm" onclick="openCk('+i+','+j+')">অর্ডার করুন</button>')+''+glAdd(i,j)+'<a class="btn s sm" href="tel:'+telN()+'">📞 কল করুন</a></div></div>'}).join('')}
 function abTab(){var h='<div class="box"><div class="g2"><div>'+IM('ফ্যাক্টরি ছবি','cfg.abimg',800,.8)+'</div><div>'+IM('মালিকের ছবি','cfg.owimg',300,.8)+'</div></div></div><br>';
 (S.cfg.ab||[]).forEach(function(r,k){var b='cfg.ab.'+k;h+='<div class="ord"><div class="row">'+I(b+'.ic','🔹','width:64px')+I(b+'.l','নাম / Label','flex:1;min-width:120px')+I(b+'.l_en','Label (English)','flex:1;min-width:120px')+'</div>'+I(b+'.v','তথ্য লিখুন','margin-top:6px')+I(b+'.v_en','Value (English)','margin-top:6px')+'<button class="btn sm r" style="margin-top:6px" onclick="rm(\'cfg.ab\','+k+')">মুছুন</button></div>'});
 return h+'<button class="btn s" onclick="S.cfg.ab.push({ic:\'🔹\',l:\'নতুন তথ্য\',v:\'\'});save();render()">+ নতুন যোগ করুন</button>'}
@@ -554,10 +554,10 @@ function login(){var u=$('lu').value,p=$('lp').value;
 if(API()){toast('যাচাই হচ্ছে…');apiCall({action:'login',pass:p}).then(function(r){if(r.ok)ok_(p);else{lastErr='ভুল পাসওয়ার্ড';render()}}).catch(function(){lastErr='সার্ভারের সাথে যোগাযোগ হয়নি';render()})}
 else if(!S.cfg.ah){if(!u||p.length<6){lastErr='আইডি দিন ও পাসওয়ার্ড কমপক্ষে ৬ অক্ষর';render();return}S.cfg.ah=ahash(u,p);save();ok_(p)}else if(ahash(u,p)===S.cfg.ah){ok_(p)}else{lastErr='ভুল আইডি বা পাসওয়ার্ড';render()}}
 function admin(){if(!sessionStorage.getItem('adm'))return'<header><div class="lg">'+li()+'</div><h1>অ্যাডমিন লগইন</h1></header><section style="max-width:400px"><div class="box"><label>আইডি</label><input id="lu" autocomplete="username"><label>পাসওয়ার্ড</label><input id="lp" type="password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')login()"><p style="color:#e03131;margin:8px 0">'+lastErr+'</p><button class="btn" onclick="login()">লগইন</button> <a href="#" onclick="location.hash=\'\';return false">← সাইটে ফিরুন</a>'+(!API()&&!S.cfg.ah?'<p style="color:var(--mut);font-size:13px">প্রথমবার — এখন যে আইডি ও পাসওয়ার্ড লিখবেন সেটাই অ্যাডমিন হবে।</p>':'')+'</div></section>';
-var T=[['orders','📦 অর্ডার ('+S.orders.length+')'],['stats','📊 ভিজিট/পরিসংখ্যান'],['site','🏪 দোকান'],['ab','🏭 ফ্যাক্টরি পরিচিতি'],['look','🎨 ডিজাইন'],['home','🏠 হোম সেকশন'],['gal','🖼 গ্যালারি'],['prods','🛠 পণ্য/নকশা'],['pay','💳 পেমেন্ট/QR'],['cloud','☁️ Google Drive'],['dl','⬇ ওয়েবসাইট ডাউনলোড'],['acct','🔑 অ্যাডমিন আইডি/পাসওয়ার্ড']];
+var T=[['orders','📦 অর্ডার ('+S.orders.length+')'],['stats','📊 ভিজিট/পরিসংখ্যান'],['site','🏪 দোকান'],['ab','🏭 ফ্যাক্টরি পরিচিতি'],['look','🎨 ডিজাইন'],['home','🏠 হোম সেকশন'],['gal','🖼 গ্যালারি'],['prods','🛠 পণ্য/নকশা'],['pay','💳 পেমেন্ট/QR'],['cloud','☁️ Google Drive'],['dl','⬇ ওয়েবসাইট ডাউনলোড'],['acct','🔑 অ্যাডমিন আইডি/পাসওয়ার্ড'],['gl','🔐 Google লগইন']];
 return'<header><div class="lg">'+li()+'</div><h1>অ্যাডমিন প্যানেল</h1><a class="hb" href="#" onclick="location.hash=\'\';return false">🌐<span class="t"> সাইট</span></a><a class="hb g" href="#admin" onclick="sessionStorage.removeItem(\'adm\');render();return false">লগআউট</a></header><section class="adm"><div class="tabs">'+T.map(function(t){return'<button class="'+(tab===t[0]?'on':'')+'" onclick="tab=\''+t[0]+'\';render()">'+t[1]+'</button>'}).join('')+'</div><div class="adc">'+tabs()+'</div></section>'}
 function tabs(){var h='',c=S.cfg;
-if(tab==='cloud')return cloud();if(tab==='ab')return abTab();
+if(tab==='gl')return glTab();if(tab==='cloud')return cloud();if(tab==='ab')return abTab();
 if(tab==='dl')return dlTab();
 if(tab==='stats')return statsTab();
 if(tab==='orders'){h+='<div class="row" style="margin-bottom:12px">'+['সব','নতুন','চলছে','সম্পন্ন','বাতিল'].map(function(s){return'<button class="chip'+(of_===s?' on':'')+'" onclick="of_=\''+s+'\';render()">'+s+'</button>'}).join('')+'<button class="btn sm s" onclick="csv()">⬇ CSV</button>'+(API()?'<button class="btn sm s" onclick="loadOrders()">🔄 রিফ্রেশ</button>':'')+'</div>';
@@ -754,6 +754,110 @@ h+='<div class="box"><h3>গত ১৪ দিন</h3><div class="chart">'+st.day
 h+='<div class="g2"><div class="box"><h3>শহর / এলাকা</h3>'+lines(st.cities,cm)+'</div><div class="box"><h3>ডিভাইস</h3>'+lines(st.devices,Math.max.apply(null,st.devices.map(function(x){return x.n}).concat([1])))+'<h3 style="margin-top:14px">কোথা থেকে এসেছে</h3>'+lines(st.sources||[],Math.max.apply(null,(st.sources||[]).map(function(x){return x.n}).concat([1])))+'</div></div><br>';
 h+='<div class="box"><h3>সাম্প্রতিক ভিজিট</h3>'+(st.recent.length?vPage(st.recent).map(function(r){return'<div class="vr"><span>'+esc(r.t)+'</span><span>🌍 '+esc(r.a)+'</span><span>📱 '+esc(r.dv)+' · '+esc(r.br)+'</span><span>'+esc(r.src)+'</span></div>'}).join('')+vPager(st.recent.length):'<small>এখনো কোনো ভিজিট নেই</small>')+'</div>';
 return h}
+/* ===== GOOGLE LOGIN (নতুন) ===== */
+var GL_API = 'https://script.google.com/macros/s/AKfycbwaeZ_u586FpFwOlLXMSKJoSO2nkSY6x4qlr45dd4695LNMe5qSYA4sLy2_7P4BQp4jIw/exec', GL_CID = '59043729621-v7b358bk0gknujics06pt3ennv8dp0vc.apps.googleusercontent.com';   /* ডেপ্লয়ের পর এখানে বসালে সব ভিজিটর দেখবে (অথবা অ্যাডমিন → Google লগইন ট্যাবে) */
+var GLU = null, GLT = '', GLD = null, GG = '', GT = 'cart';
+try { var _g = JSON.parse(localStorage.getItem('boidya_gl') || 'null'); if (_g && _g.tok) { GLU = _g.u; GLT = _g.tok } } catch (e) {}
+function glApi() { return GL_API || (S.cfg && S.cfg.gapi) || '' }
+function glCid() { return GL_CID || (S.cfg && S.cfg.gcid) || '' }
+function glCall(b) { var u = glApi(); if (!u) return Promise.reject(new Error('no api')); return fetch(u, { method: 'POST', body: JSON.stringify(b) }).then(function (r) { return r.json() }) }
+function glSave() { try { localStorage.setItem('boidya_gl', JSON.stringify({ u: GLU, tok: GLT })) } catch (e) {} }
+function glDev() { var u = navigator.userAgent; return (/Android/.test(u) ? 'Android' : /iPhone|iPad/.test(u) ? 'iOS' : /Windows/.test(u) ? 'Windows' : /Mac/.test(u) ? 'Mac' : 'Other') + ' · ' + (/Edg/.test(u) ? 'Edge' : /Chrome/.test(u) ? 'Chrome' : /Safari/.test(u) ? 'Safari' : /Firefox/.test(u) ? 'Firefox' : 'Browser') + ' · ' + (/Mobi/.test(u) ? 'Mobile' : 'Desktop') }
+function glM(h) { glX(); var m = document.createElement('div'); m.id = 'glm'; m.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center'; m.onclick = function (e) { if (e.target === m) glX() }; m.innerHTML = '<div class="mb"><button class="x" onclick="glX()">✕</button>' + h + '</div>'; document.body.appendChild(m) }
+function glX() { var m = $('glm'); if (m) m.remove() }
+function glOut() { GLU = null; GLT = ''; GG = ''; glSave(); glX(); render() }
+function glChk(d) { if (d && d.error === 'session') { glOut(); toast('আবার লগইন করুন'); return 0 } return d && d.ok }
+function glLogin() {
+  if (!glApi() || !glCid()) { toast('Google লগইন এখনো চালু হয়নি'); return }
+  glM('<h3>🔐 Google দিয়ে লগইন</h3><p style="color:var(--mut)">লগইন করলে কার্টে যোগ, পছন্দের তালিকা ও অর্ডারের হিসাব পাবেন।</p><div id="glb" style="display:flex;justify-content:center;min-height:44px"></div>');
+  var f = function () { google.accounts.id.initialize({ client_id: glCid(), callback: glCb }); google.accounts.id.renderButton($('glb'), { theme: 'outline', size: 'large', width: 260 }) };
+  if (window.google && google.accounts) f(); else { var s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.async = 1; s.onload = f; document.head.appendChild(s) }
+}
+function glCb(r) {
+  toast('লগইন হচ্ছে…');
+  glCall({ action: 'login', idToken: r.credential, dv: glDev() }).then(function (d) {
+    if (!d.ok) { toast('❌ ' + (d.error || 'লগইন হয়নি')); return }
+    GLU = d.user; GLT = d.tok; glSave(); glX(); render(); toast('✅ স্বাগতম ' + GLU.name); if (!GLU.mobile) glProf()
+  }).catch(function () { toast('❌ সার্ভারের সাথে যোগাযোগ হয়নি') })
+}
+function glProf() {
+  var u = GLU; glM('<h3>📋 আপনার তথ্য</h3><label>মোবাইল নম্বর *</label><input id="gpm" type="tel" inputmode="numeric" value="' + esc(u.mobile) + '"><label>ঠিকানা</label><textarea id="gpa" rows="2">' + esc(u.address) + '</textarea><div class="sm" id="gpg">' + (u.gps ? '📍 লোকেশন সেভ আছে' : '') + '</div><br><button class="btn s sm" onclick="glGps()">📍 আমার লোকেশন দিন</button> <button class="btn" onclick="glPS()">সেভ করুন</button>')
+}
+function glGps() {
+  if (!navigator.geolocation) { toast('লোকেশন সাপোর্ট নেই'); return }
+  navigator.geolocation.getCurrentPosition(function (p) { GG = 'https://www.google.com/maps?q=' + p.coords.latitude.toFixed(5) + ',' + p.coords.longitude.toFixed(5); $('gpg').textContent = '📍 লোকেশন নেওয়া হয়েছে' }, function () { toast('লোকেশনের অনুমতি দেওয়া হয়নি') }, { timeout: 10000 })
+}
+function glPS() {
+  var m = $('gpm').value.trim(); if (m.replace(/\D/g, '').length < 10) { toast('সঠিক মোবাইল নম্বর দিন'); return }
+  glCall({ action: 'profile', tok: GLT, mobile: m, address: $('gpa').value, gps: GG || GLU.gps || '' }).then(function (d) { if (!glChk(d)) return; GLU = d.user; glSave(); glX(); toast('✅ সেভ হয়েছে') }).catch(function () { toast('❌ সেভ হয়নি') })
+}
+function glHas(a, i, j) { return a.some(function (x) { return x.i === i && x.j === j }) }
+function glAdd(i, j) {
+  if (!GLU) return ''; return '<button class="btn sm" onclick="glTo(\'cart\',' + i + ',' + j + ',this)">🛒 ' + (glHas(GLU.cart, i, j) ? 'কার্টে আছে ✓' : 'কার্টে যোগ') + '</button> <button class="btn s sm" onclick="glTo(\'wish\',' + i + ',' + j + ',this)">' + (glHas(GLU.wish, i, j) ? '❤️' : '🤍') + '</button> '
+}
+function glTo(k, i, j, b) {
+  var p = S.products[i], d = (p.ds || [])[j]; if (!d) return; var a = GLU[k], x = a.filter(function (y) { return y.i === i && y.j === j })[0];
+  if (x) { if (k === 'wish') a.splice(a.indexOf(x), 1); else x.q++ } else a.push({ i: i, j: j, n: X(p, 'n') + ' — ' + X(d, 'n'), no: d.no || '', pr: d.pr || '', q: 1 });
+  glSync(); glFab(); toast(k === 'cart' ? '🛒 কার্টে যোগ হয়েছে' : (x ? '🤍 সরানো হয়েছে' : '❤️ পছন্দের তালিকায় যোগ'));
+  if (b) b.textContent = k === 'wish' ? (x ? '🤍' : '❤️') : '🛒 কার্টে আছে ✓'
+}
+function glSync() { glSave(); glCall({ action: 'saveCart', tok: GLT, cart: GLU.cart, wish: GLU.wish }).then(glChk).catch(function () {}) }
+function glQ(n, d) { var x = GLU.cart[n]; x.q += d; if (x.q < 1) GLU.cart.splice(n, 1); glSync(); glFab(); glAcc() }
+function glDel(k, n) { GLU[k].splice(n, 1); glSync(); glFab(); glAcc() }
+function glRows(k) {
+  var a = GLU[k]; if (!a.length) return '<p style="color:var(--mut)">কিছু নেই</p>';
+  return a.map(function (x, n) { return '<div class="row" style="justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)"><div style="flex:1;min-width:140px"><b>' + esc(x.n) + '</b><br><small>' + (x.no ? 'কোড ' + esc(x.no) + ' · ' : '') + esc(x.pr) + '</small></div>' + (k === 'cart' ? '<button class="btn sm s" onclick="glQ(' + n + ',-1)">−</button><b>' + x.q + '</b><button class="btn sm s" onclick="glQ(' + n + ',1)">+</button>' : '<button class="btn sm" onclick="glTo(\'cart\',' + x.i + ',' + x.j + ');glAcc()">🛒</button>') + '<button class="btn sm r" onclick="glDel(\'' + k + '\',' + n + ')">✕</button></div>' }).join('')
+}
+function glAcc(t) {
+  if (!GLU) return glLogin(); GT = t || GT; var u = GLU;
+  var h = '<h3>👤 ' + esc(u.name) + '</h3><div class="row" style="gap:6px;margin:8px 0">' + [['cart', '🛒 কার্ট (' + u.cart.length + ')'], ['wish', '❤️ পছন্দ (' + u.wish.length + ')'], ['ord', '📦 অর্ডার'], ['me', '👤 প্রোফাইল']].map(function (x) { return '<button class="chip' + (GT === x[0] ? ' on' : '') + '" onclick="glAcc(\'' + x[0] + '\')">' + x[1] + '</button>' }).join('') + '</div>';
+  if (GT === 'cart') h += glRows('cart') + (u.cart.length ? '<textarea id="gcn" rows="2" placeholder="নোট (ঐচ্ছিক) — মাপ, পছন্দ ইত্যাদি" style="margin-top:10px"></textarea><br><br><button class="btn" onclick="glCk()">✅ কার্ট অর্ডার পাঠান</button>' : '');
+  else if (GT === 'wish') h += glRows('wish');
+  else if (GT === 'ord') { h += '<div id="gor"><small>লোড হচ্ছে…</small></div>'; glCall({ action: 'myOrders', tok: GLT }).then(function (d) { if (!glChk(d)) return; var e = $('gor'); if (e) e.innerHTML = d.orders.length ? d.orders.map(function (o) { return '<div style="padding:8px 0;border-bottom:1px solid var(--bd)"><b>#' + esc(o.no) + '</b> · ' + esc(o.s) + ' <small>' + esc(o.t) + '</small><br><small>' + esc(o.items) + '</small></div>' }).join('') : '<p style="color:var(--mut)">এখনো কোনো অর্ডার নেই</p>' }).catch(function () {}) }
+  else h += '<p>📧 ' + esc(u.email) + '<br>📞 ' + esc(u.mobile || '—') + '<br>📍 ' + esc(u.address || '—') + '</p><button class="btn sm" onclick="glProf()">✏️ তথ্য বদলান</button> <button class="btn sm g" onclick="glOut()">লগআউট</button>';
+  glM(h)
+}
+function glCk() {
+  if (!GLU.cart.length) return; if (!GLU.mobile || !GLU.address) { toast('আগে মোবাইল ও ঠিকানা দিন'); glProf(); return }
+  glCall({ action: 'checkout', tok: GLT, items: GLU.cart, note: ($('gcn') || {}).value || '' }).then(function (d) {
+    if (!glChk(d)) { if (d && d.error && d.error !== 'session') toast('❌ ' + d.error); return }
+    GLU.cart = []; glSave(); glFab(); glM('<h3>ধন্যবাদ! 🎉</h3><p>আপনার কার্ট অর্ডার (#' + esc(d.no) + ') পাঠানো হয়েছে। আমরা শীঘ্রই যোগাযোগ করব।</p><button class="btn" onclick="glX()">ঠিক আছে</button>')
+  }).catch(function () { toast('❌ অর্ডার যায়নি, আবার চেষ্টা করুন') })
+}
+function glFab() {
+  var f = $('glf'); if (!GLU || A) { if (f) f.remove(); return }
+  if (!f) { f = document.createElement('button'); f.id = 'glf'; f.className = 'btn'; f.style.cssText = 'position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:60;border-radius:30px;box-shadow:var(--sh)'; f.onclick = function () { glAcc('cart') }; document.body.appendChild(f) }
+  f.textContent = '🛒 কার্ট (' + GLU.cart.length + ')'
+}
+function glAfter() {
+  if (A) return; var h = document.querySelector('#app header');
+  if (h && !h.querySelector('.glc')) {
+    var b = document.createElement('button'); b.className = 'hb glc'; b.onclick = function () { GLU ? glAcc() : glLogin() };
+    b.innerHTML = GLU ? (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle">' : '👤') + '<span style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;margin-left:4px">' + esc((GLU.name || '').split(' ')[0]) + '</span>' : '🔐 লগইন';
+    h.insertBefore(b, h.querySelector('a[href^="tel:"]'))
+  }
+  if (h && !$('gls')) { var d = document.createElement('div'); d.id = 'gls'; d.className = 'gls'; d.onclick = function () { GLU ? glAcc() : glLogin() }; h.insertAdjacentElement('afterend', d) }
+  var g = $('gls'); if (g) g.innerHTML = GLU ? (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:6px">' : '👤 ') + '<b>' + esc(GLU.name || '') + '</b>' : '🔐 <b>Google দিয়ে লগইন করুন</b>';
+  glFab()
+}
+(function () { var st = document.createElement('style'); st.textContent = '.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
+var _glr = render; render = function () { _glr(); glAfter() };
+setTimeout(function () { if (GLT && glApi()) glCall({ action: 'me', tok: GLT }).then(function (d) { if (glChk(d)) { GLU = d.user; glSave(); glFab() } }).catch(function () {}) }, 1500);
+/* অ্যাডমিন ট্যাব */
+function glLoadA() {
+  var p = $('glp').value; sessionStorage.setItem('glpw', p); toast('লোড হচ্ছে…');
+  Promise.all([glCall({ action: 'aUsers', pass: p }), glCall({ action: 'aOrders', pass: p })]).then(function (r) { if (!r[0].ok) { toast('❌ ' + (r[0].error || 'ব্যর্থ')); return } GLD = { u: r[0].users, o: r[1].orders || [] }; render() }).catch(function () { toast('❌ সংযোগ হয়নি — URL ঠিক আছে?') })
+}
+function glTab() {
+  var h = '<div class="box"><h3>🔐 Google লগইন ডিটেইলস</h3>' + F('Google লগইন Script (Web App) URL', 'cfg.gapi', { ph: 'https://script.google.com/macros/s/.../exec' }) + F('Google OAuth Client ID', 'cfg.gcid', { ph: 'xxxx.apps.googleusercontent.com' }) + '<label>এই স্ক্রিপ্টের অ্যাডমিন পাসওয়ার্ড</label><input id="glp" type="password" autocomplete="off" value="' + esc(sessionStorage.getItem('glpw') || '') + '"><br><br><button class="btn" onclick="glLoadA()">🔄 তথ্য আনুন</button></div>';
+  if (!GLD) return h; var U = GLD.u, td = new Date(Date.now() + 19800000).toISOString().slice(0, 10);
+  h += '<div class="box"><b>👥 মোট ' + U.length + ' জন</b> · আজ লগইন ' + U.filter(function (u) { return u.last.slice(0, 10) === td }).length + ' · মোবাইল দিয়েছেন ' + U.filter(function (u) { return u.mobile }).length + ' · কার্টে পণ্য আছে ' + U.filter(function (u) { return u.cart.length }).length + '</div>';
+  h += '<div class="box" style="overflow-x:auto"><table class="dtb" style="min-width:780px"><tr><td><b>নাম / ইমেইল</b></td><td><b>মোবাইল</b></td><td><b>ঠিকানা / লোকেশন</b></td><td><b>ডিভাইস</b></td><td><b>শেষ লগইন</b></td><td><b>কার্ট / পছন্দ</b></td></tr>' + U.map(function (u) {
+    return '<tr><td>' + esc(u.name) + '<br><small>' + esc(u.email) + '</small></td><td>' + esc(u.mobile) + '</td><td>' + esc(u.address) + (u.gps && u.gps.indexOf('https://www.google.com/maps') === 0 ? '<br><a target="_blank" rel="noopener" href="' + esc(u.gps) + '">📍 ম্যাপ</a>' : '') + '</td><td>' + esc(u.dv) + '</td><td>' + esc(u.last) + '<br><small>' + u.cnt + ' বার</small></td><td>' + (u.cart.map(function (x) { return esc(x.n) + ' ×' + x.q }).join('<br>') || '—') + '<br>❤️ ' + u.wish.length + '</td></tr>' }).join('') + '</table></div>';
+  h += '<div class="box"><h3>🛒 কার্ট অর্ডার (' + GLD.o.length + ')</h3>' + (GLD.o.map(function (o) { return '<div class="ord"><div class="row"><b>' + esc(o.name) + '</b><small>#' + esc(o.no) + ' · ' + esc(o.t) + '</small></div>📞 ' + esc(o.mobile) + '<br>📍 ' + esc(o.address) + (o.gps ? ' <a target="_blank" rel="noopener" href="' + esc(o.gps) + '">ম্যাপ</a>' : '') + '<br>🛒 ' + esc(o.items) + (o.note ? '<br>📝 ' + esc(o.note) : '') + '</div>' }).join('') || '<small>এখনো কোনো কার্ট অর্ডার নেই</small>') + '</div>';
+  return h
+}
+
 lastJ=JSON.stringify(pub_());
 pullCfg();
 route();setTimeout(gFetch,1200);if(!API())setTimeout(migW,1500);document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault()});
