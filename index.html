@@ -18,6 +18,28 @@ a{color:inherit}
 .ann{background:linear-gradient(90deg,var(--p),var(--p2));color:#fff;overflow:hidden;white-space:nowrap;font-size:14px;padding:6px 0;font-weight:500}
 .ann span{display:inline-block;padding-left:100%;animation:mq 24s linear infinite}
 @keyframes mq{to{transform:translateX(-100%)}}
+/* designs page: colourful animated tabs + eye-catching Back/Home */
+.dpb .cats2{position:relative;gap:10px;padding:8px 4px 14px;margin:8px -4px 2px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.dpb .cats2::-webkit-scrollbar{display:none}
+.dpb .cats2 a{--tc:#0b9e92;display:inline-flex;align-items:center;gap:6px;position:relative;overflow:hidden;padding:9px 18px;font-size:14px;font-weight:700;color:var(--tc);background:var(--card);background:color-mix(in srgb,var(--tc) 12%,var(--card));border:2px solid var(--tc);border-radius:26px;box-shadow:0 3px 0 rgba(0,0,0,.08);scroll-snap-align:center;animation:ctIn .55s cubic-bezier(.2,.9,.3,1.3) calc(var(--i)*70ms) both;transition:transform .18s,box-shadow .18s}
+.dpb .cats2 a .ti{display:inline-block;transition:transform .25s}
+.dpb .cats2 a:active{transform:scale(.94)}
+@media(hover:hover){.dpb .cats2 a:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 10px 20px rgba(0,0,0,.16)}.dpb .cats2 a:hover .ti{transform:rotate(-14deg) scale(1.25)}}
+.dpb .cats2 a.on{color:#fff;border-color:transparent;background:var(--tc);background:linear-gradient(135deg,var(--tc),color-mix(in srgb,var(--tc) 55%,#fff));box-shadow:0 6px 16px rgba(0,0,0,.25);animation:ctIn .55s cubic-bezier(.2,.9,.3,1.3) calc(var(--i)*70ms) both,ctPulse 2.2s ease-in-out 1s infinite}
+.dpb .cats2 a.on:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);animation:ctSh 3s ease-in-out 1.4s infinite;pointer-events:none}
+.dpb .cats2 a.on .ti{animation:ctWig 2.8s ease-in-out 1.2s infinite}
+@keyframes ctIn{from{opacity:0;transform:translateY(14px) scale(.85)}to{opacity:1;transform:none}}
+@keyframes ctPulse{0%,100%{box-shadow:0 6px 14px rgba(0,0,0,.22)}50%{box-shadow:0 8px 26px rgba(0,0,0,.38)}}
+@keyframes ctSh{0%{transform:translateX(-120%)}55%,100%{transform:translateX(120%)}}
+@keyframes ctWig{0%,100%{transform:rotate(0)}8%{transform:rotate(-16deg)}16%{transform:rotate(14deg)}24%{transform:rotate(0)}}
+.dbar .hb{position:relative;overflow:hidden;padding:10px 20px;font-size:15px;font-weight:700;color:#fff;border:0;border-radius:26px;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s}
+.dbar .hb:first-child{background:linear-gradient(135deg,#d9480f,#f59f00);animation:hbGlowO 2.4s ease-in-out infinite}
+.dbar .hb.g{background:linear-gradient(135deg,#0b9e92,#2f9e44);color:#fff;border:0;animation:hbGlowT 2.4s ease-in-out .6s infinite}
+.dbar .hb:active{transform:scale(.93)}
+@media(hover:hover){.dbar .hb:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.3)}}
+@keyframes hbGlowO{0%,100%{box-shadow:0 4px 12px rgba(217,72,15,.35)}50%{box-shadow:0 4px 20px 3px rgba(245,159,0,.6)}}
+@keyframes hbGlowT{0%,100%{box-shadow:0 4px 12px rgba(11,158,146,.35)}50%{box-shadow:0 4px 20px 3px rgba(47,158,68,.6)}}
+.noanim .dpb .cats2 a,.noanim .dpb .cats2 a *,.noanim .dpb .cats2 a:after,.noanim .dbar .hb{animation:none!important}
 /* designs page */
 .dpg{min-height:100vh}
 .dbar{position:sticky;top:0;z-index:20;background:var(--card);display:flex;align-items:center;gap:8px;padding:8px 14px;padding-top:max(8px,env(safe-area-inset-top));box-shadow:0 2px 14px #0002;border-bottom:3px solid var(--a)}
@@ -441,7 +463,7 @@ function grill(){var p='<path d="M10 200V70Q200 -50 390 70V200"/>';for(var i=0;i
 function route(){var h=location.hash,m=h.match(/^#designs\/(\d+)/);A=h==='#admin';DP=(!A&&m&&S.products[+m[1]])?+m[1]:null;ckx();if(DP!==null&&DF.i!==DP)DF={i:DP,f:'',pr:'',so:'',th:dsTh(S.products[DP]),q:''};if(DP===null)NAV=0;render();if(DP===null&&!A&&HS!=null){window.scrollTo(0,HS);HS=null}else window.scrollTo(0,0);gx();if(!A&&DP===null)setTimeout(greet,800)}
 window.addEventListener('hashchange',route);
 window.addEventListener('scroll',function(){var y=(window.pageYOffset||0)>350,b=$('btt'),w=$('wlg');if(b)b.classList.toggle('on',y);if(w)w.classList.toggle('on',y)},{passive:true});
-function render(){applyTheme();document.documentElement.lang=L;$('app').innerHTML=A?admin()+svBar():tr(DP!==null&&S.products[DP]?dsPage():pub());rev();bnI=0;fixTop();bnStart()}
+function render(){applyTheme();document.documentElement.lang=L;$('app').innerHTML=A?admin()+svBar():tr(DP!==null&&S.products[DP]?dsPage():pub());if(!A&&DP!==null)dsTabCenter();rev();bnI=0;fixTop();bnStart()}
 function go(id){var e=$(id);if(e)e.scrollIntoView({behavior:'smooth'})}
 var io=null;
 function rev(){if(io)io.disconnect();var els=document.querySelectorAll('.rv');if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');cnt(e)});return}io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');cnt(e.target);io.unobserve(e.target)}})},{threshold:.1});els.forEach(function(e){io.observe(e)})}
@@ -505,13 +527,14 @@ function openDs(i,f){var p=S.products[i];if(!p)return;if(f===undefined)CK={};FRM
 if(DP===null){HS=window.pageYOffset;NAV=1;DP=i;location.hash='#designs/'+i}
 else{var ch=DP!==i;DP=i;try{history.replaceState(null,'','#designs/'+i)}catch(e){location.hash='#designs/'+i}render();if(ch)window.scrollTo(0,0)}}
 function dsPage(){var p=S.products[DP];return'<div class="dpg"><div class="dbar"><button class="hb" onclick="dsBack()">← পিছনে</button><button class="hb g" onclick="dsHome()">🏠 হোম</button><b>'+esc(p.e||'')+' '+esc(X(p,'n'))+'</b></div><div class="dpb">'+dsInner(DP)+'</div></div>'}
+function dsTabCenter(){var a=document.querySelector('.dpb .cats2 a.on');if(!a)return;var c=a.parentNode;c.scrollLeft=a.offsetLeft-(c.clientWidth-a.offsetWidth)/2}
 function dsHome(){if(NAV){NAV=0;history.back()}else{try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}DP=null;render();window.scrollTo(0,0);setTimeout(greet,800)}}
 function dsBack(){dsHome()}
 function dsInner(i){var p=S.products[i],f=DF.f;var subs=p.subs||[],ds=p.ds||[],col=pcol(p,i),oth=ds.filter(function(d){return !hasSub(p,d.s)}).length,chips='';
 if(subs.length){chips='<div class="pub-subs"><button class="pe-sub'+(!f?' on':'')+'" style="'+cv(col)+'" onclick="openDs('+i+',\'\')">📂 সব<em>'+bn(ds.length)+'</em></button>'+subs.map(function(x,j){return'<button class="pe-sub'+(f===x.id?' on':'')+'" style="'+cv(scol(x,j))+'" onclick="openDs('+i+',\''+x.id+'\')">'+esc(subLb(x))+'<em>'+bn(ds.filter(function(d){return d.s===x.id}).length)+'</em></button>'}).join('')+(oth?'<button class="pe-sub'+(f==='_'?' on':'')+'" style="'+cv('#868e96')+'" onclick="openDs('+i+',\'_\')">📎 অন্যান্য<em>'+bn(oth)+'</em></button>':'')+'</div>'}
 
 var T=DF.th,flt='<div class="flt"><input type="search" placeholder="🔍 কোড বা নাম" oninput="DF.q=this.value;dsU()" style="flex:1.3;padding:7px;font-size:13px">'+(T?'<select onchange="DF.pr=this.value;dsU()"><option value="">দামের সীমা: সব</option>'+['₹ '+bn(T[0])+' এর নিচে','₹ '+bn(T[0])+' - '+bn(T[1]),'₹ '+bn(T[1])+' - '+bn(T[2]),'₹ '+bn(T[2])+' এর উপরে'].map(function(l,k){return'<option value="'+k+'"'+(DF.pr===String(k)?' selected':'')+'>'+l+'</option>'}).join('')+'</select>':'')+'<select onchange="DF.so=this.value;dsU()"><option value="">সাজান: ডিফল্ট</option><option value="a"'+(DF.so==='a'?' selected':'')+'>দাম: কম থেকে বেশি</option><option value="d"'+(DF.so==='d'?' selected':'')+'>দাম: বেশি থেকে কম</option></select></div>';
-return'<h3 style="border-left:6px solid '+col+';padding-left:10px">'+esc(p.e||'')+' '+esc(X(p,'n'))+' — সব নকশা</h3><div class="cats2">'+S.products.map(function(q,k){return'<a class="'+(k===i?'on':'')+'" onclick="openDs('+k+')">'+esc(X(q,'n'))+'</a>'}).join('')+'</div><div class="sm">⚖ '+UBs(p)+(estL(p)?' &nbsp; 🚚 '+estL(p):'')+'</div>'+chips+flt+'<div id="dsl">'+dsL()+'</div>'}
+return'<h3 style="border-left:6px solid '+col+';padding-left:10px">'+esc(p.e||'')+' '+esc(X(p,'n'))+' — সব নকশা</h3><div class="cats2">'+S.products.map(function(q,k){return'<a class="'+(k===i?'on':'')+'" style="--tc:'+pcol(q,k)+';--i:'+k+'" onclick="openDs('+k+')"><span class="ti">'+esc(q.e||'')+'</span>'+esc(X(q,'n'))+'</a>'}).join('')+'</div><div class="sm">⚖ '+UBs(p)+(estL(p)?' &nbsp; 🚚 '+estL(p):'')+'</div>'+chips+flt+'<div id="dsl">'+dsL()+'</div>'}
 function dsU(){var o=$('dsl');if(o)o.innerHTML=tr(dsL())}
 function dsL(){var i=DF.i,p=S.products[i],f=DF.f,T=DF.th,col=pcol(p,i),R=[];
 (p.ds||[]).forEach(function(d,j){if(f&&(f==='_'?hasSub(p,d.s):d.s!==f))return;if(DF.q){var qq=dn(DF.q).toLowerCase().trim();if(qq&&dn([d.n,d.n_en].join(' ')).toLowerCase().indexOf(qq)<0&&String(d.no).indexOf(qq)<0)return}var v=nums(d);if(DF.pr!==''&&T){var k=+DF.pr;if(v==null)return;if(k===0&&!(v<T[0]))return;if(k===1&&!(v>=T[0]&&v<T[1]))return;if(k===2&&!(v>=T[1]&&v<T[2]))return;if(k===3&&!(v>=T[2]))return}R.push({d:d,j:j,v:v})});
