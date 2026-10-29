@@ -554,10 +554,10 @@ function login(){var u=$('lu').value,p=$('lp').value;
 if(API()){toast('যাচাই হচ্ছে…');apiCall({action:'login',pass:p}).then(function(r){if(r.ok)ok_(p);else{lastErr='ভুল পাসওয়ার্ড';render()}}).catch(function(){lastErr='সার্ভারের সাথে যোগাযোগ হয়নি';render()})}
 else if(!S.cfg.ah){if(!u||p.length<6){lastErr='আইডি দিন ও পাসওয়ার্ড কমপক্ষে ৬ অক্ষর';render();return}S.cfg.ah=ahash(u,p);save();ok_(p)}else if(ahash(u,p)===S.cfg.ah){ok_(p)}else{lastErr='ভুল আইডি বা পাসওয়ার্ড';render()}}
 function admin(){if(!sessionStorage.getItem('adm'))return'<header><div class="lg">'+li()+'</div><h1>অ্যাডমিন লগইন</h1></header><section style="max-width:400px"><div class="box"><label>আইডি</label><input id="lu" autocomplete="username"><label>পাসওয়ার্ড</label><input id="lp" type="password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')login()"><p style="color:#e03131;margin:8px 0">'+lastErr+'</p><button class="btn" onclick="login()">লগইন</button> <a href="#" onclick="location.hash=\'\';return false">← সাইটে ফিরুন</a>'+(!API()&&!S.cfg.ah?'<p style="color:var(--mut);font-size:13px">প্রথমবার — এখন যে আইডি ও পাসওয়ার্ড লিখবেন সেটাই অ্যাডমিন হবে।</p>':'')+'</div></section>';
-var T=[['orders','📦 অর্ডার ('+S.orders.length+')'],['stats','📊 ভিজিট/পরিসংখ্যান'],['site','🏪 দোকান'],['ab','🏭 ফ্যাক্টরি পরিচিতি'],['look','🎨 ডিজাইন'],['home','🏠 হোম সেকশন'],['gal','🖼 গ্যালারি'],['prods','🛠 পণ্য/নকশা'],['pay','💳 পেমেন্ট/QR'],['cloud','☁️ Google Drive'],['dl','⬇ ওয়েবসাইট ডাউনলোড'],['acct','🔑 অ্যাডমিন আইডি/পাসওয়ার্ড'],['gl','🔐 Google লগইন']];
+var T=[['orders','📦 অর্ডার ('+S.orders.length+')'],['stats','📊 ভিজিট/পরিসংখ্যান'],['site','🏪 দোকান'],['ab','🏭 ফ্যাক্টরি পরিচিতি'],['look','🎨 ডিজাইন'],['home','🏠 হোম সেকশন'],['gal','🖼 গ্যালারি'],['prods','🛠 পণ্য/নকশা'],['pay','💳 পেমেন্ট/QR'],['cloud','☁️ Google Drive'],['dl','⬇ ওয়েবসাইট ডাউনলোড'],['acct','🔑 অ্যাডমিন আইডি/পাসওয়ার্ড'],['gl','🔐 Google লগইন'],['glo','🛒 কার্ট অর্ডার'+glLbl()]];
 return'<header><div class="lg">'+li()+'</div><h1>অ্যাডমিন প্যানেল</h1><a class="hb" href="#" onclick="location.hash=\'\';return false">🌐<span class="t"> সাইট</span></a><a class="hb g" href="#admin" onclick="sessionStorage.removeItem(\'adm\');render();return false">লগআউট</a></header><section class="adm"><div class="tabs">'+T.map(function(t){return'<button class="'+(tab===t[0]?'on':'')+'" onclick="tab=\''+t[0]+'\';render()">'+t[1]+'</button>'}).join('')+'</div><div class="adc">'+tabs()+'</div></section>'}
 function tabs(){var h='',c=S.cfg;
-if(tab==='gl')return glTab();if(tab==='cloud')return cloud();if(tab==='ab')return abTab();
+if(tab==='gl')return glTab();if(tab==='glo')return glOTab();if(tab==='cloud')return cloud();if(tab==='ab')return abTab();
 if(tab==='dl')return dlTab();
 if(tab==='stats')return statsTab();
 if(tab==='orders'){h+='<div class="row" style="margin-bottom:12px">'+['সব','নতুন','চলছে','সম্পন্ন','বাতিল'].map(function(s){return'<button class="chip'+(of_===s?' on':'')+'" onclick="of_=\''+s+'\';render()">'+s+'</button>'}).join('')+'<button class="btn sm s" onclick="csv()">⬇ CSV</button>'+(API()?'<button class="btn sm s" onclick="loadOrders()">🔄 রিফ্রেশ</button>':'')+'</div>';
@@ -845,9 +845,17 @@ var _glr = render; render = function () { _glr(); glAfter() };
 setTimeout(function () { if (GLT && glApi()) glCall({ action: 'me', tok: GLT }).then(function (d) { if (glChk(d)) { GLU = d.user; glSave(); glFab() } }).catch(function () {}) }, 1500);
 /* অ্যাডমিন ট্যাব */
 function glLoadA() {
-  var p = $('glp').value; sessionStorage.setItem('glpw', p); toast('লোড হচ্ছে…');
+  var e = $('glp'), p = e ? e.value : (sessionStorage.getItem('glpw') || ''); sessionStorage.setItem('glpw', p); toast('লোড হচ্ছে…');
   Promise.all([glCall({ action: 'aUsers', pass: p }), glCall({ action: 'aOrders', pass: p })]).then(function (r) { if (!r[0].ok) { toast('❌ ' + (r[0].error || 'ব্যর্থ')); return } GLD = { u: r[0].users, o: r[1].orders || [] }; GLP = 0; render() }).catch(function () { toast('❌ সংযোগ হয়নি — URL ঠিক আছে?') })
 }
+function glOTab() {
+  var h = '';
+  if (!GLD) return '<div class="box"><h3>🛒 কার্ট অর্ডার</h3><label>এই স্ক্রিপ্টের অ্যাডমিন পাসওয়ার্ড</label><input id="glp" type="password" autocomplete="off" value="' + esc(sessionStorage.getItem('glpw') || '') + '"><br><br><button class="btn" onclick="glLoadA()">🔄 অর্ডার আনুন</button></div>';
+  h += '<div class="box"><button class="btn" onclick="glLoadA()">🔄 রিফ্রেশ</button></div>';
+  h += '<div class="box"><h3>🛒 কার্ট অর্ডার (' + GLD.o.length + ')</h3>' + (GLD.o.slice(GLP * 5, GLP * 5 + 5).map(function (o) { return '<div class="ord"><div class="row"><b>' + esc(o.name) + '</b><small>#' + esc(o.no) + ' · ' + esc(o.t) + '</small></div>📞 ' + esc(o.mobile) + '<br>📍 ' + esc(o.address) + (o.gps ? ' <a target="_blank" rel="noopener" href="' + esc(o.gps) + '">ম্যাপ</a>' : '') + '<br>🛒 ' + esc(o.items) + (o.note ? '<br>📝 ' + esc(o.note) : '') + '</div>' }).join('') || '<small>এখনো কোনো কার্ট অর্ডার নেই</small>') + glPager(GLD.o.length) + '</div>';
+  return h
+}
+function glLbl() { return GLD ? ' (' + GLD.o.length + ')' : '' }
 var GLP = 0;
 function glPg(n) { GLP = n; render() }
 function glPager(t) {
@@ -861,7 +869,6 @@ function glTab() {
   h += '<div class="box"><b>👥 মোট ' + U.length + ' জন</b> · আজ লগইন ' + U.filter(function (u) { return u.last.slice(0, 10) === td }).length + ' · মোবাইল দিয়েছেন ' + U.filter(function (u) { return u.mobile }).length + ' · কার্টে পণ্য আছে ' + U.filter(function (u) { return u.cart.length }).length + '</div>';
   h += '<div class="box" style="overflow-x:auto"><table class="dtb" style="min-width:780px"><tr><td><b>নাম / ইমেইল</b></td><td><b>মোবাইল</b></td><td><b>ঠিকানা / লোকেশন</b></td><td><b>ডিভাইস</b></td><td><b>শেষ লগইন</b></td><td><b>কার্ট / পছন্দ</b></td></tr>' + U.map(function (u) {
     return '<tr><td>' + esc(u.name) + '<br><small>' + esc(u.email) + '</small></td><td>' + esc(u.mobile) + '</td><td>' + esc(u.address) + (u.gps && u.gps.indexOf('https://www.google.com/maps') === 0 ? '<br><a target="_blank" rel="noopener" href="' + esc(u.gps) + '">📍 ম্যাপ</a>' : '') + '</td><td>' + esc(u.dv) + '</td><td>' + esc(u.last) + '<br><small>' + u.cnt + ' বার</small></td><td>' + (u.cart.map(function (x) { return esc(x.n) + ' ×' + x.q }).join('<br>') || '—') + '<br>❤️ ' + u.wish.length + '</td></tr>' }).join('') + '</table></div>';
-  h += '<div class="box"><h3>🛒 কার্ট অর্ডার (' + GLD.o.length + ')</h3>' + (GLD.o.slice(GLP * 5, GLP * 5 + 5).map(function (o) { return '<div class="ord"><div class="row"><b>' + esc(o.name) + '</b><small>#' + esc(o.no) + ' · ' + esc(o.t) + '</small></div>📞 ' + esc(o.mobile) + '<br>📍 ' + esc(o.address) + (o.gps ? ' <a target="_blank" rel="noopener" href="' + esc(o.gps) + '">ম্যাপ</a>' : '') + '<br>🛒 ' + esc(o.items) + (o.note ? '<br>📝 ' + esc(o.note) : '') + '</div>' }).join('') || '<small>এখনো কোনো কার্ট অর্ডার নেই</small>') + glPager(GLD.o.length) + '</div>';
   return h
 }
 
