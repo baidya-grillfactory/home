@@ -914,7 +914,7 @@ function glCk() {
 function glFab() {
   var f = $('glf'); if (f) f.remove(); var g = $('gls'); if (!g) return;
   g.className = 'gls' + (GLU ? ' gin' : '');
-  g.innerHTML = GLU ? '<span onclick="glAcc(\'me\')" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:6px">' : '👤 ') + '<b>' + esc(GLU.name || '') + '</b></span><button class="btn sm glcart" onclick="glAcc(\'cart\')">🛒 কার্ট (' + GLU.cart.length + ')</button><button class="btn sm s" onclick="glAcc(\'wish\')">❤️ পছন্দ (' + GLU.wish.length + ')</button>' : '🔐 <b>Google দিয়ে লগইন করুন</b>'
+  g.innerHTML = GLU ? '<span onclick="glAcc(\'me\')" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:6px">' : '👤 ') + '<b>' + esc(GLU.name || '') + '</b></span><button class="btn sm glcart" onclick="glAcc(\'cart\')">🛒 কার্ট (' + GLU.cart.length + ')</button><button class="btn sm s" onclick="glAcc(\'wish\')">❤️ পছন্দ (' + GLU.wish.length + ')</button><button class="btn sm s glord" onclick="glAcc(\'ord\')">📦 অর্ডার</button>' : '🔐 <b>Google দিয়ে লগইন করুন</b>'
 }
 function glBarOff() { var g = $('gls'); if (g && g.parentNode === document.body) g.remove(); document.body.classList.remove('gbar') }
 function glAfter() {
@@ -935,7 +935,7 @@ function glAfter() {
   }
   glFab()
 }
-(function () { var st = document.createElement('style'); st.textContent = '.glcart{background:#2b8a3e!important;background-image:none!important;color:#fff!important;border:2px solid #fff;font-weight:700}.glcart:active{background:#237032!important}.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gls.gin{display:flex;align-items:center;gap:6px;position:fixed;top:0;left:0;right:0;height:46px;padding:0 14px;z-index:30;background:var(--card);border-bottom:2px solid var(--a);box-shadow:0 3px 12px #0003}body.gbar{padding-top:46px}body.gbar .dbar{top:46px}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
+(function () { var st = document.createElement('style'); st.textContent = '.glord{background:#1971c2!important;background-image:none!important;color:#fff!important}.glcart{background:#2b8a3e!important;background-image:none!important;color:#fff!important;border:2px solid #fff;font-weight:700}.glcart:active{background:#237032!important}.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gls.gin{display:flex;align-items:center;gap:6px;position:fixed;top:0;left:0;right:0;height:46px;padding:0 14px;z-index:30;background:var(--card);border-bottom:2px solid var(--a);box-shadow:0 3px 12px #0003}body.gbar{padding-top:46px}body.gbar .dbar{top:46px}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
 var _glr = render; render = function () { _glr(); glAfter() };
 setTimeout(function () { if (GLT && glApi()) glCall({ action: 'me', tok: GLT }).then(function (d) { if (glChk(d)) { GLU = d.user; glSave(); glFab() } }).catch(function () {}) }, 1500);
 /* অ্যাডমিন ট্যাব */
@@ -1047,6 +1047,29 @@ function glTab() {
 }
 
 lastJ=JSON.stringify(pub_());
+
+/* ===== বাটনে চাপার পর "অপেক্ষা করুন…" দেখানো (সব বাটনে) ===== */
+(function () {
+  var st = document.createElement('style');
+  st.textContent = '@keyframes spn{to{transform:rotate(360deg)}}.spn{display:inline-block;width:1em;height:1em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spn .7s linear infinite;vertical-align:-2px}button.wt{opacity:.85;cursor:wait!important;pointer-events:none}';
+  document.head.appendChild(st);
+  var CLK = null, of = window.fetch;
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    CLK = b && !b.disabled ? b : null; setTimeout(function () { CLK = null }, 0)
+  }, true);
+  window.fetch = function () { var b = CLK, p = of.apply(this, arguments); if (b) wait(b, p); return p };
+  function wait(b, p) {
+    if (b._w) b._w++;
+    else {
+      b._w = 1; b._h = b.innerHTML; b._d = b.disabled; var t = (b.textContent || '').trim();
+      b.style.minWidth = b.offsetWidth + 'px'; b.disabled = true; b.classList.add('wt');
+      b.innerHTML = '<i class="spn"></i>' + (t.length > 3 ? ' অপেক্ষা করুন…' : '')
+    }
+    var done = function () { setTimeout(function () { if (--b._w > 0) return; b._w = 0; if (b.isConnected && b.classList.contains('wt')) { b.innerHTML = b._h; b.disabled = b._d; b.classList.remove('wt'); b.style.minWidth = '' } }, 300) };
+    p.then(done, done)
+  }
+})();
 pullCfg();rvPull();
 route();setTimeout(gFetch,1200);if(!API())setTimeout(migW,1500);document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault()});
 </script></body></html>
