@@ -1,0 +1,3175 @@
+<!DOCTYPE html>
+<html lang="bn" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📅 Live Calendar — QA Control Room</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --bg:#05060c;
+    --glow1: rgba(124,131,253,0.30);
+    --glow2: rgba(255,94,168,0.22);
+    --glow3: rgba(56,249,215,0.18);
+    --surface: rgba(255,255,255,0.045);
+    --surface-2: rgba(255,255,255,0.075);
+    --surface-3: rgba(255,255,255,0.10);
+    --border: rgba(255,255,255,0.10);
+    --text:#eaf0f6;
+    --text-muted:#93a3b8;
+    --accent1:#7c83fd;
+    --accent2:#ff5ea8;
+    --accent3:#38f9d7;
+    --accent4:#ffd200;
+    --shadow: 0 8px 32px rgba(0,0,0,0.45);
+  }
+  html[data-theme="light"]{
+    --bg:#eef1f8;
+    --glow1: rgba(124,131,253,0.14);
+    --glow2: rgba(255,94,168,0.12);
+    --glow3: rgba(56,249,215,0.12);
+    --surface: rgba(255,255,255,0.72);
+    --surface-2: rgba(255,255,255,0.92);
+    --surface-3: rgba(255,255,255,1);
+    --border: rgba(20,30,55,0.10);
+    --text:#141b26;
+    --text-muted:#5c6b80;
+    --shadow: 0 8px 28px rgba(20,30,60,0.10);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    transition:background .5s ease, color .4s ease;
+    overflow-x:hidden;
+    overflow-y:auto;
+  }
+
+  /* ===== animated aurora background blobs ===== */
+  .bg-orbs{position:fixed; inset:0; z-index:-1; overflow:hidden; background:var(--bg);}
+  .orb{position:absolute; border-radius:50%; filter:blur(70px); opacity:.9;}
+  .orb1{width:520px;height:520px; background:var(--glow1); top:-140px; left:-100px; animation:float1 16s ease-in-out infinite;}
+  .orb2{width:480px;height:480px; background:var(--glow2); bottom:-160px; right:-120px; animation:float2 18s ease-in-out infinite;}
+  .orb3{width:420px;height:420px; background:var(--glow3); top:40%; left:50%; animation:float3 20s ease-in-out infinite;}
+  @keyframes float1{0%,100%{transform:translate(0,0);}50%{transform:translate(80px,60px);}}
+  @keyframes float2{0%,100%{transform:translate(0,0);}50%{transform:translate(-70px,-50px);}}
+  @keyframes float3{0%,100%{transform:translate(-50%,-50%);}50%{transform:translate(-45%,-58%);}}
+
+  /* ===== fixed employee welcome bar ===== */
+  #employeeWelcomeBar{
+    position:fixed; top:0; left:0; right:0; z-index:10000;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:7px 18px; gap:10px; flex-wrap:wrap;
+    background: var(--surface-2);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--border);
+    color: var(--text);
+    font-size:12.5px;
+  }
+  .emp-welcome-left{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .emp-welcome-greeting{
+    font-weight:700;
+    background:linear-gradient(90deg,#33C9B0,#4A7FE0,#B94AE0,#E3A857,#FF6FD0,#33C9B0);
+    background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    animation:empGreetingShift 6s linear infinite;
+  }
+  @keyframes empGreetingShift{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+  .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--accent3);box-shadow:0 0 0 0 rgba(56,249,215,.6);animation:pulse 2s infinite;display:inline-block;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(56,249,215,.55);}70%{box-shadow:0 0 0 9px rgba(56,249,215,0);}100%{box-shadow:0 0 0 0 rgba(56,249,215,0);}}
+  .emp-online-chip{display:inline-flex;align-items:center;gap:6px;color:var(--accent3);font-weight:600;font-size:12px;}
+  .online-badge{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
+    font-size:11px;font-weight:700;white-space:nowrap;border:1px solid var(--border);
+    animation:onlineGlow 4s ease-in-out infinite;
+  }
+  @keyframes onlineGlow{
+    0%{background:#143832;color:#33C9B0;}
+    25%{background:#3D2E18;color:#E3A857;}
+    50%{background:#3A1518;color:#FF6B6B;}
+    75%{background:#12203A;color:#4A7FE0;}
+    100%{background:#143832;color:#33C9B0;}
+  }
+  .online-badge .pulse-dot{background:currentColor;box-shadow:none;}
+  .emp-inline-stats{
+    display:flex;gap:10px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    padding:3px 12px;border-radius:7px;border:1px solid rgba(56,249,215,0.22);
+    animation:statsGlow 5s ease-in-out infinite;
+  }
+  @keyframes statsGlow{0%,100%{box-shadow:0 0 0 rgba(56,249,215,0);border-color:rgba(56,249,215,0.22);}50%{box-shadow:0 0 12px rgba(56,249,215,0.25);border-color:rgba(56,249,215,0.5);}}
+  .emp-inline-stat{color:var(--text-muted);white-space:nowrap;}
+  .emp-inline-stat b{color:var(--text);font-size:11.5px;font-weight:700;}
+  .emp-welcome-right{
+    position:fixed; top:10px; right:16px; z-index:10010;
+    display:flex; gap:8px; align-items:center;
+  }
+  #employeeWelcomeBar{ padding-right:220px; }
+  .emp-mini-btn{
+    background:var(--surface-3);border:1px solid var(--border);color:var(--text);
+    border-radius:7px;padding:6px 14px;font-size:11px;cursor:pointer;min-width:88px;font-family:inherit;
+  }
+  .emp-mini-btn:hover{opacity:.85;}
+  .emp-mini-btn.danger{
+    background:linear-gradient(135deg,#ff2fb0,#c2007a);border-color:#ff6fd0;color:#fff;font-weight:700;
+    box-shadow:0 0 10px rgba(255,32,180,.45);animation:logoutPulse 2s infinite;
+  }
+  @keyframes logoutPulse{0%,100%{box-shadow:0 0 10px rgba(255,32,180,.45);}50%{box-shadow:0 0 18px rgba(255,32,180,.8);}}
+  .guest-bar{
+    position:fixed;top:0;left:0;right:0;z-index:10000;display:flex;align-items:center;justify-content:space-between;
+    padding:10px 18px;background:var(--surface-2);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);font-size:13px;
+  }
+  .guest-bar a{color:var(--accent1);font-weight:700;text-decoration:none;}
+
+  /* ===== premium top bar ===== */
+  .cal-topbar{
+    position:sticky; top: 0; z-index:900;
+    display:flex; align-items:center; gap:16px;
+    padding:12px 20px;
+    background:var(--surface); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+  }
+  .cal-brand{
+    display:flex; align-items:center; gap:8px; font-weight:800; font-size:15px; white-space:nowrap;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3));
+    background-size:220% 100%; -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:brandShift 6s linear infinite;
+  }
+  @keyframes brandShift{0%{background-position:0% 50%;}100%{background-position:220% 50%;}}
+  .cal-ticker{
+    flex:1; overflow:hidden; position:relative; height:20px; margin-top:0;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  }
+  .cal-ticker-track{
+    position:absolute; top:0; left:0;
+    white-space:nowrap; font-size:13px; font-weight:400; letter-spacing:.2px;
+    line-height:20px;
+    animation:tickerScroll 32s linear infinite;
+    color:var(--text-muted);
+  }
+  .cal-ticker-track b{color:var(--accent2);}
+  .ticker-today-badge{
+    font-weight:700;
+    padding:2px 4px;
+    background:linear-gradient(90deg,#ff5e6e,#ffd200,#38f9d7,#7c83fd,#ff5ea8,#ff5e6e);
+    background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    animation:todayEventShift 4s linear infinite;
+  }
+  @keyframes todayEventShift{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+  @keyframes tickerScroll{
+    0%{transform:translateX(100%);}
+    65%{transform:translateX(-100%);}
+    100%{transform:translateX(-100%);}
+  }
+  .cal-ticker-flash{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0;
+    animation:tickerFlashFade 32s ease-in-out infinite;
+  }
+  .cal-ticker-flash span{
+    font-size:13px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    background:linear-gradient(90deg,#7c83fd,#ff5ea8,#38f9d7,#ffd200,#7c83fd);
+    background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    animation:todayEventShift 3s linear infinite;
+  }
+  @keyframes tickerFlashFade{
+    0%,66%{opacity:0; transform:scale(.8);}
+    74%{opacity:1; transform:scale(1);}
+    88%{opacity:1; transform:scale(1);}
+    97%{opacity:0; transform:scale(1.6);}
+    100%{opacity:0; transform:scale(1.6);}
+  }
+  .theme-toggle-wrap{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);white-space:nowrap;}
+  .theme-switch{position:relative;display:inline-block;width:44px;height:24px;}
+  .theme-switch input{opacity:0;width:0;height:0;}
+  .theme-slider{position:absolute;cursor:pointer;inset:0;background:var(--surface-3);border:1px solid var(--border);border-radius:24px;transition:.3s;}
+  .theme-slider:before{content:"";position:absolute;height:16px;width:16px;left:3px;top:3px;background:linear-gradient(135deg,var(--accent1),var(--accent2));border-radius:50%;transition:.3s;}
+  .theme-switch input:checked + .theme-slider:before{transform:translateX(20px);}
+
+  /* ===== page layout ===== */
+  .page-wrap{max-width:1240px;margin:26px auto 60px;padding:0 20px;}
+
+  .calendar-wrapper{
+    background:var(--surface);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:26px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+    animation:cardLoad .7s ease-out;
+  }
+  .calendar-wrapper::before{
+    content:'';position:absolute;inset:0;border-radius:20px;padding:1px;
+    background:linear-gradient(120deg,var(--accent1),var(--accent2),var(--accent3),var(--accent1));
+    background-size:300% 300%;
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:borderFlow 8s linear infinite; opacity:.55; pointer-events:none;
+  }
+  @keyframes borderFlow{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+  @keyframes cardLoad{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+
+  .header{text-align:center;margin-bottom:18px;position:relative;}
+
+  /* ===== folding logo (top-left of header) ===== */
+  .header-logo{
+    position:absolute;
+    top:0;
+    left:0;
+    width:170px;
+    perspective:600px;
+    transform-origin:top center;
+    animation:logoFoldIn 1s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .header-logo-icon{
+    width:100%;
+    height:auto;
+    display:block;
+    object-fit:contain;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,.35));
+  }
+  @keyframes logoFoldIn{
+    0%{ transform:rotateX(-100deg); opacity:0; }
+    60%{ transform:rotateX(12deg); opacity:1; }
+    80%{ transform:rotateX(-6deg); }
+    100%{ transform:rotateX(0deg); opacity:1; }
+  }
+  @media (max-width:640px){
+    .header-logo{ width:100px; }
+  }
+  h1.title{
+    margin:0 0 8px; font-size:26px; font-weight:800; letter-spacing:.3px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent4),var(--accent3),var(--accent1));
+    background-size:300% 100%; -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:titleShift 7s linear infinite;
+  }
+  @keyframes titleShift{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+  #live-clock{font-size:1.5em;font-weight:800;color:var(--accent2);text-shadow:0 0 14px var(--glow2);margin-bottom:4px;}
+  #live-date{font-size:1.05em;color:var(--text-muted);margin-bottom:6px;}
+
+  .controls{display:flex;justify-content:center;gap:14px;margin-bottom:22px;flex-wrap:wrap;}
+  select{
+    padding:10px 16px;font-size:14px;border-radius:10px;border:1px solid transparent;
+    background:linear-gradient(135deg, var(--accent1), var(--accent2));
+    color:#fff;cursor:pointer;outline:none;font-weight:700;
+    box-shadow:0 4px 14px rgba(124,131,253,.35);
+    transition:all .25s ease;
+  }
+  select:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(255,94,168,.45);}
+  select option{background:#182741;color:#eaf0f6;font-weight:600;}
+
+  .main-layout{display:flex;gap:22px;flex-wrap:wrap;}
+  .calendar-section{flex:3;min-width:320px;}
+  .sidebar-section{
+    flex:1; min-width:250px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:14px;
+    padding:16px; max-height:640px; overflow-y:auto;
+  }
+  .sidebar-section h2{
+    margin:0 0 6px; font-size:1.05em; text-align:center; font-weight:800;
+    background:linear-gradient(90deg,var(--accent2),var(--accent1),var(--accent3),var(--accent2));
+    background-size:280% 100%; -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:titleShift 6s linear infinite;
+  }
+  .sidebar-divider{
+    height:3px;border:none;border-radius:2px;margin:0 0 14px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3),var(--accent1));
+    background-size:300% 100%; animation:borderFlow 5s linear infinite;
+  }
+
+  table{width:100%;border-collapse:separate;border-spacing:6px 6px;table-layout:fixed;}
+  th{
+    background:var(--surface-3); color:var(--text); padding:11px 4px;
+    text-transform:uppercase; font-size:12.5px; font-weight:700; letter-spacing:.5px;
+    border-bottom:2px solid var(--border);
+  }
+
+  /* ===== weekday header boxes with color animation ===== */
+  thead th{
+    border-radius:10px;
+    border-bottom:none;
+    border:1px solid var(--border);
+    color:#fff;
+    padding:12px 4px;
+    background-size:220% 220%;
+    animation:weekdayGlow 6s ease-in-out infinite;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  thead th:hover{ transform:translateY(-3px) scale(1.05); box-shadow:0 8px 20px rgba(0,0,0,.35); }
+  @keyframes weekdayGlow{
+    0%,100%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+  }
+  thead th:nth-child(1){ background-image:linear-gradient(135deg,#ff5e6e,#ff2f6b); animation-delay:0s; }
+  thead th:nth-child(2){ background-image:linear-gradient(135deg,#7c83fd,#4a7fe0); animation-delay:.15s; }
+  thead th:nth-child(3){ background-image:linear-gradient(135deg,#ff5ea8,#b94ae0); animation-delay:.3s; }
+  thead th:nth-child(4){ background-image:linear-gradient(135deg,#38f9d7,#1fb8a0); animation-delay:.45s; }
+  thead th:nth-child(5){ background-image:linear-gradient(135deg,#ffd200,#ff9a3d); animation-delay:.6s; }
+  thead th:nth-child(6){ background-image:linear-gradient(135deg,#4a7fe0,#38c6f9); animation-delay:.75s; }
+  thead th:nth-child(7){ background-image:linear-gradient(135deg,#ff9a3d,#ff5e6e); animation-delay:.9s; }
+
+  /* ===== light-red Sunday date cells ===== */
+  #calendarBody tr td:nth-child(1){
+    background:rgba(255,90,90,0.14);
+    border-color:rgba(255,90,90,0.35);
+  }
+  #calendarBody tr td:nth-child(1):hover{
+    background:rgba(255,90,90,0.24);
+  }
+  html[data-theme="light"] #calendarBody tr td:nth-child(1){
+    background:rgba(255,70,70,0.10);
+    border-color:rgba(255,70,70,0.28);
+  }
+  html[data-theme="light"] #calendarBody tr td:nth-child(1):hover{
+    background:rgba(255,70,70,0.18);
+  }
+
+  td{
+    border:1px solid var(--border); height:auto; min-height:96px; vertical-align:top; padding:6px;
+    background:var(--surface); position:relative; border-radius:8px;
+    transition:all .3s cubic-bezier(.25,.8,.25,1);
+  }
+  td:hover{background:var(--surface-3);transform:translateY(-4px) scale(1.02);box-shadow:0 10px 24px rgba(0,0,0,.25);z-index:2;}
+  .date-number{font-weight:700;font-size:1.05em;color:var(--text);display:block;margin-bottom:5px;}
+  .bn-date{font-size:.68em;color:var(--text-muted);display:none;margin-bottom:5px;font-weight:600;letter-spacing:.2px;}
+  body.show-bn-date .bn-date{display:block;}
+  .today .bn-date{color:var(--text);opacity:.85;}
+  .panjika-note{font-size:11.5px;color:var(--text-muted);margin:2px 2px 10px;line-height:1.5;}
+
+  /* ===================== নিচের অ্যানিমেটেড দৃশ্য (গ্রাম, নদী, নৌকা, পাখি) ===================== */
+  .village-scene-section{padding:50px 0 60px;display:flex;flex-direction:column;align-items:center;}
+  .village-scene-wrap{width:100%;max-width:none;overflow:hidden;box-shadow:var(--shadow);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .village-scene{display:block;width:100%;height:auto;}
+
+  .sun{animation:sunGlow 4s ease-in-out infinite;}
+  @keyframes sunGlow{0%,100%{opacity:1;}50%{opacity:.75;}}
+
+  /* পাখি */
+  .bird{transform-box:fill-box; transform-origin:center;}
+  .bird path{transform-box:fill-box; transform-origin:center; animation:flap .6s ease-in-out infinite;}
+  .b1{animation:flyAcross 9s linear infinite;}
+  .b2{animation:flyAcross 11s linear infinite; animation-delay:-2s;}
+  .b3{animation:flyAcross 8s linear infinite; animation-delay:-4s;}
+  .b4{animation:flyAcross 12s linear infinite; animation-delay:-6s;}
+  .b5{animation:flyAcross 10s linear infinite; animation-delay:-1s;}
+  .b2 path, .b4 path{animation-duration:.5s;}
+  @keyframes flyAcross{
+    0%{transform:translate(-40px,6px); opacity:0;}
+    8%{opacity:1;}
+    50%{transform:translate(440px,-16px);}
+    92%{opacity:1;}
+    100%{transform:translate(950px,6px); opacity:0;}
+  }
+  @keyframes flap{0%,100%{transform:scaleY(1);}50%{transform:scaleY(.35);}}
+
+  /* গাছ */
+  .tree{transform-box:fill-box; transform-origin:bottom center; animation:sway 3.6s ease-in-out infinite;}
+  .t2{animation-duration:4.2s; animation-delay:-1s;}
+  .t3{animation-duration:3.2s; animation-delay:-2s;}
+  .t4{animation-duration:4s; animation-delay:-.6s;}
+  .t5{animation-duration:3.8s; animation-delay:-1.6s;}
+  .t6{animation-duration:4.4s; animation-delay:-2.4s;}
+  .t7{animation-duration:3.4s; animation-delay:-.3s;}
+  .t8{animation-duration:4.1s; animation-delay:-3s;}
+  @keyframes sway{0%,100%{transform:rotate(-2.2deg);}50%{transform:rotate(2.2deg);}}
+
+  /* ঘরের ধোঁয়া */
+  .smoke{animation:smokeRise 3.2s ease-out infinite; transform-box:fill-box;}
+  .smoke.d2{animation-delay:1.1s;}
+  .smoke.d3{animation-delay:2.2s;}
+  @keyframes smokeRise{
+    0%{transform:translate(0,0) scale(.5); opacity:.85;}
+    100%{transform:translate(6px,-38px) scale(1.4); opacity:0;}
+  }
+
+  /* ক্রিকেট খেলা */
+  .bowler-lean{animation:bowlerLean 3.2s ease-in-out infinite;}
+  @keyframes bowlerLean{
+    0%,100%{transform:translateX(0) rotate(0deg);}
+    18%{transform:translateX(7px) rotate(-4deg);}
+    28%{transform:translateX(12px) rotate(7deg);}
+    45%{transform:translateX(-2px) rotate(-2deg);}
+  }
+  .bowler-arm{animation:bowlSwing 3.2s ease-in-out infinite; transform-origin:4px -24px;}
+  @keyframes bowlSwing{
+    0%,100%{transform:rotate(-55deg);}
+    15%{transform:rotate(-95deg);}
+    28%{transform:rotate(70deg);}
+    40%{transform:rotate(95deg);}
+    58%{transform:rotate(-20deg);}
+    80%{transform:rotate(-55deg);}
+  }
+  .bat-swing{animation:batSwing 3.2s ease-in-out infinite; transform-origin:-10px -14px;}
+  @keyframes batSwing{
+    0%,34%{transform:rotate(20deg);}
+    40%{transform:rotate(-45deg);}
+    46%{transform:rotate(-60deg);}
+    56%,100%{transform:rotate(20deg);}
+  }
+  .cricket-ball{transform-box:fill-box;}
+  .cricket-ball path, .cricket-ball circle{animation:ballFlight 3.2s linear infinite;}
+  @keyframes ballFlight{
+    0%{transform:translate(0,0) scale(1); opacity:0;}
+    5%{opacity:1;}
+    38%{transform:translate(255px,10px) scale(1); opacity:1;}
+    42%{transform:translate(275px,6px) scale(1); opacity:1;}
+    55%{transform:translate(360px,-42px) scale(.85); opacity:1;}
+    70%{transform:translate(430px,-92px) scale(.6); opacity:.5;}
+    76%,100%{transform:translate(430px,-92px) scale(.6); opacity:0;}
+  }
+  .fielder-idle{animation:idleBounce 2.4s ease-in-out infinite;}
+  @keyframes idleBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+
+  /* নদী ও ঢেউ */
+  .wave-group{animation:waveFlow 6s linear infinite;}
+  .wave-group.w-back{animation-duration:9s; opacity:.5;}
+  @keyframes waveFlow{0%{transform:translateX(0);}100%{transform:translateX(-100px);}}
+
+  /* নৌকা */
+  .boat{transform-box:fill-box; transform-origin:center; animation:bob 4.4s ease-in-out infinite;}
+  .bo2{animation-duration:5.2s; animation-delay:-2s;}
+  @keyframes bob{
+    0%{transform:translate(0,0) rotate(-3deg);}
+    25%{transform:translate(14px,-10px) rotate(2deg);}
+    50%{transform:translate(24px,-2px) rotate(4deg);}
+    75%{transform:translate(10px,-11px) rotate(-1.5deg);}
+    100%{transform:translate(0,0) rotate(-3deg);}
+  }
+  .ripple{transform-box:fill-box; transform-origin:center; animation:rippleAnim 4.4s ease-in-out infinite;}
+  .bo2 .ripple{animation-duration:5.2s; animation-delay:-2s;}
+  @keyframes rippleAnim{
+    0%,100%{transform:scale(0.85); opacity:.15;}
+    50%{transform:scale(1.25); opacity:.4;}
+  }
+
+  .scene-caption{margin-top:22px; text-align:center;}
+  .scene-title{font-size:22px; font-weight:800; letter-spacing:.5px; color:var(--text);
+    background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    background-size:200% 100%; animation:empGreetingShift 6s linear infinite;}
+  .scene-credit{margin-top:6px; font-size:12.5px; color:var(--text-muted);}
+  .scene-credit b{color:var(--text); font-weight:800;}
+  .today{background:linear-gradient(135deg, rgba(124,131,253,.18), rgba(255,94,168,.14)); border:2px solid var(--accent1); box-shadow:0 0 16px var(--glow1);}
+  #calendarBody tr td:nth-child(1).today{background:linear-gradient(135deg, rgba(124,131,253,.18), rgba(255,94,168,.14)); border:2px solid var(--accent1); box-shadow:0 0 16px var(--glow1);}
+  .today .date-number{color:#fff;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:inline-block;padding:2px 8px;border-radius:50%;}
+
+  .event{
+    font-size:.76em;padding:4px 3px;margin-bottom:3px;border-radius:6px;color:#fff;display:block;
+    text-align:center;font-weight:700;word-wrap:break-word;box-shadow:0 2px 8px rgba(0,0,0,.25);
+    transition:transform .2s ease; cursor:pointer;
+  }
+  .event:hover{transform:scale(1.08);}
+
+  .sidebar-event-item{
+    padding:11px 12px;margin-bottom:10px;border-radius:10px;color:#fff;font-weight:700;font-size:.9em;
+    box-shadow:0 4px 14px rgba(0,0,0,.25); opacity:0; transform:translateX(14px) scale(.96);
+    animation:eventIn .5s ease forwards; position:relative; overflow:hidden;
+  }
+  .sidebar-event-item::after{
+    content:''; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);
+    transform:translateX(-120%); animation:eventShine 3.2s ease-in-out infinite;
+  }
+  @keyframes eventShine{0%{transform:translateX(-120%);}50%{transform:translateX(120%);}100%{transform:translateX(120%);}}
+  .sidebar-event-item span{display:block;font-size:.8em;font-weight:500;margin-top:3px;opacity:.92;}
+  @keyframes eventIn{to{opacity:1;transform:translateX(0) scale(1);}}
+  .no-event{text-align:center;color:var(--text-muted);font-style:italic;margin-top:20px;}
+  .fade-in-row{animation:fadeIn .5s ease-in-out forwards;}
+  @keyframes fadeIn{from{opacity:0;transform:scale(.98);}to{opacity:1;transform:scale(1);}}
+
+  /* premium gradient event colors */
+  .color-0{background:linear-gradient(135deg,#ff5e5e,#ff2e63);}
+  .color-1{background:linear-gradient(135deg,#43e97b,#38f9d7);}
+  .color-2{background:linear-gradient(135deg,#a770ef,#cf8bf3);}
+  .color-3{background:linear-gradient(135deg,#f7971e,#ffd200);}
+  .color-4{background:linear-gradient(135deg,#00c9ff,#7c83fd);}
+  .color-5{background:linear-gradient(135deg,#f857a6,#ff5858);}
+  .sat-off{background:linear-gradient(135deg,#6c93ff,#3d5afe);}
+
+  /* ===== Premium Visible Scrollbar Fix ===== */
+  ::-webkit-scrollbar{width:10px; height:10px;}
+  ::-webkit-scrollbar-track{background:rgba(0, 0, 0, 0.1); border-radius:10px;}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(180deg, var(--accent1), var(--accent2)); border-radius:6px; border:2px solid transparent; background-clip:padding-box;}
+  ::-webkit-scrollbar-thumb:hover{background:var(--accent3); border:2px solid transparent; background-clip:padding-box;}
+
+  /* ===== colorful round balloons floating across the whole page ===== */
+  .balloons{position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none;}
+  .balloon{
+    position:absolute; bottom:-18vh; border-radius:50%;
+    box-shadow:inset -8px -10px 18px rgba(0,0,0,.18), inset 6px 8px 14px rgba(255,255,255,.35);
+    opacity:0; animation-name:balloonFloat; animation-timing-function:ease-in-out; animation-iteration-count:infinite;
+  }
+  .balloon::before{
+    content:''; position:absolute; left:50%; top:100%; width:1px; height:22px;
+    background:rgba(255,255,255,.4); transform:translateX(-50%);
+  }
+  .balloon::after{
+    content:''; position:absolute; left:50%; top:calc(100% + 20px); width:5px; height:5px;
+    background:inherit; border-radius:2px; transform:translateX(-50%) rotate(45deg);
+  }
+  @keyframes balloonFloat{
+    0%{ transform:translateY(0) translateX(0) rotate(-4deg); opacity:0; }
+    10%{ opacity:.8; }
+    50%{ transform:translateY(-58vh) translateX(24px) rotate(4deg); }
+    90%{ opacity:.8; }
+    100%{ transform:translateY(-118vh) translateX(-18px) rotate(-4deg); opacity:0; }
+  }
+  .balloon.b1{left:4%;  width:46px; height:56px; background:linear-gradient(160deg,#ff9a9e,#ff5e5e); animation-duration:17s; animation-delay:0s;}
+  .balloon.b2{left:14%; width:34px; height:42px; background:linear-gradient(160deg,#a1c4fd,#4a7fe0); animation-duration:14s; animation-delay:2.5s;}
+  .balloon.b3{left:24%; width:52px; height:62px; background:linear-gradient(160deg,#fbc2eb,#ff5ea8); animation-duration:19s; animation-delay:1s;}
+  .balloon.b4{left:36%; width:30px; height:38px; background:linear-gradient(160deg,#fddb92,#ffd200); animation-duration:13s; animation-delay:4s;}
+  .balloon.b5{left:48%; width:44px; height:54px; background:linear-gradient(160deg,#84fab0,#38f9d7); animation-duration:16s; animation-delay:0.5s;}
+  .balloon.b6{left:60%; width:38px; height:46px; background:linear-gradient(160deg,#c2a1fc,#a770ef); animation-duration:18s; animation-delay:3s;}
+  .balloon.b7{left:70%; width:50px; height:60px; background:linear-gradient(160deg,#ffecd2,#f7971e); animation-duration:15s; animation-delay:5.5s;}
+  .balloon.b8{left:80%; width:32px; height:40px; background:linear-gradient(160deg,#a8edea,#00c9ff); animation-duration:20s; animation-delay:2s;}
+  .balloon.b9{left:90%; width:42px; height:50px; background:linear-gradient(160deg,#f6d365,#f857a6); animation-duration:16.5s; animation-delay:6s;}
+  .balloon.b10{left:56%; width:26px; height:32px; background:linear-gradient(160deg,#fff1eb,#ff5e5e); animation-duration:12s; animation-delay:7s;}
+
+  /* ===== "Go to Home" button — now docked in the top bar ===== */
+  .go-home-fab{
+    position:relative; z-index:2; flex-shrink:0;
+    display:flex; align-items:center; gap:8px;
+    padding:8px 18px; border-radius:50px;
+    font-size:12.5px; font-weight:800; letter-spacing:.2px; color:#fff; text-decoration:none; white-space:nowrap;
+    background:linear-gradient(120deg,#7c83fd,#ff5ea8,#38f9d7,#ffd200,#a770ef,#7c83fd);
+    background-size:400% 400%;
+    box-shadow:0 6px 18px rgba(124,131,253,.35), 0 0 26px rgba(255,94,168,.22);
+    animation:goHomeColorShift 7s ease infinite, goHomeFloat 3.2s ease-in-out infinite;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .go-home-fab:hover{
+    transform:scale(1.08);
+    box-shadow:0 8px 24px rgba(124,131,253,.5), 0 0 36px rgba(255,94,168,.35);
+  }
+  .go-home-fab .icon{font-size:16px;}
+  @keyframes goHomeColorShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  @keyframes goHomeFloat{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-3px);}
+  }
+  @media (max-width:720px){
+    #employeeWelcomeBar{flex-direction:column;align-items:flex-start;gap:6px;padding-right:18px;}
+    .emp-welcome-right{top:auto;bottom:14px;right:14px;}
+    .cal-topbar{flex-wrap:wrap;}
+    .cal-ticker{order:3;width:100%;}
+    .go-home-fab{padding:7px 14px;font-size:11.5px;}
+  }
+
+  /* ===== Day events popup (opens when an event badge on a date is clicked) ===== */
+  .day-modal-overlay{
+    position:fixed; inset:0; z-index:20000;
+    background:rgba(3,6,14,.74); backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center; padding:18px;
+  }
+  .day-modal-overlay.show{display:flex;}
+  .day-modal-box{
+    position:relative; width:100%; max-width:420px; max-height:80vh;
+    background:var(--surface-2); border-radius:20px; padding:26px 22px 20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.55), 0 0 40px rgba(124,131,253,.25);
+    animation:dayModalPop .35s cubic-bezier(.22,.95,.32,1.25);
+    overflow:hidden;
+  }
+  /* rotating neon-gradient border glow — the "lighting" effect */
+  .day-modal-box::before{
+    content:''; position:absolute; inset:0; border-radius:20px; padding:2px;
+    background:linear-gradient(120deg,#7c83fd,#ff5ea8,#38f9d7,#ffd200,#a770ef,#7c83fd);
+    background-size:300% 300%;
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:dayModalBorderFlow 3s linear infinite;
+    pointer-events:none;
+  }
+  /* diagonal shine sweep — extra "lighting" flash across the card */
+  .day-modal-box::after{
+    content:''; position:absolute; top:0; left:-60%; width:45%; height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,.35), transparent);
+    transform:skewX(-20deg); animation:dayModalShine 3s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes dayModalBorderFlow{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+  @keyframes dayModalShine{0%{left:-60%;}100%{left:130%;}}
+  @keyframes dayModalPop{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+  .day-modal-close{
+    position:absolute; top:12px; right:14px; z-index:2;
+    background:none; border:none; color:var(--text-muted); font-size:19px; cursor:pointer; line-height:1;
+  }
+  .day-modal-close:hover{color:var(--text);}
+  .day-modal-header{ text-align:center; margin-bottom:14px; position:relative; z-index:1; }
+  .day-modal-date{
+    font-weight:800; font-size:17px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent4),var(--accent3),var(--accent1));
+    background-size:300% 100%; -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:titleShift 6s linear infinite;
+  }
+  .day-modal-time{ font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'IBM Plex Mono',monospace; letter-spacing:.5px; }
+  .day-modal-body{ max-height:50vh; overflow-y:auto; position:relative; z-index:1; }
+  @media (max-width:480px){
+    .day-modal-box{padding:22px 16px 16px;}
+  }
+
+  /* ===== back to top button (sits above the Go to Home button) ===== */
+  #backToTopBtn{
+    position:fixed;
+    left:24px;
+    bottom:24px;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:linear-gradient(145deg,var(--accent3),#1fb8a0);
+    color:#06231c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:9500;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-115vh) scale(.5);
+    transition:transform .5s cubic-bezier(.55,0,.85,.35), opacity .5s ease, visibility 0s linear .5s, box-shadow .2s ease;
+  }
+  #backToTopBtn.show{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0) scale(1);
+    transition:transform .6s cubic-bezier(.34,1.56,.64,1), opacity .2s ease, visibility 0s linear 0s, box-shadow .2s ease;
+  }
+  #backToTopBtn:hover{
+    box-shadow:0 8px 22px rgba(0,0,0,.45);
+    filter:brightness(1.08);
+  }
+  #backToTopBtn svg{
+    width:19px;
+    height:19px;
+    stroke:#06231c;
+    stroke-width:2.6;
+    fill:none;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  @media (max-width:640px){
+    #backToTopBtn{ left:16px; bottom:16px; width:42px; height:42px; }
+  }
+
+  /* ===================== DASHBOARD INFO PANEL (News + Weather) ===================== */
+  .dashboard-info-panel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    max-width:1200px;
+    margin:0 auto 28px;
+    padding:0 20px;
+    align-items:stretch;
+  }
+  @media (max-width:820px){
+    .dashboard-info-panel{grid-template-columns:1fr; padding:0 14px;}
+  }
+  .info-widget{
+    background:var(--surface-2);
+    -webkit-backdrop-filter:blur(18px);
+    backdrop-filter:blur(18px);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:18px 20px 16px;
+    display:flex;
+    flex-direction:column;
+    min-height:430px;
+    transition:background .4s ease, border-color .4s ease, transform .25s ease;
+  }
+  .info-widget:hover{transform:translateY(-2px);}
+  .widget-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding-bottom:12px;
+    margin-bottom:12px;
+    border-bottom:1px solid var(--border);
+  }
+  .widget-icon-badge{
+    width:40px; height:40px; flex:0 0 40px;
+    border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; color:#fff;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  }
+  .news-widget .widget-icon-badge{background:linear-gradient(135deg,#ff6a6a,#d81f2a);}
+  .weather-widget .widget-icon-badge{background:linear-gradient(135deg,#4fc3ff,#1e78e0);}
+  .widget-header h2{
+    margin:0; font-size:1.02rem; font-weight:700; color:var(--text); letter-spacing:.2px;
+  }
+  .widget-refresh-note{
+    margin-left:auto; font-size:.68rem; color:var(--text-muted);
+    display:flex; align-items:center; gap:5px;
+  }
+  .widget-body{flex:1; overflow-y:auto; padding-right:2px;}
+  .widget-body::-webkit-scrollbar{width:6px;}
+  .widget-body::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+  .widget-footer{
+    margin-top:12px; padding-top:10px; border-top:1px dashed var(--border);
+    font-size:.7rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;
+  }
+  .widget-loading{
+    text-align:center; padding:40px 10px; color:var(--text-muted); font-size:.85rem;
+  }
+  .widget-loading i{margin-right:6px; animation:spin 1s linear infinite;}
+  @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .widget-error{
+    text-align:center; padding:34px 10px; color:var(--text-muted); font-size:.85rem; line-height:1.6;
+  }
+  .widget-error i{font-size:1.4rem; color:var(--accent2); display:block; margin-bottom:8px;}
+
+  @keyframes fadeInUp{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .fade-refresh{animation:fadeInUp .45s ease both;}
+
+  /* --- News item --- */
+  .news-item{
+    padding:10px 2px; border-bottom:1px dashed var(--border);
+  }
+  .news-item:last-child{border-bottom:none;}
+  .news-headline{
+    font-size:.9rem; line-height:1.45; color:var(--text); font-weight:500;
+    user-select:text; cursor:default;
+  }
+  .news-time{
+    display:flex; align-items:center; gap:5px; margin-top:5px;
+    font-size:.7rem; color:var(--text-muted);
+  }
+
+  /* --- Weather --- */
+  .weather-main{display:flex; align-items:center; gap:16px; margin-bottom:14px;}
+  .weather-icon-big{font-size:2.7rem; color:var(--accent1); flex:0 0 auto;}
+  .weather-temp{font-size:2.3rem; font-weight:800; color:var(--text); line-height:1;}
+  .weather-condition{font-size:.85rem; color:var(--text-muted); margin-top:4px;}
+  .weather-datetime{
+    font-size:.76rem; color:var(--text-muted); margin-bottom:14px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+  }
+  .weather-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  }
+  .weather-stat{
+    background:var(--surface); border:1px solid var(--border); border-radius:11px;
+    padding:10px 8px; text-align:center; font-size:.72rem; color:var(--text-muted);
+  }
+  .weather-stat i{color:var(--accent1); margin-bottom:4px; display:block; font-size:1rem;}
+  .weather-stat b{display:block; margin-top:3px; font-size:.86rem; color:var(--text); font-weight:700;}
+
+  /* ===== Extended news + weather (tabs, hourly, 7-day, AQI) ===== */
+  /* grid items default to min-width:auto, so wide scroll strips (hourly / tabs) stretched the columns */
+  .dashboard-info-panel{grid-template-columns:minmax(0,1fr) minmax(0,1fr); box-sizing:border-box; width:100%;}
+  @media (max-width:820px){.dashboard-info-panel{grid-template-columns:minmax(0,1fr);}}
+  .info-widget{height:640px; min-width:0; max-width:100%; box-sizing:border-box;}
+  .widget-body{min-width:0; overflow-x:hidden;}
+  .wx-hourly, .news-tabs{max-width:100%;}
+  .widget-refresh-btn{
+    background:none; border:none; color:inherit; cursor:pointer; padding:0; font:inherit;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .widget-refresh-btn:hover{color:var(--accent1);}
+
+  /* news tabs */
+  .news-tabs{
+    display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:6px;
+    scrollbar-width:thin;
+  }
+  .news-tabs::-webkit-scrollbar{height:5px;}
+  .news-tabs::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+  .news-tab{
+    flex:0 0 auto; cursor:pointer; white-space:nowrap;
+    background:var(--surface); color:var(--text-muted);
+    border:1px solid var(--border); border-radius:999px;
+    padding:6px 13px; font-size:.78rem; font-weight:600; font-family:inherit;
+    transition:background .2s ease, color .2s ease, border-color .2s ease, transform .15s ease;
+  }
+  .news-tab:hover{color:var(--text); transform:translateY(-1px);}
+  .news-tab.active{
+    background:linear-gradient(135deg,#ff6a6a,#d81f2a); color:#fff; border-color:transparent;
+    box-shadow:0 3px 10px rgba(216,31,42,.35);
+  }
+  .news-headline a{color:inherit; text-decoration:none;}
+  .news-headline a:hover{text-decoration:underline; color:var(--accent1);}
+  .news-time{flex-wrap:wrap; gap:10px;}
+  .news-time span{display:inline-flex; align-items:center; gap:5px;}
+  .news-source{
+    background:var(--surface); border:1px solid var(--border); border-radius:6px;
+    padding:1px 7px; font-weight:600; color:var(--text);
+  }
+  .news-retry{
+    margin-top:10px; cursor:pointer; background:var(--surface); color:var(--text);
+    border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-family:inherit; font-size:.8rem;
+  }
+  .news-retry:hover{border-color:var(--accent1);}
+
+  /* weather extras */
+  .weather-main{position:relative;}
+  .weather-hilo{margin-left:auto; font-size:.85rem; font-weight:700; color:var(--text); text-align:right; white-space:nowrap;}
+  .weather-hilo i{font-size:.7rem; color:var(--accent1); margin:0 2px 0 6px;}
+  .weather-grid{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));}
+  .weather-stat small{display:block; margin-top:2px; font-size:.64rem; color:var(--text-muted); font-weight:500;}
+  .aqi-dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:middle;}
+  .wx-section-title{
+    margin:16px 0 8px; font-size:.8rem; font-weight:700; color:var(--text);
+    display:flex; align-items:center; gap:7px;
+  }
+  .wx-section-title i{color:var(--accent1);}
+  .wx-hourly{display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; scrollbar-width:thin;}
+  .wx-hourly::-webkit-scrollbar{height:5px;}
+  .wx-hourly::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+  .wx-hour{
+    flex:0 0 62px; background:var(--surface); border:1px solid var(--border); border-radius:11px;
+    padding:8px 4px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:5px;
+    font-size:.7rem; color:var(--text-muted);
+  }
+  .wx-hour i.fa-solid{font-size:1.05rem; color:var(--accent1);}
+  .wx-hour b{font-size:.86rem; color:var(--text);}
+  .wx-h-pop{font-size:.62rem; min-height:12px;}
+  .wx-h-pop i{font-size:.55rem; margin-right:2px; color:#4fc3ff;}
+  .wx-daily{display:flex; flex-direction:column; gap:6px; padding-bottom:4px;}
+  .wx-day{
+    display:grid; grid-template-columns:78px 24px 1fr 52px 70px; align-items:center; gap:8px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:8px 10px; font-size:.76rem; color:var(--text-muted);
+  }
+  .wx-day i.fa-solid{color:var(--accent1); text-align:center; font-size:1rem;}
+  .wx-d-name{font-weight:700; color:var(--text);}
+  .wx-d-cond{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .wx-d-pop{font-size:.68rem; white-space:nowrap;}
+  .wx-d-pop i{color:#4fc3ff; font-size:.6rem; margin-right:2px;}
+  .wx-d-temp{text-align:right; white-space:nowrap;}
+  .wx-d-temp b{color:var(--text);}
+  @media (max-width:480px){
+    .wx-day{grid-template-columns:70px 22px 1fr 64px;}
+    .wx-d-pop{display:none;}
+  }
+
+  /* ===== Nature banner (bottom of page): slow zoom + cross-fade, no text on top ===== */
+  .nature-banner{
+    position:relative; max-width:1200px; margin:0 auto 40px; box-sizing:border-box;
+    width:calc(100% - 40px); height:clamp(220px, 34vw, 400px);
+    border-radius:16px; overflow:hidden; border:1px solid var(--border); box-shadow:var(--shadow);
+    background:linear-gradient(135deg,#1f6f54,#2c9c78 45%,#6fc3a0);
+  }
+  .nature-banner::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to top, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 45%);
+  }
+  .nature-banner .nb-img{
+    position:absolute; inset:0; background-size:cover; background-position:center;
+    opacity:0; transition:opacity 1.8s ease-in-out; will-change:transform, opacity;
+  }
+  .nature-banner .nb-img.show{opacity:1;}
+  .nature-banner .nb-img.zin {animation:nbZoomIn  18s ease-in-out forwards;}
+  .nature-banner .nb-img.zout{animation:nbZoomOut 18s ease-in-out forwards;}
+  @keyframes nbZoomIn {from{transform:scale(1);}    to{transform:scale(1.18);}}
+  @keyframes nbZoomOut{from{transform:scale(1.18);} to{transform:scale(1);}}
+  @media (max-width:820px){ .nature-banner{width:calc(100% - 28px);} }
+  @media (prefers-reduced-motion:reduce){
+    .nature-banner .nb-img.zin, .nature-banner .nb-img.zout{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+
+<div class="balloons">
+  <div class="balloon b1"></div>
+  <div class="balloon b2"></div>
+  <div class="balloon b3"></div>
+  <div class="balloon b4"></div>
+  <div class="balloon b5"></div>
+  <div class="balloon b6"></div>
+  <div class="balloon b7"></div>
+  <div class="balloon b8"></div>
+  <div class="balloon b9"></div>
+  <div class="balloon b10"></div>
+</div>
+
+
+<div class="day-modal-overlay" id="dayEventsModal" onclick="if(event.target===this) closeDayEventsModal()">
+  <div class="day-modal-box">
+    <button class="day-modal-close" onclick="closeDayEventsModal()" title="Close">✕</button>
+    <div class="day-modal-header">
+      <div class="day-modal-date" id="dayModalDate">--</div>
+      <div class="day-modal-time" id="dayModalTime">--:--:--</div>
+    </div>
+    <div class="day-modal-body" id="dayModalBody"></div>
+  </div>
+</div>
+
+<div class="cal-topbar" id="calTopbar">
+  <div class="cal-brand">📅 Live Calendar</div>
+  <div class="cal-ticker">
+    <div class="cal-ticker-track" id="tickerTrack">🎉 <b>Special Occasions</b> auto-highlighted every month &nbsp;•&nbsp; See all public holidays and special days live &nbsp;•&nbsp; New calendar years available through 2026–2028 &nbsp;•&nbsp; 🎉</div>
+    <div class="cal-ticker-flash"><span id="tickerFlashText">📅 আজ</span></div>
+  </div>
+  <a href="index.html" class="go-home-fab" title="Go to Home"><span class="icon">🏠</span> Go to Home</a>
+  <div class="theme-toggle-wrap" id="bnDateToggleWrap">
+    <span>বাংলা তারিখ</span>
+    <label class="theme-switch">
+      <input type="checkbox" id="bnDateSwitch" onchange="toggleBnDate()">
+      <span class="theme-slider"></span>
+    </label>
+  </div>
+  <div class="theme-toggle-wrap">
+    <span>🌙</span>
+    <label class="theme-switch">
+      <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
+      <span class="theme-slider"></span>
+    </label>
+    <span>☀️</span>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <div class="calendar-wrapper">
+    <div class="header">
+      <div class="header-logo"><img class="header-logo-icon" src="logo_1.png" alt="Logo"></div>
+      <h1 class="title">✨ বিশেষ দিন ও ক্যালেন্ডার ✨</h1>
+      <div id="live-clock"></div>
+      <div id="live-date"></div>
+    </div>
+
+    <div class="controls">
+      <select id="monthSelect" onchange="renderCalendar()">
+        <option value="0">জানুয়ারি</option>
+        <option value="1">ফেব্রুয়ারি</option>
+        <option value="2">মার্চ</option>
+        <option value="3">এপ্রিল</option>
+        <option value="4">মে</option>
+        <option value="5">জুন</option>
+        <option value="6">জুলাই</option>
+        <option value="7">আগস্ট</option>
+        <option value="8">সেপ্টেম্বর</option>
+        <option value="9">অক্টোবর</option>
+        <option value="10">নভেম্বর</option>
+        <option value="11">ডিসেম্বর</option>
+      </select>
+      <select id="yearSelect" onchange="renderCalendar()">
+        <option value="2026">২০২৬</option>
+        <option value="2027">২০২৭</option>
+        <option value="2028">২০২৮</option>
+      </select>
+    </div>
+
+    <div class="main-layout">
+      <div class="calendar-section">
+        <table id="calendarTable">
+          <thead>
+            <tr>
+              <th>রবি</th><th>সোম</th><th>মঙ্গল</th><th>বুধ</th><th>বৃহঃ</th><th>শুক্র</th><th>শনি</th>
+            </tr>
+          </thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>📅 Upcoming Special Occasions</h2>
+        <hr class="sidebar-divider">
+        <div id="sidebarEventList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Dashboard Information Panel ===================== -->
+<section class="dashboard-info-panel">
+
+  <!-- 📰 Bengali News Widget -->
+  <div class="info-widget news-widget">
+    <div class="widget-header">
+      <span class="widget-icon-badge"><i class="fa-solid fa-newspaper"></i></span>
+      <h2>Latest Bengali News</h2>
+      <span class="widget-refresh-note"><button type="button" class="widget-refresh-btn" title="Refresh now" onclick="fetchBengaliNews(true)"><i class="fa-solid fa-rotate"></i> Every 15 min</button></span>
+    </div>
+    <div class="news-tabs" id="newsTabs"></div>
+    <div class="widget-body" id="newsBody">
+      <div class="widget-loading"><i class="fa-solid fa-spinner"></i> খবর লোড হচ্ছে...</div>
+    </div>
+    <div class="widget-footer">
+      <i class="fa-regular fa-clock"></i> <span id="newsLastUpdated">Last updated: --</span>
+    </div>
+  </div>
+
+  <!-- 🌤️ Kolkata Weather Widget -->
+  <div class="info-widget weather-widget">
+    <div class="widget-header">
+      <span class="widget-icon-badge"><i class="fa-solid fa-cloud-sun"></i></span>
+      <h2>Kolkata Weather</h2>
+      <span class="widget-refresh-note"><button type="button" class="widget-refresh-btn" title="Refresh now" onclick="fetchKolkataWeather()"><i class="fa-solid fa-rotate"></i> Every 2 min</button></span>
+    </div>
+    <div class="widget-body" id="weatherBody">
+      <div class="widget-loading"><i class="fa-solid fa-spinner"></i> আবহাওয়া লোড হচ্ছে...</div>
+    </div>
+    <div class="widget-footer">
+      <i class="fa-regular fa-clock"></i> <span id="weatherLastUpdated">Last updated: --</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- 🌿 Nature Banner (Wikimedia Commons, free, no API key) -->
+<section class="nature-banner" id="natureBanner"></section>
+
+<script>
+/* 🌿 Nature banner — Wikimedia Commons (free, no API key). Changes every 15 s with a slow zoom. */
+(function(){
+    var NB_TOPICS = ['Sundarbans','Darjeeling','Himalayas landscape','Kanchenjunga','tea garden','waterfall',
+                     'sunset lake','misty forest','river sunrise','Bengal village landscape','beach sunset','mountain lake'];
+    var ROTATE_MS = 15000;          // 🔁 chhobi bodlanor somoy (15 second)
+    var NB_CACHE_KEY = 'calNatureBanner';
+    var ORIGINS = ['center center','30% 40%','70% 40%','35% 65%','65% 65%','50% 30%'];
+
+    var bg = document.getElementById('natureBanner');
+    if (!bg) return;
+    var pool = [], ptr = 0, timer = null, extraTopic = 0, busy = false, zoomIn = true;
+
+    function dayIndex(){
+        var d = new Date();
+        return Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+    }
+    function todayKey(){ return new Date().toLocaleDateString('en-CA'); }
+    function textOf(html){
+        return (new DOMParser().parseFromString(html || '', 'text/html').body.textContent || '').trim();
+    }
+    function fetchJson(url){
+        var ctrl = new AbortController();
+        var t = setTimeout(function(){ ctrl.abort(); }, 10000);
+        return fetch(url, { signal: ctrl.signal }).then(function(r){
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        }).finally(function(){ clearTimeout(t); });
+    }
+    function apiUrl(topic, featuredOnly){
+        var q = topic + ' filetype:bitmap' + (featuredOnly ? ' incategory:"Featured pictures on Wikimedia Commons"' : '');
+        return 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search' +
+               '&gsrnamespace=6&gsrlimit=40&gsrsearch=' + encodeURIComponent(q) +
+               '&prop=imageinfo&iiprop=url|size|mime|extmetadata&iiurlwidth=1600';
+    }
+    function candidatesFrom(data){
+        var pages = (data && data.query && data.query.pages) ? Object.keys(data.query.pages).map(function(k){ return data.query.pages[k]; }) : [];
+        return pages.filter(function(p){
+            var ii = p.imageinfo && p.imageinfo[0];
+            return ii && ii.mime === 'image/jpeg' && ii.thumburl && ii.width >= 1600 && ii.height >= 700 && ii.width / ii.height >= 1.4;
+        }).sort(function(a, b){ return (a.index || 0) - (b.index || 0); }).map(function(p){
+            var ii = p.imageinfo[0], md = ii.extmetadata || {};
+            return {
+                url: ii.thumburl,
+                title: p.title.replace(/^File:/, '').replace(/\.[a-z]+$/i, '').replace(/_/g, ' '),
+                credit: textOf(md.Artist && md.Artist.value).slice(0, 60),
+                license: textOf(md.LicenseShortName && md.LicenseShortName.value),
+                link: ii.descriptionurl
+            };
+        });
+    }
+    async function findCandidates(topicIdx){
+        for (var t = 0; t < 3; t++){
+            var topic = NB_TOPICS[(topicIdx + t) % NB_TOPICS.length];
+            for (var f = 1; f >= 0; f--){
+                try {
+                    var c = candidatesFrom(await fetchJson(apiUrl(topic, !!f)));
+                    if (c.length >= (f ? 2 : 1)) return { topic: topic, list: c };
+                } catch (e){ console.warn('Nature background lookup failed:', topic, e.message); }
+            }
+        }
+        return null;
+    }
+    function preload(url){
+        return new Promise(function(res, rej){
+            var im = new Image();
+            im.onload = function(){ res(url); };
+            im.onerror = function(){ rej(new Error('image load failed')); };
+            im.src = url;
+        });
+    }
+    function inPool(url){ return pool.some(function(p){ return p.url === url; }); }
+    function savePic(pic){
+        try { localStorage.setItem(NB_CACHE_KEY, JSON.stringify({ day: todayKey(), pic: pic })); } catch (e){}
+    }
+
+    /* new picture = new layer that cross-fades in while slowly zooming in/out */
+    function show(pic){
+        var layer = document.createElement('div');
+        layer.className = 'nb-img ' + (zoomIn ? 'zin' : 'zout');
+        zoomIn = !zoomIn;
+        layer.style.backgroundImage = 'url("' + pic.url + '")';
+        layer.style.transformOrigin = ORIGINS[Math.floor(Math.random() * ORIGINS.length)];
+        layer.style.animationDuration = (ROTATE_MS + 3500) + 'ms';
+        bg.appendChild(layer);
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){ layer.classList.add('show'); }); });
+        setTimeout(function(){
+            Array.prototype.slice.call(bg.querySelectorAll('.nb-img')).forEach(function(el){ if (el !== layer) el.remove(); });
+        }, 2100);
+        if (pic.title) console.info('Background photo:', pic.title, '|', pic.credit || '', '|', pic.license || '', '|', pic.link || '');
+    }
+
+    async function addMore(){
+        for (var t = 0; t < NB_TOPICS.length; t++){
+            extraTopic = (extraTopic + 1) % NB_TOPICS.length;
+            try {
+                var c = candidatesFrom(await fetchJson(apiUrl(NB_TOPICS[extraTopic], true)));
+                var added = 0;
+                c.forEach(function(p){ if (!inPool(p.url)){ pool.push(p); added++; } });
+                if (added) return;
+            } catch (e){}
+        }
+    }
+    async function showNext(){
+        if (busy || document.hidden || !pool.length) return;
+        busy = true;
+        try {
+            if (pool.length - ptr < 4) addMore();
+            for (var k = 1; k <= Math.min(4, pool.length); k++){
+                var idx = (ptr + k) % pool.length;
+                try { await preload(pool[idx].url); ptr = idx; show(pool[ptr]); savePic(pool[ptr]); return; } catch (e){}
+            }
+        } finally { busy = false; }
+    }
+
+    async function init(){
+        var shown = false, cachedUrl = null;
+        try {
+            var saved = JSON.parse(localStorage.getItem(NB_CACHE_KEY) || 'null');
+            if (saved && saved.day === todayKey() && saved.pic){ await preload(saved.pic.url); show(saved.pic); shown = true; cachedUrl = saved.pic.url; }
+        } catch (e){}
+        var topicIdx = dayIndex() % NB_TOPICS.length;
+        extraTopic = topicIdx;
+        var found = await findCandidates(topicIdx);
+        if (!found) return;
+        pool = found.list;
+        if (cachedUrl){
+            var at = pool.findIndex(function(p){ return p.url === cachedUrl; });
+            ptr = at >= 0 ? at : 0;
+        } else {
+            var start = dayIndex() % pool.length;
+            for (var k = 0; k < Math.min(4, pool.length) && !shown; k++){
+                var idx = (start + k) % pool.length;
+                try { await preload(pool[idx].url); ptr = idx; show(pool[idx]); shown = true; savePic(pool[idx]); } catch (e){}
+            }
+        }
+        timer = setInterval(showNext, ROTATE_MS);
+    }
+    init();
+})();
+</script>
+
+<script>
+/* ===================== THEME ===================== */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const chk = document.getElementById('themeSwitch');
+  if(chk) chk.checked = (theme === 'light');
+}
+function toggleTheme(){
+  const isLight = document.getElementById('themeSwitch').checked;
+  applyTheme(isLight ? 'light' : 'dark');
+  localStorage.setItem('qa_theme', isLight ? 'light' : 'dark');
+}
+applyTheme(localStorage.getItem('qa_theme') || 'dark');
+
+/* ===================== বাংলা তারিখ টগল (ডিফল্ট: বন্ধ) ===================== */
+function applyBnDateSetting(show){
+  document.body.classList.toggle('show-bn-date', show);
+  const chk = document.getElementById('bnDateSwitch');
+  if(chk) chk.checked = show;
+}
+function toggleBnDate(){
+  const show = document.getElementById('bnDateSwitch').checked;
+  applyBnDateSetting(show);
+  localStorage.setItem('qa_show_bn_date', show ? '1' : '0');
+}
+applyBnDateSetting(localStorage.getItem('qa_show_bn_date') === '1');
+
+/* ===================== SMALL HELPERS ===================== */
+function getBrowserName(){
+  const ua = navigator.userAgent;
+  if(ua.includes('Edg/')) return 'Edge';
+  if(ua.includes('Chrome/') && !ua.includes('OPR')) return 'Chrome';
+  if(ua.includes('Firefox/')) return 'Firefox';
+  if(ua.includes('Safari/') && !ua.includes('Chrome')) return 'Safari';
+  if(ua.includes('OPR')) return 'Opera';
+  return 'Unknown';
+}
+function getDeviceType(){
+  const ua = navigator.userAgent;
+  if(/Mobi|Android/i.test(ua)) return 'Mobile';
+  if(/Tablet|iPad/i.test(ua)) return 'Tablet';
+  return 'Desktop';
+}
+async function getClientIP(){
+  try{
+    const res = await fetch('https://api.ipify.org?format=json');
+    const d = await res.json();
+    return d.ip || '';
+  }catch(e){ return ''; }
+}
+function secToHMS(sec){
+  sec = Math.max(0, Math.round(sec));
+  const h = String(Math.floor(sec/3600)).padStart(2,'0');
+  const m = String(Math.floor((sec%3600)/60)).padStart(2,'0');
+  const s = String(sec%60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+function to12Hour(t){
+  if(!t) return '';
+  const d = new Date(t);
+  if(!isNaN(d.getTime())) return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  return t;
+}
+function formatPreviousLogin(v){ return v || '--'; }
+function currentGreetingText(){
+  const h = new Date().getHours();
+  if(h>=5 && h<12) return 'Good Morning';
+  if(h>=12 && h<17) return 'Good Afternoon';
+  if(h>=17 && h<20) return 'Good Evening';
+  return 'Good Night';
+}
+
+
+/* ===================== HOLIDAYS DATA ===================== */
+const holidays = {
+    // 2026
+    "2026-01-01": ["New Years Day"],
+    "2026-01-12": ["Birthday of Swami Vivekananda"],
+    "2026-01-23": ["Saraswati Puja", "Birthday of Netaji"],
+    "2026-01-26": ["Republic Day"],
+    "2026-03-03": ["Doljatra"],
+    "2026-03-21": ["Eid Ul-Fitar"],
+    "2026-03-26": ["Ram Navami"],
+    "2026-03-31": ["Mahavir Jayanti"],
+    "2026-04-03": ["Good Friday"],
+    "2026-04-14": ["Birthday of Dr. B.R. Ambedkar"],
+    "2026-04-15": ["Bengali New Year"],
+    "2026-05-01": ["Buddha Purnima", "May Day"],
+    "2026-05-09": ["Birthday of Rabindra Nath Tagore"],
+    "2026-05-31": ["Id-Ud-Zoha (Bakrid)"],
+    "2026-06-26": ["Muharram"],
+    "2026-07-01": ["National Doctors' Day", "Chartered Accountants Day"],
+    "2026-07-02": ["World UFO Day"],
+    "2026-07-03": ["International Plastic Bag Free Day"],
+    "2026-07-06": ["World Zoonoses Day"],
+    "2026-07-07": ["World Chocolate Day"],
+    "2026-07-10": ["Yogini Ekadashi"],
+    "2026-07-11": ["World Population Day"],
+    "2026-07-12": ["Malala Day"],
+    "2026-07-15": ["World Youth Skills Day"],
+    "2026-07-16": ["Jagannath Rath Yatra", "Karka Sankranti"],
+    "2026-07-17": ["World Day for International Justice", "World Emoji Day"],
+    "2026-07-18": ["Nelson Mandela International Day"],
+    "2026-07-20": ["International Chess Day"],
+    "2026-07-22": ["National Flag Adoption Day"],
+    "2026-07-24": ["Income Tax Day"],
+    "2026-07-25": ["Devshayani Ekadashi"],
+    "2026-07-26": ["Kargil Vijay Diwas"],
+    "2026-07-27": ["Dr. A.P.J. Abdul Kalam Memorial Day"],
+    "2026-07-28": ["World Hepatitis Day", "World Nature Conservation Day"],
+    "2026-07-29": ["Guru Purnima", "Ashadha Purnima", "International Tiger Day"],
+    "2026-07-30": ["International Day of Friendship"],
+    "2026-08-02": ["Friendship Day"],
+    "2026-08-03": ["Nag Panchami"],
+    "2026-08-09": ["Ekadashi", "Nagasaki Day"],
+    "2026-08-12": ["Amavasya", "Akhri Chahar Shomba", "International Youth Day"],
+    "2026-08-15": ["Independence Day", "Hariyali Teej"],
+    "2026-08-18": ["Manasa Puja", "Kalki Jayanti"],
+    "2026-08-19": ["World Photography Day"],
+    "2026-08-20": ["World Mosquito Day"],
+    "2026-08-23": ["Ekadashi", "Jhulan Yatra Begins"],
+    "2026-08-26": ["Fateh-Dowaz-Daham", "Onam"],
+    "2026-08-27": ["Purnima", "Raksha Bandhan", "Rakhi Purnima", "Jhulan Yatra Ends"],
+    "2026-08-28": ["Gayatri Jayanti", "Sanskrit Day"],
+    "2026-08-29": ["National Sports Day"],
+    "2026-08-31": ["Kajari Teej"],
+    "2026-09-04": ["Janmashtami", "Lokenath Brahmachari Janmatithi"],
+    "2026-09-05": ["Teachers' Day", "Nandotsav"],
+    "2026-09-07": ["Ekadashi"],
+    "2026-09-08": ["International Literacy Day"],
+    "2026-09-11": ["Amavasya"],
+    "2026-09-14": ["Hindi Diwas", "Hartalika Teej"],
+    "2026-09-15": ["Engineers' Day", "Rishi Panchami", "Ganesh Puja"],
+    "2026-09-16": ["Balarama Jayanti"],
+    "2026-09-18": ["Vishwakarma Puja"],
+    "2026-09-19": ["Radha Ashtami"],
+    "2026-09-20": ["Anukul Thakur Janmatithi"],
+    "2026-09-21": ["International Day of Peace"],
+    "2026-09-22": ["Ekadashi", "World Rose Day"],
+    "2026-09-23": ["Fateh-Iyaj-Daham"],
+    "2026-09-25": ["Anant Chaturdashi", "Ganesh Visarjan"],
+    "2026-09-26": ["Purnima", "World Environmental Health Day", "Vidyasagar Jayanti"],
+    "2026-09-27": ["World Tourism Day", "Pitru Paksha Begins"],
+    "2026-09-28": ["World Rabies Day"],
+    "2026-09-29": ["World Heart Day"],
+    "2026-10-01": ["International Day of Older Persons"],
+    "2026-10-02": ["Gandhi Jayanti", "International Day of Non-Violence"],
+    "2026-10-04": ["World Animal Day"],
+    "2026-10-05": ["World Teachers' Day"],
+    "2026-10-06": ["Ekadashi"],
+    "2026-10-08": ["Indian Air Force Day"],
+    "2026-10-09": ["World Post Day"],
+    "2026-10-10": ["Mahalaya", "Amavasya", "World Mental Health Day"],
+    "2026-10-11": ["International Day of the Girl Child", "Sharadiya Navratri Begins"],
+    "2026-10-13": ["Karwa Chauth", "International Day for Disaster Risk Reduction"],
+    "2026-10-14": ["World Standards Day"],
+    "2026-10-15": ["Global Handwashing Day"],
+    "2026-10-16": ["Durga Puja - Maha Shashthi", "World Food Day"],
+    "2026-10-17": ["Durga Puja - Maha Saptami"],
+    "2026-10-18": ["Durga Puja - Maha Saptami (Adhika Puja)"],
+    "2026-10-19": ["Durga Puja - Maha Ashtami"],
+    "2026-10-20": ["Durga Puja - Maha Navami"],
+    "2026-10-21": ["Durga Puja - Vijaya Dashami"],
+    "2026-10-22": ["Ekadashi"],
+    "2026-10-24": ["United Nations Day"],
+    "2026-10-25": ["Lakshmi Puja"],
+    "2026-10-26": ["Purnima"],
+    "2026-10-31": ["National Unity Day", "Halloween"],
+    "2026-11-01": ["World Vegan Day"],
+    "2026-11-05": ["Ekadashi"],
+    "2026-11-06": ["Dhanteras"],
+    "2026-11-07": ["National Cancer Awareness Day"],
+    "2026-11-08": ["Kali Puja", "Diwali", "World Radiography Day"],
+    "2026-11-09": ["Amavasya"],
+    "2026-11-10": ["World Science Day for Peace and Development"],
+    "2026-11-11": ["Bhai Dooj (Bharatridwitiya)", "National Education Day"],
+    "2026-11-14": ["Children's Day", "World Diabetes Day"],
+    "2026-11-15": ["Chhat Puja"],
+    "2026-11-16": ["International Day for Tolerance"],
+    "2026-11-17": ["Kartik Puja"],
+    "2026-11-18": ["Jagaddhatri Puja"],
+    "2026-11-19": ["International Men's Day", "World Toilet Day"],
+    "2026-11-20": ["Ekadashi", "Universal Children's Day"],
+    "2026-11-21": ["World Television Day"],
+    "2026-11-24": ["Guru Nanak Jayanti", "Rash Yatra", "Purnima"],
+    "2026-11-26": ["Constitution Day of India"],
+    "2026-12-01": ["World AIDS Day"],
+    "2026-12-02": ["National Pollution Control Day"],
+    "2026-12-03": ["International Day of Persons with Disabilities"],
+    "2026-12-04": ["Ekadashi", "Indian Navy Day"],
+    "2026-12-05": ["World Soil Day"],
+    "2026-12-07": ["Armed Forces Flag Day"],
+    "2026-12-08": ["Amavasya"],
+    "2026-12-10": ["Human Rights Day"],
+    "2026-12-14": ["National Energy Conservation Day"],
+    "2026-12-16": ["Vijay Diwas"],
+    "2026-12-18": ["International Migrants Day"],
+    "2026-12-20": ["Ekadashi"],
+    "2026-12-22": ["National Mathematics Day"],
+    "2026-12-23": ["Kisan Diwas"],
+    "2026-12-24": ["Purnima", "National Consumer Day"],
+    "2026-12-25": ["Christmas Day", "Good Governance Day"],
+    "2026-12-30": ["Sarada Devi Janmatithi"],
+
+    // 2027
+    "2027-01-01": ["New Years Day"],
+
+"2027-01-09": ["Pravasi Bharatiya Divas"],
+
+"2027-01-10": ["World Hindi Day"],
+
+"2027-01-12": [
+  "Birthday of Swami Vivekananda",
+  "National Youth Day"
+],
+
+"2027-01-15": [
+  "Indian Army Day",
+  "Makar Sankranti",
+  "Pongal",
+  "Magh Bihu"
+],
+
+"2027-01-23": [
+  "Birthday of Netaji",
+  "Parakram Diwas"
+],
+
+"2027-01-24": ["National Girl Child Day"],
+
+"2027-01-25": ["National Voters' Day"],
+
+"2027-01-26": ["Republic Day"],
+
+"2027-01-30": ["Martyrs' Day"],
+
+"2027-01-31": ["World Leprosy Day"],
+    "2027-02-02": ["World Wetlands Day"],
+
+"2027-02-04": ["World Cancer Day"],
+
+"2027-02-06": ["Vasant Panchami Eve"],
+
+"2027-02-07": ["Ratha Saptami"],
+
+"2027-02-08": ["Bhishma Ashtami"],
+
+"2027-02-10": [
+  "Jaya Ekadashi",
+  "World Pulses Day"
+],
+
+"2027-02-11": [
+  "Saraswati Puja (Shree Panchami)",
+  "Vasant Panchami",
+  "Safer Internet Day"
+],
+
+"2027-02-12": ["National Productivity Day"],
+
+"2027-02-13": [
+  "World Radio Day",
+  "Kumbha Sankranti"
+],
+
+"2027-02-14": ["Valentine's Day"],
+
+"2027-02-18": ["Maha Shivaratri"],
+
+"2027-02-20": ["World Day of Social Justice"],
+
+"2027-02-21": [
+  "International Mother Language Day"
+],
+
+"2027-02-24": ["Central Excise Day"],
+
+"2027-02-27": [
+  "Id-Ul-Fitar (Expected)",
+  "National Protein Day"
+],
+
+"2027-02-28": [
+  "National Science Day",
+  "Rare Disease Day"
+],
+    "2027-03-01": ["Zero Discrimination Day"],
+
+"2027-03-03": ["World Wildlife Day"],
+
+"2027-03-04": ["National Safety Day"],
+
+"2027-03-08": [
+  "International Women's Day"
+],
+
+"2027-03-10": [
+  "Id Ul-Fitar"
+],
+
+"2027-03-14": [
+  "Pi Day"
+],
+
+"2027-03-15": [
+  "World Consumer Rights Day"
+],
+
+"2027-03-16": [
+  "National Vaccination Day"
+],
+
+"2027-03-20": [
+  "International Day of Happiness",
+  "World Sparrow Day"
+],
+
+"2027-03-21": [
+  "International Day of Forests",
+  "World Down Syndrome Day"
+],
+
+"2027-03-22": [
+  "Doljatra",
+  "World Water Day"
+],
+
+"2027-03-23": [
+  "Shaheed Diwas",
+  "World Meteorological Day"
+],
+
+"2027-03-24": [
+  "World Tuberculosis Day"
+],
+
+"2027-03-25": [
+  "Holi (Many States)"
+],
+
+"2027-03-26": [
+  "Good Friday"
+],
+
+"2027-03-27": [
+  "World Theatre Day"
+],
+    "2027-04-01": ["Odisha Foundation Day", "Utkala Dibasa"],
+
+"2027-04-02": ["World Autism Awareness Day"],
+
+"2027-04-04": ["Mahavir Jayanti"],
+
+"2027-04-05": ["National Maritime Day"],
+
+"2027-04-07": ["World Health Day"],
+
+"2027-04-10": ["World Homeopathy Day"],
+
+"2027-04-11": ["National Safe Motherhood Day"],
+
+"2027-04-13": ["Jallianwala Bagh Memorial Day"],
+
+"2027-04-14": [
+  "Birthday of Dr. B.R. Ambedkar",
+  "Vaisakhi",
+  "Pohela Boishakh",
+  "Tamil New Year",
+  "Vishu",
+  "Bohag Bihu",
+  "Maha Vishuba Sankranti"
+],
+
+"2027-04-15": [
+  "Bengali New Year",
+  "Ram Navami"
+],
+
+"2027-04-17": ["World Hemophilia Day"],
+
+"2027-04-18": ["World Heritage Day"],
+
+"2027-04-19": ["Good Friday"],
+
+"2027-04-21": ["National Civil Services Day"],
+
+"2027-04-22": ["Earth Day"],
+
+"2027-04-23": ["World Book and Copyright Day"],
+
+"2027-04-24": ["National Panchayati Raj Day"],
+
+"2027-04-25": ["World Malaria Day"],
+
+"2027-04-26": ["World Intellectual Property Day"],
+
+"2027-04-28": ["World Day for Safety and Health at Work"],
+
+"2027-04-29": ["International Dance Day"],
+    "2027-05-01": [
+  "May Day",
+  "International Workers' Day",
+  "Maharashtra Day",
+  "Gujarat Foundation Day"
+],
+
+"2027-05-02": [
+  "World Laughter Day"
+],
+
+"2027-05-03": [
+  "World Press Freedom Day"
+],
+
+"2027-05-07": [
+  "Rabindranath Tagore Jayanti"
+],
+
+"2027-05-08": [
+  "World Red Cross and Red Crescent Day"
+],
+
+"2027-05-09": [
+  "Birthday of Rabindra Nath Tagore",
+  "Mother's Day"
+],
+
+"2027-05-11": [
+  "National Technology Day"
+],
+
+"2027-05-12": [
+  "International Nurses Day"
+],
+
+"2027-05-15": [
+  "International Day of Families"
+],
+
+"2027-05-16": [
+  "National Dengue Day"
+],
+
+"2027-05-17": [
+  "Id-Ud-Zoha (Bakrid)",
+  "World Telecommunication and Information Society Day"
+],
+
+"2027-05-20": [
+  "Buddha Purnima"
+],
+
+"2027-05-21": [
+  "National Anti-Terrorism Day"
+],
+
+"2027-05-22": [
+  "International Day for Biological Diversity"
+],
+
+"2027-05-24": [
+  "Commonwealth Day"
+],
+
+"2027-05-29": [
+  "International Day of UN Peacekeepers"
+],
+
+"2027-05-31": [
+  "World No Tobacco Day"
+],
+    // ===================== JUNE 2027 =====================
+
+"2027-06-01": ["World Milk Day", "Global Parents Day"],
+
+"2027-06-03": ["World Bicycle Day"],
+
+"2027-06-05": ["World Environment Day"],
+
+"2027-06-07": ["World Food Safety Day"],
+
+"2027-06-08": ["World Oceans Day"],
+
+"2027-06-12": ["World Day Against Child Labour"],
+
+"2027-06-14": ["World Blood Donor Day"],
+
+"2027-06-15": ["Muharram"],
+
+"2027-06-18": ["Autistic Pride Day"],
+
+"2027-06-20": ["World Refugee Day", "Father's Day"],
+
+"2027-06-21": [
+  "International Day of Yoga",
+  "World Music Day"
+],
+
+"2027-06-23": ["United Nations Public Service Day"],
+
+"2027-06-26": [
+  "International Day Against Drug Abuse",
+  "International Day in Support of Victims of Torture"
+],
+
+"2027-06-29": ["National Statistics Day"],
+
+
+// ===================== JULY 2027 =====================
+
+"2027-07-01": [
+  "National Doctors' Day",
+  "Chartered Accountants Day"
+],
+
+"2027-07-02": ["World UFO Day"],
+
+"2027-07-03": ["International Plastic Bag Free Day"],
+
+"2027-07-06": ["World Zoonoses Day"],
+
+"2027-07-07": ["World Chocolate Day"],
+
+"2027-07-11": ["World Population Day"],
+
+"2027-07-15": ["World Youth Skills Day"],
+
+"2027-07-17": [
+  "World Day for International Justice",
+  "World Emoji Day"
+],
+
+"2027-07-18": ["Nelson Mandela International Day"],
+
+"2027-07-20": ["International Chess Day"],
+
+"2027-07-22": ["National Flag Adoption Day"],
+
+"2027-07-24": ["Income Tax Day"],
+
+"2027-07-26": ["Kargil Vijay Diwas"],
+
+"2027-07-27": ["Dr. A.P.J. Abdul Kalam Memorial Day"],
+
+"2027-07-28": [
+  "World Hepatitis Day",
+  "World Nature Conservation Day"
+],
+
+"2027-07-29": ["International Tiger Day"],
+
+"2027-07-30": ["International Day of Friendship"],
+
+
+// ===================== AUGUST 2027 =====================
+
+"2027-08-01": ["Friendship Day"],
+
+"2027-08-06": ["Hiroshima Day"],
+
+"2027-08-09": ["Nagasaki Day", "Quit India Movement Day"],
+
+"2027-08-12": ["International Youth Day"],
+
+"2027-08-15": [
+  "Independence Day"
+],
+
+"2027-08-19": ["World Photography Day"],
+
+"2027-08-20": ["World Mosquito Day"],
+
+"2027-08-25": [
+  "Janmashtami"
+],
+
+"2027-08-29": ["National Sports Day"],
+    "2027-09-02": ["Ganesh Chaturthi"],
+
+"2027-09-05": [
+  "Teachers' Day",
+  "International Day of Charity"
+],
+
+"2027-09-08": ["International Literacy Day"],
+
+"2027-09-14": ["Hindi Diwas"],
+
+"2027-09-15": ["Engineers' Day"],
+
+"2027-09-16": ["World Ozone Day"],
+
+"2027-09-17": ["Vishwakarma Puja"],
+
+"2027-09-21": [
+  "International Day of Peace",
+  "World Alzheimer's Day"
+],
+
+"2027-09-22": ["World Rose Day"],
+
+"2027-09-25": ["World Pharmacists Day"],
+
+"2027-09-26": [
+  "World Environmental Health Day",
+  "World Rivers Day"
+],
+
+"2027-09-27": ["World Tourism Day"],
+
+"2027-09-28": ["World Rabies Day"],
+
+"2027-09-29": [
+  "Mahalaya",
+  "World Heart Day"
+],
+    "2027-10-01": ["International Day of Older Persons"],
+
+"2027-10-02": [
+  "Gandhi Jayanti",
+  "International Day of Non-Violence"
+],
+
+"2027-10-04": ["World Animal Day"],
+
+"2027-10-05": [
+  "World Teachers' Day",
+  "Durga Puja - Maha Shashthi"
+],
+
+"2027-10-06": [
+  "Durga Puja - Maha Saptami"
+],
+
+"2027-10-07": [
+  "Durga Puja - Maha Ashtami"
+],
+
+"2027-10-08": [
+  "Durga Puja - Maha Navami",
+  "Indian Air Force Day"
+],
+
+"2027-10-09": [
+  "Durga Puja - Vijaya Dashami",
+  "World Post Day"
+],
+
+"2027-10-10": [
+  "World Mental Health Day"
+],
+
+"2027-10-11": [
+  "International Day of the Girl Child"
+],
+
+"2027-10-13": [
+  "International Day for Disaster Risk Reduction"
+],
+
+"2027-10-14": [
+  "World Standards Day"
+],
+
+"2027-10-15": [
+  "Global Handwashing Day"
+],
+
+"2027-10-16": [
+  "World Food Day"
+],
+
+"2027-10-20": [
+  "Karwa Chauth"
+],
+
+"2027-10-24": [
+  "United Nations Day"
+],
+
+"2027-10-29": [
+  "Lakshmi Puja"
+],
+
+"2027-10-31": [
+  "Bharatridwitiya",
+  "National Unity Day",
+  "Halloween"
+],
+    "2027-11-01": [
+  "World Vegan Day"
+],
+
+"2027-11-02": [
+  "National Cancer Awareness Day"
+],
+
+"2027-11-04": [
+  "Chhat Puja"
+],
+
+"2027-11-05": [
+  "World Tsunami Awareness Day"
+],
+
+"2027-11-07": [
+  "National Cancer Awareness Day"
+],
+
+"2027-11-08": [
+  "World Radiography Day"
+],
+
+"2027-11-10": [
+  "World Science Day for Peace and Development"
+],
+
+"2027-11-11": [
+  "National Education Day"
+],
+
+"2027-11-14": [
+  "Children's Day",
+  "World Diabetes Day",
+  "Guru Nanak Jayanti"
+],
+
+"2027-11-16": [
+  "International Day for Tolerance"
+],
+
+"2027-11-19": [
+  "International Men's Day",
+  "World Toilet Day"
+],
+
+"2027-11-20": [
+  "Universal Children's Day"
+],
+
+"2027-11-21": [
+  "World Television Day"
+],
+
+"2027-11-26": [
+  "Constitution Day of India"
+],
+
+"2027-12-02": [
+  "National Pollution Control Day",
+  "World Computer Literacy Day"
+],
+
+"2027-12-03": [
+  "International Day of Persons with Disabilities"
+],
+
+"2027-12-04": [
+  "Indian Navy Day"
+],
+
+"2027-12-05": [
+  "World Soil Day",
+  "International Volunteer Day"
+],
+
+"2027-12-07": [
+  "Armed Forces Flag Day"
+],
+
+"2027-12-09": [
+  "International Anti-Corruption Day"
+],
+
+"2027-12-10": [
+  "Human Rights Day"
+],
+
+"2027-12-11": [
+  "International Mountain Day"
+],
+
+"2027-12-14": [
+  "National Energy Conservation Day"
+],
+
+"2027-12-16": [
+  "Vijay Diwas"
+],
+
+"2027-12-18": [
+  "International Migrants Day"
+],
+
+"2027-12-22": [
+  "National Mathematics Day"
+],
+
+"2027-12-23": [
+  "Kisan Diwas"
+],
+
+"2027-12-24": [
+  "National Consumer Day"
+],
+
+"2027-12-25": [
+  "Christmas Day",
+  "Good Governance Day"
+],
+
+"2027-12-31": [
+  "New Year's Eve"
+],
+
+    // 2028
+    "2028-01-01": ["New Years Day"],
+    "2028-01-12": ["Birthday of Swami Vivekananda"],
+    "2028-01-23": ["Birthday of Netaji"],
+    "2028-01-26": ["Republic Day"],
+    "2028-01-31": ["Saraswati Puja"],
+    "2028-02-27": ["Id Ul-Fitar"],
+    "2028-03-22": ["Doljatra"],
+    "2028-04-03": ["Ram Navami"],
+    "2028-04-07": ["Mahavir Jayanti"],
+    "2028-04-14": ["Good Friday", "Birthday of Dr. B.R. Ambedkar"],
+    "2028-04-15": ["Bengali New Year"],
+    "2028-05-01": ["May Day"],
+    "2028-05-05": ["Id-Ud-Zoha (Bakrid)"],
+    "2028-05-08": ["Buddha Purnima"],
+    "2028-05-09": ["Birthday of Rabindra Nath Tagore"],
+    "2028-06-03": ["Muharram"],
+    "2028-08-13": ["Janmashtami"],
+    "2028-08-15": ["Independence Day"],
+    "2028-09-18": ["Mahalaya"],
+    "2028-09-25": ["Durga Puja - Saptami"],
+    "2028-09-26": ["Durga Puja - Astami", "Durga Puja - Nabami"],
+    "2028-09-27": ["Durga Puja - Vijaya Dasami"],
+    "2028-10-02": ["Birthday of Gandhiji"],
+    "2028-10-17": ["Lakshmi Puja"],
+    "2028-10-23": ["Chhat Puja"],
+    "2028-11-02": ["Birth Day of Guru Nanak"],
+    "2028-12-25": ["Christmas Day"]
+};
+
+/* ===================== বাংলা (পশ্চিমবঙ্গ পঞ্জিকা) তারিখ ও তিথি ===================== */
+const bnDigitsMap = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+function toBengaliNumber(n) {
+    return n.toString().split('').map(ch => (/[0-9]/.test(ch) ? bnDigitsMap[+ch] : ch)).join('');
+}
+
+const bengaliMonthNames = ["বৈশাখ","জ্যৈষ্ঠ","আষাঢ়","শ্রাবণ","ভাদ্র","আশ্বিন","কার্তিক","অগ্রহায়ণ","পৌষ","মাঘ","ফাল্গুন","চৈত্র"];
+
+/* ---- সূর্যের প্রকৃত (apparent) সাইডেরিয়াল দ্রাঘিমাংশ — বাংলা মাস নির্ধারণের ভিত্তি ----
+   বাংলা মাস প্রকৃতপক্ষে সূর্যের রাশি পরিবর্তনের (সংক্রান্তি) উপর ভিত্তি করে, তাই এর
+   দৈর্ঘ্য স্থির ৩০/৩১ দিন নয় — গ্রীষ্মে (আষাঢ়-ভাদ্র) পৃথিবী সূর্য থেকে দূরে থাকায়
+   সূর্যের আপাত গতি কমে যায় বলে মাস ৩১-৩২ দিনের হয়, আর শীতে (পৌষ-ফাল্গুন) মাস
+   ২৯-৩০ দিনের হয়। এই কোডে প্রকৃত সৌর অবস্থান হিসাব করে রাশি (মাস) নির্ণয় করা হয়েছে। */
+function sunSiderealLongitude(dateUTCms) {
+    const JD = dateUTCms / 86400000 + 2440587.5;
+    const T = (JD - 2451545.0) / 36525;
+    const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+    const M = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) * Math.PI / 180;
+    const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+            + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+            + 0.000289 * Math.sin(3 * M);
+    const trueLong = L0 + C;
+    const Omega = (125.04 - 1934.136 * T) * Math.PI / 180;
+    const apparentLong = trueLong - 0.00569 - 0.00478 * Math.sin(Omega);
+    // পশ্চিমবঙ্গের ঐতিহ্যবাহী (বিশুদ্ধ সিদ্ধান্ত) পঞ্জিকার সাথে মিলিয়ে ক্যালিব্রেট করা অয়নাংশ —
+    // ২০২৬ সালের নিশ্চিত পয়লা বৈশাখ (১৫ এপ্রিল) ও আষাঢ় মাসের ৩২ দিন হওয়ার তথ্যের সাথে যাচাই করে বসানো
+    const ayanamsa = 24.1 + 0.0139552 * (T * 100);
+    let sidereal = apparentLong - ayanamsa;
+    sidereal = ((sidereal % 360) + 360) % 360;
+    return sidereal;
+}
+
+/* ---- কলকাতার আনুমানিক সূর্যোদয়ের সময় (NOAA সরলীকৃত সৌর সমীকরণ) ----
+   পঞ্জিকায় দিনের তিথি/মাস সূর্যোদয়ের মুহূর্তে যা থাকে তা দিয়ে নির্ধারিত হয়,
+   তাই প্রতিটি তারিখের জন্য প্রকৃত সূর্যোদয়ের সময় হিসাব করে সেই মুহূর্তের
+   অবস্থান দেখা হচ্ছে (একটা স্থির সময় যেমন সকাল ৬টা ধরে নেওয়ার বদলে)। */
+function kolkataSunriseUTCms(y, m, d) {
+    const lat = 22.5726 * Math.PI / 180;
+    const lon = 88.3639;
+    const startOfYear = Date.UTC(y, 0, 1);
+    const n = Math.round((Date.UTC(y, m, d) - startOfYear) / 86400000) + 1;
+    const gamma = 2 * Math.PI / 365 * (n - 1 + (6 - 12) / 24);
+    const eqtime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
+                  - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
+    const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
+               - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma)
+               - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
+    const zenith = 90.833 * Math.PI / 180;
+    let cosH = (Math.cos(zenith) / (Math.cos(lat) * Math.cos(decl))) - Math.tan(lat) * Math.tan(decl);
+    cosH = Math.min(1, Math.max(-1, cosH));
+    const Hdeg = Math.acos(cosH) * 180 / Math.PI;
+    const sunriseUTCmin = 720 - 4 * lon - eqtime - 4 * Hdeg;
+    return Date.UTC(y, m, d, 0, 0, 0) + sunriseUTCmin * 60000;
+}
+
+function rashiIndexAtSunrise(y, m, d) {
+    const lon = sunSiderealLongitude(kolkataSunriseUTCms(y, m, d));
+    return Math.floor(lon / 30) % 12;
+}
+
+/* একবার ২০২৫-২০২৯ পরিসরে দিন-ধরে-দিন স্ক্যান করে প্রতিটি বাংলা মাসের শুরুর তারিখ বের করে
+   একটা লুকআপ টেবিল বানানো হচ্ছে — যাতে প্রতিটি সেল রেন্ডারে বারবার ভারী হিসাব না করতে হয়। */
+let bengaliCalendarSegments = null;
+function buildBengaliCalendarSegments() {
+    const segments = [];
+    let cur = new Date(Date.UTC(2025, 5, 1));
+    const end = new Date(Date.UTC(2029, 4, 15));
+    let prevRashi = null;
+    let bengaliYear = null;
+    while (cur.getTime() <= end.getTime()) {
+        const y = cur.getUTCFullYear(), m = cur.getUTCMonth(), d = cur.getUTCDate();
+        const rashi = rashiIndexAtSunrise(y, m, d);
+        if (rashi !== prevRashi) {
+            if (rashi === 0) bengaliYear = y - 593;
+            else if (bengaliYear === null) bengaliYear = (m >= 3 ? y : y - 1) - 593;
+            segments.push({ startMs: Date.UTC(y, m, d), month: rashi, year: bengaliYear });
+            prevRashi = rashi;
+        }
+        cur.setUTCDate(cur.getUTCDate() + 1);
+    }
+    return segments;
+}
+function findBengaliSegment(dateUTCms) {
+    if (!bengaliCalendarSegments) bengaliCalendarSegments = buildBengaliCalendarSegments();
+    for (let i = bengaliCalendarSegments.length - 1; i >= 0; i--) {
+        if (dateUTCms >= bengaliCalendarSegments[i].startMs) return bengaliCalendarSegments[i];
+    }
+    return bengaliCalendarSegments[0];
+}
+
+/* Gregorian (year, month 0-11, day) → বাংলা তারিখ, প্রকৃত সৌর অবস্থানের ভিত্তিতে গণনা করা।
+   পশ্চিমবঙ্গের ২০২৬ সালের পয়লা বৈশাখ (১৫ এপ্রিল) ও আষাঢ় মাস ৩২ দিনে হওয়ার তথ্যের
+   সাথে মিলিয়ে ক্যালিব্রেট করা, তাই বছরের মধ্যে মাসের দৈর্ঘ্য ২৯-৩২ দিন পর্যন্ত ওঠানামা করে,
+   যেমনটা প্রকৃত ঐতিহ্যবাহী পঞ্জিকায় হয়। বিভিন্ন পঞ্জিকা প্রকাশক (বিশুদ্ধ সিদ্ধান্ত, পি.এম.
+   বাগচী ইত্যাদি) নিজেদের মধ্যেও মাঝেমধ্যে ১ দিন এদিক-ওদিক দেখায় বলে এখানেও সামান্য
+   পার্থক্য থাকতে পারে। */
+function gregorianToBengali(year, month, day) {
+    const key = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    const verified = getVerifiedBengaliDate(key);
+    if (verified) return verified;
+    const dateUTCms = Date.UTC(year, month, day);
+    const seg = findBengaliSegment(dateUTCms);
+    const dayInMonth = Math.round((dateUTCms - seg.startMs) / 86400000) + 1;
+    return { day: dayInMonth, month: bengaliMonthNames[seg.month], year: seg.year };
+}
+
+/* আগস্ট-ডিসেম্বর ২০২৬ এর বাংলা তারিখ আসল পঞ্জিকার (ছবি থেকে যাচাই করা) মাস-শুরুর
+   তারিখগুলোর (অ্যাঙ্কর) ভিত্তিতে হুবহু বসানো হলো, যাতে জ্যোতির্বৈজ্ঞানিক আনুমানিক হিসাবের
+   সাথে ১ দিন এদিক-ওদিক না হয়। */
+const verifiedBengaliAnchors = [
+    { start: '2026-08-01', month: 'শ্রাবণ', startDay: 15 },
+    { start: '2026-08-19', month: 'ভাদ্র',   startDay: 1 },
+    { start: '2026-09-19', month: 'আশ্বিন',  startDay: 1 },
+    { start: '2026-10-19', month: 'কার্তিক', startDay: 1 },
+    { start: '2026-11-18', month: 'অগ্রহায়ণ', startDay: 1 },
+    { start: '2026-12-17', month: 'পৌষ',     startDay: 1 },
+];
+const verifiedBengaliRangeEnd = '2026-12-31';
+let verifiedBengaliDateMap = null;
+function buildVerifiedBengaliDateMap() {
+    const map = {};
+    const bnYear = 1433;
+    for (let i = 0; i < verifiedBengaliAnchors.length; i++) {
+        const anchor = verifiedBengaliAnchors[i];
+        const startMs = Date.UTC(...anchor.start.split('-').map((v, idx) => idx === 1 ? parseInt(v, 10) - 1 : parseInt(v, 10)));
+        const endMs = (i + 1 < verifiedBengaliAnchors.length)
+            ? Date.UTC(...verifiedBengaliAnchors[i + 1].start.split('-').map((v, idx) => idx === 1 ? parseInt(v, 10) - 1 : parseInt(v, 10)))
+            : Date.UTC(...verifiedBengaliRangeEnd.split('-').map((v, idx) => idx === 1 ? parseInt(v, 10) - 1 : parseInt(v, 10))) + 86400000;
+        for (let ms = startMs; ms < endMs; ms += 86400000) {
+            const d = new Date(ms);
+            const key = `${d.getUTCFullYear()}-${(d.getUTCMonth() + 1).toString().padStart(2, '0')}-${d.getUTCDate().toString().padStart(2, '0')}`;
+            const dayInMonth = anchor.startDay + Math.round((ms - startMs) / 86400000);
+            map[key] = { day: dayInMonth, month: anchor.month, year: bnYear };
+        }
+    }
+    return map;
+}
+function getVerifiedBengaliDate(key) {
+    if (!verifiedBengaliDateMap) verifiedBengaliDateMap = buildVerifiedBengaliDateMap();
+    return verifiedBengaliDateMap[key] || null;
+}
+
+
+/* ---- তিথি (পূর্ণিমা / অমাবস্যা / একাদশী) — চাঁদের প্রকৃত সূর্যোদয়কালীন অবস্থান ভিত্তিক ---- */
+function getMoonAgeDays(dateUTCms) {
+    const knownNewMoonUTC = Date.UTC(2000, 0, 6, 18, 14, 0); // reference amavasya (astronomical epoch)
+    const synodicMonth = 29.530588861;
+    let age = ((dateUTCms - knownNewMoonUTC) / 86400000) % synodicMonth;
+    if (age < 0) age += synodicMonth;
+    return age;
+}
+function getTithiIndex(year, month, day) {
+    // সূর্যোদয়ের তিথি অনুযায়ী পঞ্জিকা তৈরি হয় — তাই প্রকৃত সূর্যোদয়ের সময় ব্যবহার করা হলো
+    const age = getMoonAgeDays(kolkataSunriseUTCms(year, month, day));
+    const tithiLength = 29.530588861 / 30;
+    let idx = Math.floor(age / tithiLength) + 1;
+    if (idx > 30) idx = 30;
+    return idx;
+}
+function getTithiEventLabel(tithiIndex) {
+    if (tithiIndex === 15) return "পূর্ণিমা";
+    if (tithiIndex === 30) return "অমাবস্যা";
+    if (tithiIndex === 11) return "একাদশী (শুক্লপক্ষ)";
+    if (tithiIndex === 26) return "একাদশী (কৃষ্ণপক্ষ)";
+    return null;
+}
+function alreadyHasTithiEvent(list) {
+    if (!list) return false;
+    const keys = ['পূর্ণিমা','অমাবস্যা','একাদশী','purnima','amavasya','amavasy','ekadashi'];
+    return list.some(ev => keys.some(k => ev.toLowerCase().includes(k)));
+}
+/* আগস্ট-ডিসেম্বর ২০২৬ এর জন্য প্রকৃত পঞ্জিকার (ছবি থেকে যাচাই করা) সঠিক একাদশী/অমাবস্যা/পূর্ণিমা
+   ইতিমধ্যে holidays অবজেক্টে সরাসরি বসানো আছে, তাই এই সময়ের জন্য approximate (আনুমানিক)
+   জ্যোতির্বৈজ্ঞানিক হিসাব বাদ দেওয়া হলো, যাতে ভুল তারিখে ডুপ্লিকেট/ভুল তিথি না বসে। */
+function isVerifiedPanjikaRange(y, m) {
+    return y === 2026 && m >= 7 && m <= 11; // Aug(7) - Dec(11), 0-indexed
+}
+function injectPanjikaTithiEvents(startYear, endYear) {
+    for (let y = startYear; y <= endYear; y++) {
+        for (let m = 0; m < 12; m++) {
+            if (isVerifiedPanjikaRange(y, m)) continue;
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const label = getTithiEventLabel(getTithiIndex(y, m, d));
+                if (!label) continue;
+                const key = `${y}-${(m + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                if (!holidays[key]) holidays[key] = [];
+                if (!alreadyHasTithiEvent(holidays[key])) holidays[key].push(label);
+            }
+        }
+    }
+}
+
+/* ---- বাংলার মহাপুরুষদের জন্ম ও মৃত্যু/তিরোধান দিবস (প্রতি বছর পুনরাবৃত্ত গ্রেগরিয়ান তারিখ) ---- */
+const mahapurushAnniversaries = [
+    { month: 5,  day: 22, label: "রাজা রামমোহন রায়ের জন্মদিন" },
+    { month: 9,  day: 27, label: "রাজা রামমোহন রায়ের মৃত্যুদিন" },
+    { month: 9,  day: 26, label: "ঈশ্বরচন্দ্র বিদ্যাসাগরের জন্মদিন" },
+    { month: 7,  day: 29, label: "ঈশ্বরচন্দ্র বিদ্যাসাগরের মৃত্যুদিন" },
+    { month: 1,  day: 25, label: "মাইকেল মধুসূদন দত্তের জন্মদিন" },
+    { month: 6,  day: 29, label: "মাইকেল মধুসূদন দত্তের মৃত্যুদিন" },
+    { month: 6,  day: 26, label: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের জন্মদিন" },
+    { month: 4,  day: 8,  label: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের মৃত্যুদিন" },
+    { month: 2,  day: 18, label: "শ্রীরামকৃষ্ণ পরমহংসদেবের জন্মতিথি" },
+    { month: 8,  day: 16, label: "শ্রীরামকৃষ্ণ পরমহংসদেবের তিরোধান দিবস" },
+    { month: 12, day: 22, label: "মা সারদাদেবীর জন্মদিন" },
+    { month: 7,  day: 21, label: "মা সারদাদেবীর তিরোধান দিবস" },
+    { month: 7,  day: 4,  label: "স্বামী বিবেকানন্দের মৃত্যুদিন" },
+    { month: 8,  day: 7,  label: "রবীন্দ্রনাথ ঠাকুরের মৃত্যুদিন (২২ শ্রাবণ)" },
+    { month: 5,  day: 25, label: "কাজী নজরুল ইসলামের জন্মদিন" },
+    { month: 8,  day: 29, label: "কাজী নজরুল ইসলামের মৃত্যুদিন" },
+    { month: 8,  day: 18, label: "নেতাজি সুভাষচন্দ্র বসুর প্রয়াণ/নিখোঁজ দিবস" },
+    { month: 11, day: 5,  label: "দেশবন্ধু চিত্তরঞ্জন দাশের জন্মদিন" },
+    { month: 6,  day: 16, label: "দেশবন্ধু চিত্তরঞ্জন দাশের মৃত্যুদিন" },
+    { month: 11, day: 30, label: "আচার্য জগদীশচন্দ্র বসুর জন্মদিন" },
+    { month: 11, day: 23, label: "আচার্য জগদীশচন্দ্র বসুর মৃত্যুদিন" },
+    { month: 1,  day: 1,  label: "সত্যেন্দ্রনাথ বসুর জন্মদিন" },
+    { month: 2,  day: 4,  label: "সত্যেন্দ্রনাথ বসুর মৃত্যুদিন" },
+    { month: 9,  day: 15, label: "শরৎচন্দ্র চট্টোপাধ্যায়ের জন্মদিন" },
+    { month: 1,  day: 16, label: "শরৎচন্দ্র চট্টোপাধ্যায়ের মৃত্যুদিন" },
+    { month: 8,  day: 2,  label: "আচার্য প্রফুল্লচন্দ্র রায়ের জন্মদিন" },
+    { month: 6,  day: 16, label: "আচার্য প্রফুল্লচন্দ্র রায়ের মৃত্যুদিন" },
+    { month: 9,  day: 28, label: "রানী রাসমণির জন্মদিন" },
+    { month: 2,  day: 19, label: "রানী রাসমণির মৃত্যুদিন" }
+];
+function injectMahapurushAnniversaries(startYear, endYear) {
+    for (let y = startYear; y <= endYear; y++) {
+        mahapurushAnniversaries.forEach(item => {
+            const key = `${y}-${item.month.toString().padStart(2, '0')}-${item.day.toString().padStart(2, '0')}`;
+            if (!holidays[key]) holidays[key] = [];
+            if (!holidays[key].includes(item.label)) holidays[key].push(item.label);
+        });
+    }
+}
+
+injectMahapurushAnniversaries(2026, 2028);
+injectPanjikaTithiEvents(2026, 2028);
+
+/* ===================== LIVE CLOCK ===================== */
+function updateLiveTime() {
+    const now = new Date();
+    document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('live-date').innerText = now.toLocaleDateString('bn-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const flashEl = document.getElementById('tickerFlashText');
+    if (flashEl) {
+        flashEl.innerText = '📅 আজ — ' + now.toLocaleDateString('bn-BD', { weekday: 'long', month: 'long', day: 'numeric' });
+    }
+}
+setInterval(updateLiveTime, 1000);
+updateLiveTime();
+
+/* Every month's 2nd and 4th Saturday (a common recurring off-day) — computed
+   on the fly for whichever month/year is being rendered, so it automatically
+   works for every month/year without hardcoding dates into `holidays`. */
+function getRecurringSaturdayEvents(year, month) {
+    const events = {};
+    let satCount = 0;
+    const daysInThisMonth = new Date(year, month + 1, 0).getDate();
+    for (let d = 1; d <= daysInThisMonth; d++) {
+        if (new Date(year, month, d).getDay() === 6) { // 6 = Saturday
+            satCount++;
+            if (satCount === 2) events[d] = "2nd Saturday";
+            if (satCount === 4) events[d] = "4th Saturday";
+        }
+    }
+    return events;
+}
+
+/* ===================== TODAY'S EVENT(S) IN TICKER ===================== */
+function updateTodayEventTicker() {
+    const track = document.getElementById('tickerTrack');
+    if (!track) return;
+
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const d = now.getDate();
+    const dateString = `${y}-${(m + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+
+    let todaysEvents = [];
+    if (holidays[dateString]) todaysEvents = todaysEvents.concat(holidays[dateString]);
+
+    const recurring = getRecurringSaturdayEvents(y, m);
+    if (recurring[d]) todaysEvents.push(recurring[d]);
+
+    const fullText = '🎉 <b>Special Occasions</b> auto-highlighted every month &nbsp;•&nbsp; See all public holidays and special days live &nbsp;•&nbsp; New calendar years available through 2026–2028 &nbsp;•&nbsp; 🎉';
+    const shortText = '🎉 <b>Special Occasions</b> auto-highlighted every month &nbsp;•&nbsp; 🎉';
+
+    if (todaysEvents.length > 0) {
+        const eventsText = todaysEvents.join(' এবং ');
+        const badge = `<span class="ticker-today-badge">🎊 আজকের ইভেন্ট — ${eventsText} 🎊</span> &nbsp;•&nbsp; `;
+        track.innerHTML = badge + shortText;
+    } else {
+        track.innerHTML = fullText;
+    }
+}
+updateTodayEventTicker();
+
+/* ===================== CALENDAR RENDER ===================== */
+function renderCalendar() {
+    const month = parseInt(document.getElementById('monthSelect').value);
+    const year = parseInt(document.getElementById('yearSelect').value);
+    const tbody = document.getElementById('calendarBody');
+    const sidebarList = document.getElementById('sidebarEventList');
+
+    tbody.innerHTML = "";
+    sidebarList.innerHTML = "";
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const recurringSaturdays = getRecurringSaturdayEvents(year, month);
+
+    const today = new Date();
+    const isCurrentMonth = (today.getMonth() === month && today.getFullYear() === year);
+    const currentDay = today.getDate();
+
+    let monthHolidays = [];
+
+    let date = 1;
+    for (let i = 0; i < 6; i++) {
+        let row = document.createElement("tr");
+        row.className = "fade-in-row";
+        row.style.animationDelay = (i * 0.05) + "s";
+        let hasDate = false;
+
+        for (let j = 0; j < 7; j++) {
+            let cell = document.createElement("td");
+
+            if (i === 0 && j < firstDay) {
+                // empty
+            } else if (date > daysInMonth) {
+                // empty
+            } else {
+                hasDate = true;
+                let dateSpan = document.createElement("span");
+                dateSpan.className = "date-number";
+                dateSpan.innerText = date;
+                cell.appendChild(dateSpan);
+
+                let bnDateSpan = document.createElement("span");
+                bnDateSpan.className = "bn-date";
+                const bnInfo = gregorianToBengali(year, month, date);
+                bnDateSpan.innerText = `${toBengaliNumber(bnInfo.day)} ${bnInfo.month} ${toBengaliNumber(bnInfo.year)}`;
+                cell.appendChild(bnDateSpan);
+
+                if (isCurrentMonth && date === currentDay) {
+                    cell.className = "today";
+                }
+
+                let formattedMonth = (month + 1).toString().padStart(2, '0');
+                let formattedDate = date.toString().padStart(2, '0');
+                let dateString = `${year}-${formattedMonth}-${formattedDate}`;
+                const dayNum = date; // captured per-iteration so click handlers below get the right day
+
+                if (holidays[dateString]) {
+                    holidays[dateString].forEach((event, index) => {
+                        let colorIndex = (date + index) % 6;
+                        let colorClass = `color-${colorIndex}`;
+
+                        let eventDiv = document.createElement("div");
+                        eventDiv.className = `event ${colorClass}`;
+                        eventDiv.innerText = event;
+                        eventDiv.onclick = (e) => { e.stopPropagation(); openDayEventsModal(dateString, dayNum, month, year); };
+                        cell.appendChild(eventDiv);
+
+                        monthHolidays.push({
+                            date: `${date}ই ${document.getElementById('monthSelect').options[month].text}`,
+                            name: event,
+                            colorClass: colorClass
+                        });
+                    });
+                }
+
+                if (recurringSaturdays[date]) {
+                    let eventDiv = document.createElement("div");
+                    eventDiv.className = "event sat-off";
+                    eventDiv.innerText = recurringSaturdays[date];
+                    eventDiv.onclick = (e) => { e.stopPropagation(); openDayEventsModal(dateString, dayNum, month, year); };
+                    cell.appendChild(eventDiv);
+
+                    monthHolidays.push({
+                        date: `${date}ই ${document.getElementById('monthSelect').options[month].text}`,
+                        name: recurringSaturdays[date],
+                        colorClass: "sat-off"
+                    });
+                }
+                date++;
+            }
+            row.appendChild(cell);
+        }
+        if (hasDate) {
+            tbody.appendChild(row);
+        }
+    }
+
+    if (monthHolidays.length > 0) {
+        monthHolidays.forEach((h, idx) => {
+            let item = document.createElement("div");
+            item.className = `sidebar-event-item ${h.colorClass}`;
+            item.style.animationDelay = (idx * 0.08) + "s";
+            item.innerHTML = `${h.name} <span>তারিখ: ${h.date}</span>`;
+            sidebarList.appendChild(item);
+        });
+    } else {
+        let noEventDiv = document.createElement("div");
+        noEventDiv.className = "no-event";
+        noEventDiv.innerText = "এই মাসে কোনো বিশেষ দিন নেই।";
+        sidebarList.appendChild(noEventDiv);
+    }
+}
+
+/* ===================== DAY EVENTS POPUP ===================== */
+function openDayEventsModal(dateString, dayNum, monthIdx, yearNum) {
+    const modal = document.getElementById('dayEventsModal');
+    const dateEl = document.getElementById('dayModalDate');
+    const bodyEl = document.getElementById('dayModalBody');
+    if (!modal || !dateEl || !bodyEl) return;
+
+    const dateObj = new Date(yearNum, monthIdx, dayNum);
+    dateEl.innerText = dateObj.toLocaleDateString('bn-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    let items = [];
+    (holidays[dateString] || []).forEach((name, index) => {
+        items.push({ name: name, colorClass: `color-${(dayNum + index) % 6}` });
+    });
+    const recurring = getRecurringSaturdayEvents(yearNum, monthIdx);
+    if (recurring[dayNum]) items.push({ name: recurring[dayNum], colorClass: 'sat-off' });
+
+    bodyEl.innerHTML = '';
+    if (items.length === 0) {
+        let none = document.createElement('div');
+        none.className = 'no-event';
+        none.innerText = 'এই দিনে কোনো বিশেষ ইভেন্ট নেই।';
+        bodyEl.appendChild(none);
+    } else {
+        items.forEach((it, idx) => {
+            let div = document.createElement('div');
+            div.className = `sidebar-event-item ${it.colorClass}`;
+            div.style.animationDelay = (idx * 0.08) + 's';
+            div.innerText = it.name;
+            bodyEl.appendChild(div);
+        });
+    }
+
+    modal.classList.add('show');
+    updateDayModalTime();
+    if (window.__dayModalTimeTimer) clearInterval(window.__dayModalTimeTimer);
+    window.__dayModalTimeTimer = setInterval(updateDayModalTime, 1000);
+}
+
+function updateDayModalTime() {
+    const t = document.getElementById('dayModalTime');
+    if (t) t.innerText = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function closeDayEventsModal() {
+    const modal = document.getElementById('dayEventsModal');
+    if (modal) modal.classList.remove('show');
+    if (window.__dayModalTimeTimer) clearInterval(window.__dayModalTimeTimer);
+}
+
+window.onload = function() {
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    if(currentYear < 2026) currentYear = 2026;
+    if(currentYear > 2028) currentYear = 2028;
+
+    document.getElementById('monthSelect').value = today.getMonth();
+    document.getElementById('yearSelect').value = currentYear;
+
+    renderCalendar();
+};
+
+/* ===========================================================================
+   📰 BENGALI NEWS WIDGET  —  category tabs (ABP Ananda + Google News Bengali + BBC Bangla)
+   =========================================================================== */
+const NEWS_MAX_ITEMS  = 15;
+const NEWS_REFRESH_MS = 15 * 60 * 1000; // active tab auto-refresh: 15 minutes
+const NEWS_CACHE_MS   = 5 * 60 * 1000;  // switching tabs re-uses data younger than 5 min
+
+/* Google News RSS in Bengali (India edition). Very reliable and it gathers headlines
+   from many Bengali publishers (Anandabazar, Sangbad Pratidin, Ei Samay, TV9 Bangla, Zee 24 Ghanta ...) */
+function gnUrl(path){
+    return 'https://news.google.com/rss' + path + (path.indexOf('?') === -1 ? '?' : '&') + 'hl=bn&gl=IN&ceid=IN:bn';
+}
+function gnSearch(q){ return gnUrl('/search?q=' + encodeURIComponent(q + ' when:2d')); }
+
+/* ➕ To add another tab, just add one line here. `gn:true` = Google News feed (shows publisher name) */
+const NEWS_CATEGORIES = [
+    { id:'abp',           label:'ABP আনন্দ',   url:'https://bengali.abplive.com/home/feed' },
+    { id:'top',           label:'শীর্ষ খবর',    url: gnUrl(''), gn:true },
+    { id:'kolkata',       label:'কলকাতা',      url: gnSearch('কলকাতা'), gn:true },
+    { id:'wb',            label:'পশ্চিমবঙ্গ',   url: gnSearch('পশ্চিমবঙ্গ'), gn:true },
+    { id:'india',         label:'দেশ',          url: gnUrl('/headlines/section/topic/NATION'), gn:true },
+    { id:'world',         label:'বিশ্ব',         url: gnUrl('/headlines/section/topic/WORLD'), gn:true },
+    { id:'sports',        label:'খেলা',         url: gnUrl('/headlines/section/topic/SPORTS'), gn:true },
+    { id:'entertainment', label:'বিনোদন',      url: gnUrl('/headlines/section/topic/ENTERTAINMENT'), gn:true },
+    { id:'business',      label:'ব্যবসা',       url: gnUrl('/headlines/section/topic/BUSINESS'), gn:true },
+    { id:'tech',          label:'প্রযুক্তি',     url: gnUrl('/headlines/section/topic/TECHNOLOGY'), gn:true },
+    { id:'bbc',           label:'BBC বাংলা',   url:'https://feeds.bbci.co.uk/bengali/rss.xml' }
+];
+
+/* 🔑 BEST FIX: apnar nijer Google Apps Script relay (steps chat-e deya ache).
+   Deploy kore /exec URL ta ekhane boshan. Faka thakle sudhu free public relay chalbe (ora aksomoy fail kore). */
+const NEWS_PROXY_URL = 'https://script.google.com/macros/s/AKfycbyT5-etjCj42XDJOgi44Fq33i0QKjQaX2rb-iBm7DwWqjGqRHKZI2S5fIqRx6mAlglL/exec';   // e.g. 'https://script.google.com/macros/s/XXXXXXXX/exec'
+
+/* Browsers block direct cross-origin RSS fetches, so a relay is used. */
+function newsSourcesFor(feedUrl){
+    const enc = encodeURIComponent(feedUrl);
+    const list = [];
+    if (NEWS_PROXY_URL) list.push({ type:'xml', own:true, url: NEWS_PROXY_URL + (NEWS_PROXY_URL.indexOf('?') === -1 ? '?' : '&') + 'url=' + enc });
+    list.push(
+        { type:'rss2json', url:'https://api.rss2json.com/v1/api.json?count=20&rss_url=' + enc },
+        { type:'xml',      url:'https://api.allorigins.win/raw?url=' + enc },
+        { type:'allorigins-json', url:'https://api.allorigins.win/get?url=' + enc },
+        { type:'xml',      url:'https://api.codetabs.com/v1/proxy?quest=' + enc },
+        { type:'xml',      url:'https://corsproxy.io/?url=' + enc },
+        { type:'xml',      url:'https://corsproxy.io/?' + enc }
+    );
+    return list;
+}
+
+function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : str;
+    return div.innerHTML;
+}
+
+function fetchWithTimeout(url, ms){
+    const ctrl = new AbortController();
+    const timer = setTimeout(function(){ ctrl.abort(); }, ms || 9000);
+    return fetch(url, { cache:'no-store', signal: ctrl.signal }).finally(function(){ clearTimeout(timer); });
+}
+
+function toDate(str){
+    if (!str) return null;
+    /* rss2json gives "YYYY-MM-DD HH:MM:SS" in UTC with no zone marker */
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(str)) str = str.replace(' ', 'T') + 'Z';
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function formatNewsTime(d){
+    if (!d) return '';
+    return d.toLocaleString('en-IN', {
+        timeZone:'Asia/Kolkata', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'
+    });
+}
+
+/* Google News titles look like "Headline - Publisher" */
+function splitTitleSource(title){
+    const i = title.lastIndexOf(' - ');
+    if (i > 10 && title.length - i < 45) return { title: title.slice(0, i).trim(), source: title.slice(i + 3).trim() };
+    return { title: title, source: '' };
+}
+
+function safeLink(url){
+    return /^https?:\/\//i.test(url || '') ? url : '';
+}
+
+function parseXmlFeed(xmlText){
+    const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
+    if (xml.querySelector('parsererror')) throw new Error('Feed parse error');
+    const items = Array.from(xml.querySelectorAll('item'));
+    if (!items.length) throw new Error('Empty feed');
+    return items.map(function(item){
+        const g = function(tag){ const el = item.querySelector(tag); return el ? el.textContent.trim() : ''; };
+        return { title:g('title'), link:g('link'), pubDate:toDate(g('pubDate')), source:g('source') };
+    });
+}
+
+function parseRss2Json(data){
+    if (data.status !== 'ok' || !Array.isArray(data.items) || !data.items.length) throw new Error('rss2json returned no items');
+    return data.items.map(function(it){
+        return { title:(it.title || '').trim(), link:(it.link || '').trim(), pubDate:toDate((it.pubDate || '').trim()), source:'' };
+    });
+}
+
+function finishItems(items, cat){
+    const seen = {};
+    let out = [];
+    items.forEach(function(it){
+        if (cat.gn){
+            const s = splitTitleSource(it.title);
+            it.title = s.title;
+            if (!it.source) it.source = s.source;
+        }
+        if (!it.title || seen[it.title]) return;
+        seen[it.title] = true;
+        out.push(it);
+    });
+    if (cat.gn && out.every(function(x){ return x.pubDate; })){
+        out.sort(function(a, b){ return b.pubDate - a.pubDate; });
+    }
+    return out.slice(0, NEWS_MAX_ITEMS);
+}
+
+async function fetchOneNewsSource(source, cat){
+    const res = await fetchWithTimeout(source.url, 9000);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    let raw;
+    if (source.type === 'rss2json') raw = parseRss2Json(await res.json());
+    else if (source.type === 'allorigins-json'){
+        const j = await res.json();
+        if (!j || !j.contents) throw new Error('empty contents');
+        raw = parseXmlFeed(j.contents);
+    } else raw = parseXmlFeed(await res.text());
+    const items = finishItems(raw, cat);
+    if (!items.length) throw new Error('No usable items');
+    return items;
+}
+
+/* first relay that succeeds wins (all public relays are raced together, so it is fast) */
+function firstSuccess(promises){
+    return new Promise(function(resolve, reject){
+        let left = promises.length, lastErr = null;
+        if (!left) return reject(new Error('no sources'));
+        promises.forEach(function(p){
+            p.then(resolve, function(e){ lastErr = e; if (--left === 0) reject(lastErr); });
+        });
+    });
+}
+
+async function fetchNewsFromAnySource(cat){
+    const sources = newsSourcesFor(cat.url);
+    const tag = function(src){ return function(e){ console.warn('News source failed (' + cat.id + ' / ' + src.url.split('?')[0] + '):', e.message); throw e; }; };
+    if (sources[0].own){
+        try { return await fetchOneNewsSource(sources[0], cat); }
+        catch (e){ console.warn('Own news proxy failed:', e.message); }
+    }
+    const rest = sources.filter(function(x){ return !x.own; });
+    return firstSuccess(rest.map(function(src){ return fetchOneNewsSource(src, cat).catch(tag(src)); }));
+}
+
+/* last good headlines are also kept in localStorage, so the widget is never empty */
+function saveNewsLocal(id, items){
+    try { localStorage.setItem('calNewsData_' + id, JSON.stringify({ t: Date.now(), items: items })); } catch(e){}
+}
+function loadNewsLocal(id){
+    try {
+        const o = JSON.parse(localStorage.getItem('calNewsData_' + id) || 'null');
+        if (!o || !Array.isArray(o.items) || !o.items.length) return null;
+        o.items.forEach(function(it){ it.pubDate = it.pubDate ? new Date(it.pubDate) : null; });
+        return o;
+    } catch(e){ return null; }
+}
+
+/* ---------- News UI ---------- */
+const newsCache = {};
+let newsToken = 0;
+let activeNewsId = 'abp';
+try { const saved = localStorage.getItem('calNewsTab'); if (saved && NEWS_CATEGORIES.some(function(c){ return c.id === saved; })) activeNewsId = saved; } catch(e){}
+
+function renderNewsTabs(){
+    const wrap = document.getElementById('newsTabs');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    NEWS_CATEGORIES.forEach(function(c){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'news-tab' + (c.id === activeNewsId ? ' active' : '');
+        b.textContent = c.label;
+        b.onclick = function(){ selectNewsTab(c.id); };
+        wrap.appendChild(b);
+    });
+    const act = wrap.querySelector('.active');
+    if (act && act.scrollIntoView) act.scrollIntoView({ block:'nearest', inline:'center' });
+}
+
+function selectNewsTab(id){
+    activeNewsId = id;
+    try { localStorage.setItem('calNewsTab', id); } catch(e){}
+    renderNewsTabs();
+    fetchBengaliNews(false);
+}
+
+function renderNewsItems(items, cat){
+    const body = document.getElementById('newsBody');
+    if (!body) return;
+    body.innerHTML = '';
+    items.forEach(function(item, idx){
+        const timeLbl = formatNewsTime(item.pubDate);
+        const link = safeLink(item.link);
+        const title = escapeHtml(item.title || 'শিরোনাম পাওয়া যায়নি');
+        const row = document.createElement('div');
+        row.className = 'news-item fade-refresh';
+        row.style.animationDelay = (Math.min(idx, 8) * 0.05) + 's';
+        row.innerHTML =
+            '<div class="news-headline">' +
+                (link ? '<a href="' + escapeHtml(link) + '" target="_blank" rel="noopener noreferrer">' + title + '</a>' : title) +
+            '</div>' +
+            '<div class="news-time">' +
+                (item.source ? '<span class="news-source">' + escapeHtml(item.source) + '</span>' : '') +
+                (timeLbl ? '<span><i class="fa-regular fa-clock"></i> ' + timeLbl + '</span>' : '') +
+            '</div>';
+        body.appendChild(row);
+    });
+    body.scrollTop = 0;
+}
+
+function updateNewsTimestamp(ts){
+    const el = document.getElementById('newsLastUpdated');
+    if (el) el.innerText = 'Last updated: ' + new Date(ts || Date.now()).toLocaleTimeString('en-IN', {
+        timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+}
+
+async function fetchBengaliNews(force){
+    const body = document.getElementById('newsBody');
+    if (!body) return;
+    const cat = NEWS_CATEGORIES.filter(function(c){ return c.id === activeNewsId; })[0] || NEWS_CATEGORIES[0];
+    const token = ++newsToken;
+    const cached = newsCache[cat.id];
+
+    if (cached && !force && Date.now() - cached.t < NEWS_CACHE_MS){
+        renderNewsItems(cached.items, cat);
+        updateNewsTimestamp(cached.t);
+        return;
+    }
+    if (cached){ renderNewsItems(cached.items, cat); updateNewsTimestamp(cached.t); }
+    else body.innerHTML = '<div class="widget-loading"><i class="fa-solid fa-spinner"></i> খবর লোড হচ্ছে...</div>';
+
+    try {
+        const items = await fetchNewsFromAnySource(cat);
+        newsCache[cat.id] = { items: items, t: Date.now() };
+        saveNewsLocal(cat.id, items);
+        if (token !== newsToken) return; // user already switched to another tab
+        renderNewsItems(items, cat);
+        updateNewsTimestamp(newsCache[cat.id].t);
+    } catch (err){
+        console.error('Bengali News fetch failed (' + cat.id + '):', err);
+        if (token !== newsToken || cached) return; // keep showing older headlines if we have them
+        const old = loadNewsLocal(cat.id);
+        if (old){
+            renderNewsItems(old.items, cat);
+            updateNewsTimestamp(old.t);
+            const note = document.createElement('div');
+            note.className = 'news-time';
+            note.style.cssText = 'justify-content:center;padding:8px;opacity:.75';
+            note.textContent = 'অফলাইন — আগের সংরক্ষিত খবর দেখানো হচ্ছে';
+            body.appendChild(note);
+            return;
+        }
+        body.innerHTML = '<div class="widget-error"><i class="fa-solid fa-triangle-exclamation"></i>এই মুহূর্তে খবর পাওয়া যাচ্ছে না।<br>' +
+            '<button type="button" class="news-retry" onclick="fetchBengaliNews(true)">আবার চেষ্টা করুন</button></div>';
+    }
+}
+
+/* ===========================================================================
+   🌤️ KOLKATA WEATHER WIDGET  —  current + hourly + 7-day + AQI, auto-failover
+   Location is always fixed to Kolkata — only the SOURCE rotates on failure.
+   =========================================================================== */
+const KOLKATA_LAT = 22.5726;
+const KOLKATA_LON = 88.3639;
+const WEATHER_REFRESH_MS = 2 * 60 * 1000; // 2 minutes
+
+/* WMO weather_code (Open-Meteo) -> Font Awesome icon + Bengali condition label */
+const WEATHER_CODE_MAP = {
+    0:  { icon:'fa-sun',                 label:'পরিষ্কার আকাশ' },
+    1:  { icon:'fa-cloud-sun',           label:'প্রায় পরিষ্কার' },
+    2:  { icon:'fa-cloud-sun',           label:'আংশিক মেঘলা' },
+    3:  { icon:'fa-cloud',               label:'মেঘলা আকাশ' },
+    45: { icon:'fa-smog',                label:'কুয়াশাচ্ছন্ন' },
+    48: { icon:'fa-smog',                label:'ঘন কুয়াশা' },
+    51: { icon:'fa-cloud-rain',          label:'হালকা গুঁড়ি বৃষ্টি' },
+    53: { icon:'fa-cloud-rain',          label:'গুঁড়ি বৃষ্টি' },
+    55: { icon:'fa-cloud-rain',          label:'ভারী গুঁড়ি বৃষ্টি' },
+    56: { icon:'fa-cloud-rain',          label:'হিমশীতল গুঁড়ি বৃষ্টি' },
+    57: { icon:'fa-cloud-rain',          label:'হিমশীতল গুঁড়ি বৃষ্টি' },
+    61: { icon:'fa-cloud-showers-heavy', label:'হালকা বৃষ্টি' },
+    63: { icon:'fa-cloud-showers-heavy', label:'বৃষ্টি' },
+    65: { icon:'fa-cloud-showers-heavy', label:'ভারী বৃষ্টি' },
+    66: { icon:'fa-cloud-showers-heavy', label:'হিমশীতল বৃষ্টি' },
+    67: { icon:'fa-cloud-showers-heavy', label:'হিমশীতল ভারী বৃষ্টি' },
+    71: { icon:'fa-snowflake',           label:'হালকা তুষারপাত' },
+    73: { icon:'fa-snowflake',           label:'তুষারপাত' },
+    75: { icon:'fa-snowflake',           label:'ভারী তুষারপাত' },
+    77: { icon:'fa-snowflake',           label:'তুষারকণা' },
+    80: { icon:'fa-cloud-showers-heavy', label:'বৃষ্টির ঝাপটা' },
+    81: { icon:'fa-cloud-showers-heavy', label:'বৃষ্টির ঝাপটা' },
+    82: { icon:'fa-cloud-showers-heavy', label:'তীব্র বৃষ্টির ঝাপটা' },
+    85: { icon:'fa-snowflake',           label:'তুষারের ঝাপটা' },
+    86: { icon:'fa-snowflake',           label:'ভারী তুষারের ঝাপটা' },
+    95: { icon:'fa-cloud-bolt',          label:'বজ্রঝড়' },
+    96: { icon:'fa-cloud-bolt',          label:'বজ্রঝড় ও শিলাবৃষ্টি' },
+    99: { icon:'fa-cloud-bolt',          label:'বজ্রঝড় ও শিলাবৃষ্টি' }
+};
+function weatherInfoFor(code){
+    return WEATHER_CODE_MAP[code] || { icon:'fa-cloud', label:'অজানা অবস্থা' };
+}
+
+/* Free-text condition (wttr.in fallback) -> Font Awesome icon */
+function iconForConditionText(desc){
+    const d = (desc || '').toLowerCase();
+    if (d.includes('thunder')) return 'fa-cloud-bolt';
+    if (d.includes('snow')) return 'fa-snowflake';
+    if (d.includes('rain') || d.includes('drizzle') || d.includes('shower')) return 'fa-cloud-showers-heavy';
+    if (d.includes('fog') || d.includes('mist') || d.includes('haze')) return 'fa-smog';
+    if (d.includes('overcast') || d.includes('cloud')) return 'fa-cloud';
+    if (d.includes('clear') || d.includes('sunny')) return 'fa-sun';
+    return 'fa-cloud-sun';
+}
+
+/* night-time variants of the sun icons */
+function iconForHour(icon, hour, isDay){
+    const night = isDay === undefined ? (hour < 6 || hour >= 18) : !isDay;
+    if (!night) return icon;
+    if (icon === 'fa-sun') return 'fa-moon';
+    if (icon === 'fa-cloud-sun') return 'fa-cloud-moon';
+    return icon;
+}
+
+/* "2026-09-28T15:00" (already Asia/Kolkata) -> "3 PM" / "6:05 AM" without any timezone maths */
+function clock12(str, withMinutes){
+    const m = /T(\d{2}):(\d{2})/.exec(str || '');
+    if (!m) return '--:--';
+    let h = parseInt(m[1], 10);
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return withMinutes ? (h + ':' + m[2] + ' ' + ap) : (h + ' ' + ap);
+}
+
+function compass(deg){
+    if (deg == null || isNaN(deg)) return '';
+    const pts = ['N','NE','E','SE','S','SW','W','NW'];
+    return pts[Math.round(deg / 45) % 8];
+}
+
+function uvLabel(v){
+    if (v == null) return '--';
+    const n = Math.round(v);
+    const t = n <= 2 ? 'Low' : n <= 5 ? 'Moderate' : n <= 7 ? 'High' : n <= 10 ? 'Very high' : 'Extreme';
+    return n + ' · ' + t;
+}
+
+function aqiInfo(v){
+    if (v == null) return null;
+    if (v <= 50)  return { label:'Good',                 color:'#2fbf71' };
+    if (v <= 100) return { label:'Moderate',             color:'#e6c229' };
+    if (v <= 150) return { label:'Unhealthy (sensitive)', color:'#f08a24' };
+    if (v <= 200) return { label:'Unhealthy',            color:'#e2453c' };
+    if (v <= 300) return { label:'Very unhealthy',       color:'#a24bd1' };
+    return             { label:'Hazardous',              color:'#8a1f3a' };
+}
+
+function dayLabel(dateStr, idx){
+    if (idx === 0) return 'Today';
+    if (idx === 1) return 'Tomorrow';
+    const d = new Date(dateStr + 'T00:00:00Z');
+    return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('en-IN', { timeZone:'UTC', weekday:'short', day:'numeric', month:'short' });
+}
+
+/* --- Every source is normalized into one common shape ---------------------
+   { temp, feelsLike, humidity, windSpeed, windDir, gusts, pressure, visKm, cloud, uv, rainChance,
+     icon, condition, sunrise, sunset, hi, lo, hourly:[{label,temp,pop,icon}], daily:[{label,icon,cond,hi,lo,pop}] }
+------------------------------------------------------------------------- */
+function parseOpenMeteoText(text){
+    const data = JSON.parse(text);
+    if (!data.current) throw new Error('Malformed Open-Meteo response');
+    const cur = data.current, daily = data.daily || {}, hourly = data.hourly || {};
+    const info = weatherInfoFor(cur.weather_code);
+    const curHour = parseInt((cur.time || '').slice(11, 13), 10);
+
+    /* hourly: start from the current hour, next 24 hours */
+    const hours = [];
+    let rainNow = null;
+    if (hourly.time){
+        const key = (cur.time || '').slice(0, 13);
+        let start = hourly.time.findIndex(function(t){ return t.slice(0, 13) >= key; });
+        if (start < 0) start = 0;
+        if (hourly.precipitation_probability) rainNow = hourly.precipitation_probability[start];
+        for (let i = start; i < Math.min(start + 24, hourly.time.length); i++){
+            const hr = parseInt(hourly.time[i].slice(11, 13), 10);
+            hours.push({
+                label: i === start ? 'Now' : clock12(hourly.time[i], false),
+                temp: Math.round(hourly.temperature_2m[i]),
+                pop: hourly.precipitation_probability ? hourly.precipitation_probability[i] : null,
+                icon: iconForHour(weatherInfoFor(hourly.weather_code[i]).icon, hr)
+            });
+        }
+    }
+
+    const days = [];
+    if (daily.time){
+        for (let i = 0; i < daily.time.length; i++){
+            const di = weatherInfoFor(daily.weather_code ? daily.weather_code[i] : null);
+            days.push({
+                label: dayLabel(daily.time[i], i),
+                icon: di.icon, cond: di.label,
+                hi: Math.round(daily.temperature_2m_max[i]),
+                lo: Math.round(daily.temperature_2m_min[i]),
+                pop: daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : null
+            });
+        }
+    }
+
+    return {
+        temp: Math.round(cur.temperature_2m),
+        feelsLike: Math.round(cur.apparent_temperature),
+        humidity: cur.relative_humidity_2m + '%',
+        windSpeed: Math.round(cur.wind_speed_10m) + ' km/h',
+        windDir: compass(cur.wind_direction_10m),
+        gusts: cur.wind_gusts_10m != null ? Math.round(cur.wind_gusts_10m) : null,
+        pressure: cur.pressure_msl != null ? Math.round(cur.pressure_msl) : null,
+        visKm: cur.visibility != null ? Math.round(cur.visibility / 100) / 10 : null,
+        cloud: cur.cloud_cover,
+        uv: daily.uv_index_max ? daily.uv_index_max[0] : null,
+        rainChance: rainNow,
+        icon: iconForHour(info.icon, curHour, cur.is_day === undefined ? undefined : !!cur.is_day),
+        condition: info.label,
+        sunrise: clock12(daily.sunrise ? daily.sunrise[0] : '', true),
+        sunset:  clock12(daily.sunset  ? daily.sunset[0]  : '', true),
+        hi: days.length ? days[0].hi : null,
+        lo: days.length ? days[0].lo : null,
+        hourly: hours,
+        daily: days
+    };
+}
+
+function parseWttrText(text){
+    const data = JSON.parse(text);
+    const cur = data.current_condition && data.current_condition[0];
+    if (!cur) throw new Error('Malformed wttr.in response');
+    const wk = data.weather || [];
+    const astro = wk[0] && wk[0].astronomy && wk[0].astronomy[0];
+    const descText = (cur.weatherDesc && cur.weatherDesc[0] && cur.weatherDesc[0].value) || 'Unknown';
+    const days = wk.map(function(d, i){
+        const mid = (d.hourly && d.hourly[4]) || (d.hourly && d.hourly[0]) || {};
+        const desc = (mid.weatherDesc && mid.weatherDesc[0] && mid.weatherDesc[0].value) || '';
+        const pops = (d.hourly || []).map(function(h){ return parseInt(h.chanceofrain, 10) || 0; });
+        return {
+            label: dayLabel(d.date, i), icon: iconForConditionText(desc), cond: desc,
+            hi: Math.round(parseFloat(d.maxtempC)), lo: Math.round(parseFloat(d.mintempC)),
+            pop: pops.length ? Math.max.apply(null, pops) : null
+        };
+    });
+    return {
+        temp: Math.round(parseFloat(cur.temp_C)),
+        feelsLike: Math.round(parseFloat(cur.FeelsLikeC)),
+        humidity: cur.humidity + '%',
+        windSpeed: cur.windspeedKmph + ' km/h',
+        windDir: cur.winddir16Point || '',
+        gusts: null,
+        pressure: cur.pressure ? Math.round(parseFloat(cur.pressure)) : null,
+        visKm: cur.visibility ? parseFloat(cur.visibility) : null,
+        cloud: cur.cloudcover != null ? parseInt(cur.cloudcover, 10) : null,
+        uv: cur.uvIndex != null ? parseFloat(cur.uvIndex) : null,
+        rainChance: days.length ? days[0].pop : null,
+        icon: iconForConditionText(descText),
+        condition: descText,
+        sunrise: astro ? astro.sunrise : '--:--',
+        sunset: astro ? astro.sunset : '--:--',
+        hi: days.length ? days[0].hi : null,
+        lo: days.length ? days[0].lo : null,
+        hourly: [],
+        daily: days
+    };
+}
+
+const OPEN_METEO_KOLKATA_URL =
+    'https://api.open-meteo.com/v1/forecast?latitude=' + KOLKATA_LAT + '&longitude=' + KOLKATA_LON +
+    '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,cloud_cover,visibility' +
+    '&hourly=temperature_2m,precipitation_probability,weather_code' +
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max' +
+    '&forecast_days=7&timezone=Asia/Kolkata';
+
+const AQI_KOLKATA_URL =
+    'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + KOLKATA_LAT + '&longitude=' + KOLKATA_LON +
+    '&current=us_aqi,pm2_5,pm10&timezone=Asia/Kolkata';
+
+const WEATHER_SOURCES = [
+    { name:'open-meteo',            url: OPEN_METEO_KOLKATA_URL, parse: parseOpenMeteoText },
+    { name:'open-meteo-via-proxy1', url:'https://api.allorigins.win/raw?url=' + encodeURIComponent(OPEN_METEO_KOLKATA_URL), parse: parseOpenMeteoText },
+    { name:'wttr.in',               url:'https://wttr.in/' + KOLKATA_LAT + ',' + KOLKATA_LON + '?format=j1', parse: parseWttrText },
+    { name:'open-meteo-via-proxy2', url:'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(OPEN_METEO_KOLKATA_URL), parse: parseOpenMeteoText }
+];
+
+async function fetchWeatherFromAnySource(){
+    let lastError = null;
+    for (let i = 0; i < WEATHER_SOURCES.length; i++){
+        const source = WEATHER_SOURCES[i];
+        try {
+            const res = await fetchWithTimeout(source.url, 9000);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return source.parse(await res.text());
+        } catch (err){
+            lastError = err;
+            console.warn('Weather source failed (' + source.name + '):', err.message);
+        }
+    }
+    throw lastError || new Error('All weather sources failed');
+}
+
+/* Air quality is a bonus — if it fails the rest of the widget still works */
+async function fetchAirQuality(){
+    const urls = [ AQI_KOLKATA_URL, 'https://api.allorigins.win/raw?url=' + encodeURIComponent(AQI_KOLKATA_URL) ];
+    for (let i = 0; i < urls.length; i++){
+        try {
+            const res = await fetchWithTimeout(urls[i], 8000);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = JSON.parse(await res.text());
+            if (data.current && data.current.us_aqi != null){
+                return { aqi: Math.round(data.current.us_aqi), pm25: data.current.pm2_5, pm10: data.current.pm10 };
+            }
+        } catch (err){
+            console.warn('AQI source failed:', err.message);
+        }
+    }
+    return null;
+}
+
+function updateWeatherTimestamp(){
+    const el = document.getElementById('weatherLastUpdated');
+    if (el) el.innerText = 'Last updated: ' + new Date().toLocaleTimeString('en-IN', {
+        timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+}
+
+function statCard(icon, label, value, extraHtml){
+    return '<div class="weather-stat"><i class="fa-solid ' + icon + '"></i>' + label + '<b>' + value + '</b>' + (extraHtml || '') + '</div>';
+}
+
+function renderWeather(w){
+    const body = document.getElementById('weatherBody');
+    if (!body) return;
+    const prevTop = body.scrollTop;
+    const prevHr = body.querySelector('.wx-hourly');
+    const prevLeft = prevHr ? prevHr.scrollLeft : 0;
+    const now = new Date();
+
+    const dateLabel = now.toLocaleDateString('en-IN', {
+        timeZone:'Asia/Kolkata', weekday:'long', day:'numeric', month:'long', year:'numeric'
+    });
+    const timeLabel = now.toLocaleTimeString('en-IN', { timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit' });
+
+    const hiLo = (w.hi != null && w.lo != null)
+        ? '<div class="weather-hilo"><i class="fa-solid fa-arrow-up"></i>' + w.hi + '° <i class="fa-solid fa-arrow-down"></i>' + w.lo + '°</div>' : '';
+
+    let html =
+        '<div class="weather-main fade-refresh">' +
+            '<div class="weather-icon-big"><i class="fa-solid ' + w.icon + '"></i></div>' +
+            '<div>' +
+                '<div class="weather-temp">' + w.temp + '°C</div>' +
+                '<div class="weather-condition">' + escapeHtml(w.condition) + '</div>' +
+            '</div>' + hiLo +
+        '</div>' +
+        '<div class="weather-datetime fade-refresh">' +
+            '<i class="fa-regular fa-calendar"></i> ' + dateLabel +
+            ' &nbsp;•&nbsp; <i class="fa-regular fa-clock"></i> ' + timeLabel +
+        '</div>';
+
+    /* --- stats grid --- */
+    let stats = '';
+    stats += statCard('fa-temperature-half', 'Feels like', w.feelsLike + '°C');
+    stats += statCard('fa-droplet', 'Humidity', w.humidity);
+    stats += statCard('fa-wind', 'Wind', w.windSpeed + (w.windDir ? ' ' + w.windDir : ''),
+                      w.gusts != null ? '<small>gusts ' + w.gusts + ' km/h</small>' : '');
+    if (w.rainChance != null) stats += statCard('fa-umbrella', 'Rain chance', w.rainChance + '%');
+    if (w.uv != null)         stats += statCard('fa-sun', 'UV index', uvLabel(w.uv));
+    if (w.aqi){
+        const a = aqiInfo(w.aqi.aqi);
+        stats += statCard('fa-lungs', 'Air quality (AQI)',
+                          '<span class="aqi-dot" style="background:' + a.color + '"></span>' + w.aqi.aqi,
+                          '<small>' + a.label + (w.aqi.pm25 != null ? ' · PM2.5 ' + Math.round(w.aqi.pm25) : '') + '</small>');
+    }
+    if (w.pressure != null) stats += statCard('fa-gauge', 'Pressure', w.pressure + ' hPa');
+    if (w.visKm != null)    stats += statCard('fa-eye', 'Visibility', w.visKm + ' km');
+    if (w.cloud != null)    stats += statCard('fa-cloud', 'Cloud cover', w.cloud + '%');
+    stats += statCard('fa-sun', 'Sunrise', w.sunrise);
+    stats += statCard('fa-moon', 'Sunset', w.sunset);
+    html += '<div class="weather-grid fade-refresh">' + stats + '</div>';
+
+    /* --- hourly strip --- */
+    if (w.hourly && w.hourly.length){
+        html += '<div class="wx-section-title"><i class="fa-regular fa-clock"></i> Next 24 hours</div><div class="wx-hourly">';
+        w.hourly.forEach(function(h){
+            html += '<div class="wx-hour">' +
+                '<span class="wx-h-time">' + h.label + '</span>' +
+                '<i class="fa-solid ' + h.icon + '"></i>' +
+                '<b>' + h.temp + '°</b>' +
+                '<span class="wx-h-pop">' + (h.pop != null && h.pop > 0 ? '<i class="fa-solid fa-droplet"></i>' + h.pop + '%' : '&nbsp;') + '</span>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+
+    /* --- 7 day forecast --- */
+    if (w.daily && w.daily.length){
+        html += '<div class="wx-section-title"><i class="fa-regular fa-calendar-days"></i> ' + w.daily.length + '-day forecast</div><div class="wx-daily">';
+        w.daily.forEach(function(d){
+            html += '<div class="wx-day">' +
+                '<span class="wx-d-name">' + d.label + '</span>' +
+                '<i class="fa-solid ' + d.icon + '"></i>' +
+                '<span class="wx-d-cond">' + escapeHtml(d.cond) + '</span>' +
+                '<span class="wx-d-pop">' + (d.pop != null ? '<i class="fa-solid fa-droplet"></i>' + d.pop + '%' : '') + '</span>' +
+                '<span class="wx-d-temp"><b>' + d.hi + '°</b> / ' + d.lo + '°</span>' +
+            '</div>';
+        });
+        html += '</div>';
+    }
+
+    body.innerHTML = html;
+    body.scrollTop = prevTop;
+    const newHr = body.querySelector('.wx-hourly');
+    if (newHr) newHr.scrollLeft = prevLeft;
+}
+
+async function fetchKolkataWeather(){
+    const body = document.getElementById('weatherBody');
+    if (!body) return;
+    try {
+        const results = await Promise.all([ fetchWeatherFromAnySource(), fetchAirQuality() ]);
+        const w = results[0];
+        w.aqi = results[1];
+        renderWeather(w);
+        updateWeatherTimestamp();
+    } catch (err){
+        console.error('Kolkata Weather fetch failed on all sources:', err);
+        if (!body.querySelector('.weather-main')){ // keep showing older data if we already have some
+            body.innerHTML = '<div class="widget-error"><i class="fa-solid fa-triangle-exclamation"></i>Weather temporarily unavailable.</div>';
+        }
+    }
+}
+
+/* ===================== INIT + AUTO-REFRESH ===================== */
+document.addEventListener('DOMContentLoaded', function(){
+    renderNewsTabs();
+    fetchBengaliNews(false);
+    fetchKolkataWeather();
+    setInterval(function(){ fetchBengaliNews(true); }, NEWS_REFRESH_MS);
+    setInterval(fetchKolkataWeather, WEATHER_REFRESH_MS);
+});
+
+</script>
+
+<button id="backToTopBtn" title="Back to Top" aria-label="Back to Top" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+  <svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+</button>
+<script>
+(function(){
+  var btn = document.getElementById('backToTopBtn');
+  function toggleBtn(){
+    if(window.scrollY > 250){
+      btn.classList.add('show');
+    }else{
+      btn.classList.remove('show');
+    }
+  }
+  window.addEventListener('scroll', toggleBtn, {passive:true});
+  toggleBtn();
+})();
+</script>
+<section class="village-scene-section">
+  <div class="scene-caption">
+    <div class="scene-credit">Maintain and develop and design by <b>KALYAN SARKAR</b></div>
+  </div>
+</section>
+
+</body>
+</html>
