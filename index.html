@@ -1070,6 +1070,41 @@ lastJ=JSON.stringify(pub_());
     p.then(done, done)
   }
 })();
+
+/* ===== Google লগইন / কার্ট অংশের ইংরেজি অনুবাদ ===== */
+(function () {
+  var G = {
+    'আপনার কার্ট অর্ডার (#': 'Your cart order (#', ') পাঠানো হয়েছে। আমরা শীঘ্রই যোগাযোগ করব।': ') has been placed. We will contact you soon.',
+    'ধন্যবাদ! আপনার মন্তব্য যোগ হয়েছে': 'Thank you! Your comment has been added', 'ধন্যবাদ!': 'Thank you!',
+    'আমাদের কাজ কেমন লেগেছে লিখুন': 'Tell us how you liked our work', 'সহ মন্তব্যটি সাইটে দেখা যাবে': 'will be shown on the site with your comment', 'আপনার নাম (': 'Your name (',
+    'মন্তব্য লিখতে আগে Google দিয়ে লগইন করুন': 'Please log in with Google to write a comment', 'আপনার মন্তব্য মুছবেন?': 'Delete your comment?', 'মন্তব্য মুছে গেছে': 'Comment deleted',
+    'এখনো কোনো মন্তব্য নেই — আপনিই প্রথম হোন!': 'No comments yet — be the first!', 'এখনো কোনো অর্ডার নেই': 'No orders yet',
+    'আগে মোবাইল ও ঠিকানা দিন': 'Please add your mobile number and address first', 'সঠিক মোবাইল নম্বর দিন': 'Enter a valid mobile number',
+    'লোকেশনের অনুমতি দেওয়া হয়নি': 'Location permission was not granted', 'লোকেশন সাপোর্ট নেই': 'Location is not supported', 'লোকেশন নেওয়া হয়েছে': 'Location captured', 'লোকেশন সেভ আছে': 'Location saved', 'আমার লোকেশন দিন': 'Share my location', 'লোকেশন': 'Location',
+    'সার্ভারের সাথে যোগাযোগ হয়নি': 'Could not reach the server', 'অর্ডার যায়নি, আবার চেষ্টা করুন': 'Order failed, please try again', 'হয়নি, আবার চেষ্টা করুন': 'failed, please try again',
+    'লগইন এখনো চালু হয়নি': 'login is not enabled yet', 'লগইন করলে কার্টে যোগ, পছন্দের তালিকা ও অর্ডারের হিসাব পাবেন।': 'Log in to add items to your cart, save favourites and track your orders.',
+    'Google দিয়ে লগইন করুন': 'Log in with Google', 'Google দিয়ে লগইন': 'Log in with Google', 'আবার লগইন করুন': 'Please log in again', 'লগইন হচ্ছে': 'Logging in', 'লগইন হয়নি': 'Login failed', 'লোড হচ্ছে': 'Loading',
+    'ডাউনলোড শুরু হয়েছে': 'Download started', 'ডাউনলোড হয়নি': 'Download failed',
+    'কার্টে যোগ হয়েছে': 'Added to cart', 'কার্টে আছে': 'In cart', 'কার্টে যোগ': 'Add to cart', 'পছন্দের তালিকায় যোগ': 'Added to wishlist', 'পছন্দের তালিকা': 'wishlist', 'সরানো হয়েছে': 'Removed',
+    'কার্ট অর্ডার পাঠান': 'Place cart order', 'অর্ডার বাতিল করুন': 'Cancel order', 'অর্ডার #': 'Order #', 'বাতিল করবেন?': '— cancel it?', 'অর্ডার বাতিল হয়েছে': 'Order cancelled',
+    'নোট (ঐচ্ছিক) — মাপ, পছন্দ ইত্যাদি': 'Note (optional) — size, preferences etc.', 'আপনার তথ্য': 'Your details', 'তথ্য বদলান': 'Edit details', 'মোবাইল নম্বর *': 'Mobile number *',
+    'সেভ হয়েছে': 'Saved', 'সেভ হয়নি': 'Not saved', 'সেভ করুন': 'Save', 'আপডেট করুন': 'Update', 'জমা দিন': 'Submit', 'মুছুন': 'Delete', 'ঠিক আছে': 'OK', 'কিছু লিখুন': 'Please write something',
+    'আপনার মতামত লিখুন': 'Write your feedback', 'আপনার মতামত': 'Your feedback', 'কম দেখুন': 'Show less', 'আরও দেখুন': 'Show more', 'সংযোগ হয়নি': 'Connection failed', 'কিছু নেই': 'Nothing here',
+    'স্বাগতম': 'Welcome', 'প্রোফাইল': 'Profile', 'অর্ডার': 'Orders', 'কার্ট': 'Cart', 'পছন্দ': 'Wishlist', 'কনফার্ম': 'Confirmed', 'নতুন': 'New', 'চলছে': 'In progress', 'সম্পন্ন': 'Completed', 'বাতিল': 'Cancelled', 'লগআউট': 'Logout', '✅ গ্রাহক': '✅ Customer', 'গ্রাহক': 'Customer', '।': '.'
+  };
+  // মূল পেজের (render-এর) অংশ: শুধু পূর্ণ বাক্য
+  ['কার্টে যোগ হয়েছে', 'কার্টে আছে', 'কার্টে যোগ', 'আরও দেখুন', 'কম দেখুন', 'আপনার মতামত লিখুন', 'এখনো কোনো মন্তব্য নেই — আপনিই প্রথম হোন!', '✅ গ্রাহক'].forEach(function (k) { if (!TR[k]) TR[k] = G[k] });
+  TK = Object.keys(TR).sort(function (a, b) { return b.length - a.length });
+  var GK = Object.keys(G).sort(function (a, b) { return b.length - a.length });
+  function tg(v) { if (L !== 'en' || A || !/[ঀ-৿]/.test(v)) return v; GK.forEach(function (k) { v = v.split(k).join(G[k]) }); return tr(v) }
+  function T(n) {
+    if (n.nodeType === 3) { var v = n.nodeValue, t = tg(v); if (t !== v) n.nodeValue = t }
+    else if (n.nodeType === 1) { ['placeholder', 'title', 'aria-label'].forEach(function (a) { var v = n.getAttribute(a); if (v) { var t = tg(v); if (t !== v) n.setAttribute(a, t) } }); for (var c = n.firstChild; c; c = c.nextSibling) T(c) }
+  }
+  function inGl(n) { var e = n.nodeType === 1 ? n : n.parentNode; return e && e.closest && e.closest('#gls,#glm,#toast') }
+  new MutationObserver(function (ms) { ms.forEach(function (m) { if (m.type === 'characterData') { if (inGl(m.target)) T(m.target) } else m.addedNodes.forEach(function (n) { if (inGl(n)) T(n) }) }) }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  var oc = window.confirm; window.confirm = function (m) { return oc.call(window, tg(String(m))) };
+})();
 pullCfg();rvPull();
 route();setTimeout(gFetch,1200);if(!API())setTimeout(migW,1500);document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault()});
 </script></body></html>
