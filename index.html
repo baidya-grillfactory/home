@@ -107,7 +107,7 @@ h3:after{content:"";position:absolute;left:0;bottom:0;height:4px;width:60%;borde
 .fe>div{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sh);text-align:center;transition:.3s}.fe>div:hover{transform:translateY(-5px)}
 .fe i{display:block;font-style:normal;font-size:40px;transition:transform .4s}.fe>div:hover i{transform:scale(1.25) rotate(-8deg)}
 .fe b{display:block;margin:6px 0 2px}.fe small{color:var(--mut)}
-.rvw{background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--sh);border-left:5px solid var(--p2)}.rvw .stars{color:#fab005;letter-spacing:2px}
+.rs-cust{background:#e6fcf5;color:#087f5b}.rvw{background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--sh);border-left:5px solid var(--p2)}.rvw .stars{color:#fab005;letter-spacing:2px}
 .box{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sh);border-top:4px solid var(--a)}
 .wel{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.wel>div:first-child{flex:1;min-width:240px}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;max-width:1000px;margin:0 auto;padding:10px 14px 30px}.two section{padding:20px 0;margin:0;max-width:none}
@@ -295,7 +295,7 @@ function mig(){if(!S||!S.cfg)S=cl(DEF);if(!S.banners){S.banners=S.cfg.hero?[{i:S
 function sample(p){var a=[];for(var j=1;j<=6;j++)a.push({n:p.n+' নকশা '+bn(j),pr:'₹ '+bn(200+j*20)+' / স্কয়ার ফিট',i:'',sz:'',mt:'',fn:'',s:(p.subs&&p.subs.length)?p.subs[(j-1)%p.subs.length].id:''});return a}
 
 function NAV0(){return[{k:'prods',t:'আমাদের কাজ',on:1},{k:'gal',t:'গ্যালারি',on:1},{k:'why',t:'কেন আমরা',on:1},{k:'rev',t:'গ্রাহকের কথা',on:1},{k:'about',t:'আমাদের সম্পর্কে',on:1},{k:'order',t:'অর্ডার করুন',on:1},{k:'loc',t:'লোকেশন',on:1}]}
-function navLinks(){var a=[];S.nav.forEach(function(n,i){if(!n.on)return;if(n.k==='why'&&!S.feats.length)return;if(n.k==='rev'&&!S.revs.length)return;a.push([i,n])});return a}
+function navLinks(){var a=[];S.nav.forEach(function(n,i){if(!n.on)return;if(n.k==='why'&&!S.feats.length)return;if(n.k==='rev'&&!rvShow())return;a.push([i,n])});return a}
 function navBar(){return'<nav class="nv">'+navLinks().map(function(o){return'<a onclick="nvA('+o[0]+')">'+esc(X(o[1],'t'))+'</a>'}).join('')+'</nav>'}
 function navMenu(){var s=parseFloat(S.cfg.navSpd);if(!(s>0))s=.7;return'<button class="hb g" id="nvb" onclick="nvT()" aria-label="Menu" aria-expanded="false">☰</button><div class="nvm" style="--ns:'+s+'s"><div><div class="nvi">'+navLinks().map(function(o,j){return'<a style="--i:'+j+'" onclick="nvA('+o[0]+')">'+esc(X(o[1],'t'))+'</a>'}).join('')+'</div></div></div>'}
 function nvT(f){var m=document.querySelector('.nvm'),b=$('nvb');if(!m)return;var o=f===0?false:!m.classList.contains('open');m.classList.toggle('open',o);if(b){b.textContent=o?'✕':'☰';b.setAttribute('aria-expanded',o)}}
@@ -325,10 +325,10 @@ var GF=0;
 function gGet(){var k=(S.cfg.gkey||'').trim(),p=(S.cfg.gpid||'').trim();if(!k||!p)return null;try{var c=JSON.parse(localStorage.getItem('boidya_g')||'null');if(c&&c.id===p&&c.rt!=null)return c}catch(e){}return null}
 function GS(){var c=gGet();if(!c)return S.stats;var f=0,a=S.stats.map(function(s){if(/google|গুগল/i.test((s.l||'')+(s.l_en||''))){f=1;return gStat(s,c)}return s});if(!f)a.unshift(gStat({},c));return a}
 function gStat(s,c){var r=(Math.round(c.rt*10)/10).toFixed(1);return Object.assign({},s,{n:bn(r)+' ★',l:'Google রেটিং ('+bn(c.n)+' জন)',l_en:'Google Rating ('+c.n+' reviews)'})}
-function GR(){var c=gGet();if(!c||!c.rv.length)return S.revs;return c.rv.map(function(v){return{n:v.n,t:v.t,rt:v.rt,lk:v.lk,src:'google'}}).concat(S.revs.filter(function(r){return r.src!=='google'}))}
+function GR0(){var c=gGet();if(!c||!c.rv.length)return S.revs;return c.rv.map(function(v){return{n:v.n,t:v.t,rt:v.rt,lk:v.lk,src:'google'}}).concat(S.revs.filter(function(r){return r.src!=='google'}))}
 function gFetch(){var k=(S.cfg.gkey||'').trim(),p=(S.cfg.gpid||'').trim();if(GF||A||!k||!p)return;var c=gGet();if(c&&Date.now()-c.t<216e5)return;GF=1;
 fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(p),{headers:{'X-Goog-Api-Key':k,'X-Goog-FieldMask':'rating,userRatingCount,reviews'}}).then(function(r){return r.json()}).then(function(d){if(!d||d.rating==null)return;var o={id:p,t:Date.now(),rt:d.rating,n:d.userRatingCount||0,rv:(d.reviews||[]).map(function(v){var a=v.authorAttribution||{};return{n:a.displayName||'Google',t:(v.originalText&&v.originalText.text)||(v.text&&v.text.text)||'',rt:v.rating||5,lk:a.uri||v.googleMapsUri||''}}).filter(function(v){return v.t})};try{localStorage.setItem('boidya_g',JSON.stringify(o))}catch(e){}render()}).catch(function(){})}
-function rsrc(r){var m={google:'গুগল রিভিউ',web:'ওয়েবসাইট রিভিউ',fb:'Facebook রিভিউ'}[r.src]||'';if(!m)return'';var b='<span class="rsr rs-'+r.src+'">'+m+'</span>',u=(r.lk||'').trim();return/^https?:/i.test(u)?'<a class="rsrl" href="'+esc(u)+'" target="_blank" rel="noopener">'+b+'</a>':b}
+function rsrc(r){var m={google:'গুগল রিভিউ',web:'ওয়েবসাইট রিভিউ',fb:'Facebook রিভিউ',cust:'✅ গ্রাহক'}[r.src]||'';if(!m)return'';var b='<span class="rsr rs-'+r.src+'">'+m+'</span>',u=(r.lk||'').trim();return/^https?:/i.test(u)?'<a class="rsrl" href="'+esc(u)+'" target="_blank" rel="noopener">'+b+'</a>':b}
 
 var VP=0,VN=10;
 function vPage(a){var m=Math.max(1,Math.ceil(a.length/VN));if(VP>=m)VP=m-1;return a.slice(VP*VN,VP*VN+VN)}
@@ -484,7 +484,7 @@ if(GS().length)h+='<div class="st rv">'+GS().map(function(s,i){return'<div class
 h+='<div class="cats">'+S.products.map(function(p,i){return'<a onclick="pick('+i+')"><span style="border-color:'+pcol(p,i)+';'+(p.i?'background-image:url('+p.i+')':'background:'+pcol(p,i)+'26')+'">'+(p.i?'':esc(p.e||'🔧'))+'</span>'+esc(X(p,'n'))+'</a>'}).join('')+'</div>';
 h+='<section id="prods"><h3>আমাদের কাজ</h3><div class="grid rv">'+S.products.map(function(p,i){return'<div class="card c'+(i%5)+'" style="--i:'+i+';border-top-color:'+pcol(p,i)+'"><div class="imw"><div class="im" style="'+(p.i?'background-image:url('+p.i+')':'')+'">'+(p.i?'':esc(p.e||'🔧'))+'</div></div><div class="b"><b>'+esc(X(p,'n'))+'</b><small>'+esc(X(p,'d'))+'</small>'+subTags(p)+'<div style="font-size:12px;color:var(--mut);margin-top:4px">⚖ '+UBs(p)+'</div>'+(p.p?'<div style="color:var(--p);font-weight:700">'+esc(p.p)+'</div>':'')+(estL(p)?'<div style="font-size:12px;margin-top:6px;color:#2b8a3e">🚚 '+estL(p)+'</div>':'')+'<button class="q" onclick="pick('+i+')">সব নকশা দেখুন ('+bn((p.ds||[]).length)+')</button></div></div>'}).join('')+'</div></section>';
 h+=gSec();if(S.feats.length)h+='<section id="why"><h3>কেন আমাদের বেছে নেবেন?</h3><div class="fe rv">'+S.feats.map(function(f,i){return'<div style="--i:'+i+'"><i>'+esc(f.e)+'</i><b>'+esc(X(f,'t'))+'</b><small>'+esc(X(f,'d'))+'</small></div>'}).join('')+'</div></section>';
-if(GR().length)h+='<section id="rev"><h3>গ্রাহকের কথা</h3><div class="fe rv">'+GR().map(function(r,i){return'<div class="rvw" style="--i:'+i+';text-align:left"><div class="stars">'+'★★★★★'.slice(0,rn(r))+'</div>'+esc(X(r,'t'))+'<br><b style="display:inline">— '+esc(X(r,'n'))+'</b><br>'+rsrc(r)+'</div>'}).join('')+'</div></section>';
+if(rvShow())h+=rvSec();
 h+='<section id="about" class="rv"><h3>আমাদের সম্পর্কে</h3><div class="box wel"><div>'+esc(X(c,'about'))+'<br><a class="abmini" style="margin-top:10px" onclick="openAb()">🏭 কারখানার পরিচিতি ›</a></div><a class="btn" onclick="openCk(-1)">অর্ডার করুন</a></div></section>';
 var ll=c.ll||c.addr;
 h+='<div class="two"><section id="order" class="rv"><h3>অর্ডার করুন</h3><div class="box"><label>কী তৈরি করাতে চান?</label><select id="ot">'+S.products.map(function(p){return'<option>'+esc(X(p,'n'))+'</option>'}).join('')+'</select><br><br><button class="btn" onclick="openCk($(\'ot\').selectedIndex)">অর্ডার করুন</button> <a class="btn w" target="_blank" rel="noopener" href="'+waLink()+'">WhatsApp</a> <a class="btn s" href="tel:'+esc(c.phone)+'">📞 ফোন</a></div></section>';
@@ -619,7 +619,7 @@ h+='<button class="btn s" onclick="ad(\'stats\')">+ যোগ করুন</butt
 S.feats.forEach(function(f,i){h+='<div class="ord row">'+I('feats.'+i+'.e','🛡️','width:64px')+I('feats.'+i+'.t','শিরোনাম','flex:1;min-width:130px')+I('feats.'+i+'.d','বিবরণ','width:100%')+I('feats.'+i+'.t_en','Title (English)','flex:1;min-width:130px')+I('feats.'+i+'.d_en','Description (English)','width:100%')+'<button class="btn sm r" onclick="rm(\'feats\','+i+')">মুছুন</button></div>'});
 h+='<button class="btn s" onclick="ad(\'feats\')">+ যোগ করুন</button><br><br><h3>গ্রাহকের কথা</h3><p style="color:var(--mut);font-size:14px">শুধু সত্যিকারের গ্রাহকের মন্তব্য দিন। খালি থাকলে সেকশন দেখা যাবে না।</p>';
 S.revs.forEach(function(r,i){h+='<div class="ord">'+I('revs.'+i+'.n','নাম')+I('revs.'+i+'.t','মন্তব্য')+I('revs.'+i+'.t_en','Comment (English)')+selK('revs.'+i+'.src',[['google','গুগল রিভিউ'],['web','ওয়েবসাইট রিভিউ'],['fb','Facebook রিভিউ'],['other','অন্য (ব্যাজ নেই)']])+I('revs.'+i+'.rt','⭐ ১-৫','width:70px')+I('revs.'+i+'.lk','রিভিউ লিংক (ঐচ্ছিক)')+'<button class="btn sm r" onclick="rm(\'revs\','+i+')">মুছুন</button></div>'});
-return h+'<button class="btn s" onclick="ad(\'revs\')">+ যোগ করুন</button>'}
+return h+'<button class="btn s" onclick="ad(\'revs\')">+ যোগ করুন</button>'+rvAdm()}
 if(tab==='gal')return galEd();
 if(tab==='prods')return peHtml();
 if(tab==='pay'){S.pay.forEach(function(x,k){var b='pay.'+k;h+='<div class="ord"><div class="row">'+I(b+'.n','পদ্ধতির নাম','flex:1;min-width:150px')+CB('চালু',b+'.on')+'</div>'+F('নির্দেশনা',b+'.note',{t:'ta',r:2})+F('UPI আইডি (ঐচ্ছিক)',b+'.upi',{ph:'yourname@upi'})+IM('পেমেন্ট QR কোড ছবি',b+'.qr',420,.92)+'<div style="margin-top:8px"><button class="btn sm r" onclick="rm(\'pay\','+k+')">মুছুন</button></div></div>'});
@@ -961,6 +961,54 @@ function glOTab() {
   return h
 }
 
+
+/* ===== গ্রাহকের নিজে লেখা মন্তব্য ===== */
+var RVC = [], RVALL = 0, RVS = 5, RVA = null;
+function GR() { return RVC.map(function (v) { return { n: v.n, t: v.t, rt: v.rt, src: 'cust' } }).concat(GR0()) }
+function rvShow() { return GR0().length || RVC.length || (glOn() && glApi()) }
+function rvPull() { if (!glApi()) return; glCall({ action: 'reviews' }).then(function (d) { if (d && d.ok && d.reviews) { RVC = d.reviews; render() } }).catch(function () {}) }
+function rvCard(r, i) { return '<div class="rvw" style="--i:' + i + ';text-align:left"><div class="stars">' + '★★★★★'.slice(0, rn(r)) + '</div>' + esc(X(r, 't')) + '<br><b style="display:inline">— ' + esc(X(r, 'n')) + '</b><br>' + rsrc(r) + '</div>' }
+function rvTog() { var y = window.pageYOffset; RVALL = RVALL ? 0 : 1; render(); window.scrollTo(0, y) }
+function rvSec() {
+  var L = GR(), n = RVALL ? L.length : Math.min(4, L.length);
+  return '<section id="rev"><h3>গ্রাহকের কথা</h3>' + (L.length ? '<div class="fe rv">' + L.slice(0, n).map(rvCard).join('') + '</div>' : '<p style="color:var(--mut)">এখনো কোনো মন্তব্য নেই — আপনিই প্রথম হোন!</p>') +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px">' + (L.length > 4 ? '<button class="btn" onclick="rvTog()">' + (RVALL ? '▲ কম দেখুন' : '▼ আরও দেখুন (' + bn(L.length - 4) + ')') + '</button>' : '') + (glOn() && glApi() ? '<button class="btn s" onclick="rvForm()">✍️ আপনার মতামত লিখুন</button>' : '') + '</div></section>'
+}
+function rvStarH() { var h = ''; for (var i = 1; i <= 5; i++) h += '<span onclick="rvSt(' + i + ')" style="cursor:pointer">' + (i <= RVS ? '★' : '☆') + '</span>'; return h }
+function rvSt(n) { RVS = n; var e = $('rvst'); if (e) e.innerHTML = rvStarH() }
+function rvForm() {
+  if (!GLU) { toast('মন্তব্য লিখতে আগে Google দিয়ে লগইন করুন'); glLogin(); return }
+  glM('<h3>✍️ আপনার মতামত</h3><div id="rvf"><small>লোড হচ্ছে…</small></div>');
+  glCall({ action: 'myReview', tok: GLT }).then(function (d) {
+    if (!glChk(d)) return; var r = d.review || {}, e = $('rvf'); if (!e) return; RVS = +r.rt || 5;
+    e.innerHTML = '<div id="rvst" style="font-size:34px;color:#fab005;letter-spacing:4px">' + rvStarH() + '</div><textarea id="rvt" rows="4" maxlength="500" placeholder="আমাদের কাজ কেমন লেগেছে লিখুন…" style="margin:10px 0">' + esc(r.t || '') + '</textarea><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="rvSend()">✅ ' + (r.t ? 'আপডেট করুন' : 'জমা দিন') + '</button>' + (r.t ? '<button class="btn r" onclick="rvDelMine()">🗑 মুছুন</button>' : '') + '</div><small style="color:var(--mut)">আপনার নাম (' + esc(GLU.name) + ') সহ মন্তব্যটি সাইটে দেখা যাবে।</small>'
+  }).catch(function () { glX(); toast('❌ সংযোগ হয়নি') })
+}
+function rvSend() {
+  var t = ($('rvt').value || '').trim(); if (t.length < 3) { toast('কিছু লিখুন'); return }
+  glCall({ action: 'addReview', tok: GLT, rt: RVS, t: t }).then(function (d) { if (!glChk(d)) { if (d && d.error && d.error !== 'session') toast('❌ ' + d.error); return } glX(); toast('✅ ধন্যবাদ! আপনার মন্তব্য যোগ হয়েছে'); rvPull() }).catch(function () { toast('❌ হয়নি, আবার চেষ্টা করুন') })
+}
+function rvDelMine() { if (!confirm('আপনার মন্তব্য মুছবেন?')) return; glCall({ action: 'delMyReview', tok: GLT }).then(function (d) { if (!glChk(d)) return; glX(); toast('🗑 মন্তব্য মুছে গেছে'); rvPull() }).catch(function () { toast('❌ হয়নি') }) }
+/* অ্যাডমিন */
+function rvAdm() {
+  var h = '<br><h3>🙋 গ্রাহকের নিজে লেখা মন্তব্য</h3><p style="color:var(--mut);font-size:14px">লগইন করা গ্রাহকরা যা লিখেছেন — এখান থেকে এডিট বা মুছতে পারবেন।</p>';
+  if (!RVA) return h + '<label>Google লগইন স্ক্রিপ্টের অ্যাডমিন পাসওয়ার্ড</label><input id="rvp" type="password" autocomplete="off" value="' + esc(sessionStorage.getItem('glpw') || '') + '"><br><br><button class="btn" onclick="rvLoadA()">🔄 মন্তব্য আনুন</button>';
+  h += RVA.length ? RVA.map(function (r, i) {
+    return '<div class="ord"><small>' + esc(r.e) + ' · ' + esc(r.t0) + '</small><input id="rva_n' + i + '" value="' + esc(r.n) + '" placeholder="নাম"><textarea id="rva_t' + i + '" rows="3">' + esc(r.t) + '</textarea><label>⭐ ১-৫</label><input id="rva_r' + i + '" type="number" min="1" max="5" value="' + esc(r.rt) + '" style="width:80px"><div class="row" style="margin-top:6px"><button class="btn sm s" onclick="rvSaveA(' + i + ')">💾 সেভ</button><button class="btn sm r" onclick="rvDelA(' + i + ')">🗑 মুছুন</button></div></div>'
+  }).join('') : '<small>এখনো কোনো গ্রাহক মন্তব্য লেখেননি</small><br>';
+  return h + '<button class="btn sm" onclick="rvLoadA()">🔄 রিফ্রেশ</button>'
+}
+function rvPw() { var e = $('rvp'), p = e ? e.value : (sessionStorage.getItem('glpw') || ''); sessionStorage.setItem('glpw', p); return p }
+function rvLoadA() { var p = rvPw(); toast('লোড হচ্ছে…'); glCall({ action: 'aReviews', pass: p }).then(function (d) { if (!d.ok) { toast('❌ ' + (d.error || 'ব্যর্থ')); return } RVA = d.reviews; render() }).catch(function () { toast('❌ সংযোগ হয়নি — URL ঠিক আছে? Apps Script আপডেট করে New version deploy করেছেন?') }) }
+function rvSaveA(i) {
+  var r = RVA[i], n = $('rva_n' + i).value, t = $('rva_t' + i).value, rt = Math.min(5, Math.max(1, +$('rva_r' + i).value || 5));
+  glCall({ action: 'aEditReview', pass: rvPw(), id: r.id, name: n, t: t, rt: rt }).then(function (d) { if (!d.ok) { toast('❌ ' + (d.error || 'ব্যর্থ')); return } r.n = n; r.t = t; r.rt = rt; toast('✅ সেভ হয়েছে'); rvPull() }).catch(function () { toast('❌ সংযোগ হয়নি') })
+}
+function rvDelA(i) {
+  if (!confirm('এই মন্তব্য সম্পূর্ণ মুছে যাবে। মুছবেন?')) return;
+  glCall({ action: 'aDelReview', pass: rvPw(), id: RVA[i].id }).then(function (d) { if (!d.ok) { toast('❌ ' + (d.error || 'ব্যর্থ')); return } RVA.splice(i, 1); var y = window.pageYOffset; render(); window.scrollTo(0, y); toast('🗑 মুছে গেছে'); rvPull() }).catch(function () { toast('❌ সংযোগ হয়নি') })
+}
+
 /* ===== কার্ট অর্ডার মোছা / গ্রাহক বাতিল ===== */
 function glHidL(){try{return JSON.parse(localStorage.getItem('boidya_glh')||'[]')}catch(e){return[]}}
 function glHid(a){var h=glHidL();return h.length?a.filter(function(o){return h.indexOf(String(o.no))<0}):a}
@@ -990,6 +1038,6 @@ function glTab() {
 }
 
 lastJ=JSON.stringify(pub_());
-pullCfg();
+pullCfg();rvPull();
 route();setTimeout(gFetch,1200);if(!API())setTimeout(migW,1500);document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG')e.preventDefault()});
 </script></body></html>
