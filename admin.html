@@ -800,13 +800,20 @@ function peCamDone(){var a=PCAM?PCAM.shots.slice():[];camStop();if(a.length)peAd
 function siteHtml(withData){var h;try{var b=atob((document.getElementById('pubhtml').textContent||'').replace(/\s/g,'')),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);h=new TextDecoder().decode(u)}catch(e){return''}
 if(withData){var snap=JSON.stringify(pub_()).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029'),mk='var S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}',cd="(function(){var P="+snap+";for(var k in P.cfg)DEF.cfg[k]=P.cfg[k];['feats','stats','revs','banners','hrs','pay','products','gal','nav'].forEach(function(a){if(P[a])DEF[a]=P[a]})})();\n";if(h.indexOf(mk)>-1)h=h.replace(mk,function(){return cd+mk})}
 return h}
+function adminHtml(){var sc='',pb='';[].forEach.call(document.scripts,function(x){var t=x.textContent||'';if(x.id==='pubhtml')pb=t;else if(!sc&&t.indexOf('var KEY=')>-1)sc=t});if(!sc||!pb)return'';var hd=document.head.innerHTML.replace(/<script[^>]*accounts\.google\.com[^>]*><\/script>/g,'');return'<!DOCTYPE html>\n<html lang="bn"><head>'+hd+'</head><body><div id="app"></div>\n<script>'+sc+'<'+'/script>\n<script type="text/plain" id="pubhtml">'+pb+'<'+'/script>\n</body></html>'}
 function kb(h){try{return bn(Math.max(1,Math.round(new Blob([h]).size/1024)))+' KB'}catch(e){return''}}
-function dlSite(w){var h=siteHtml(w);if(!h){toast('❌ ফাইল তৈরি করা যায়নি');return}dl(h,'baidya-grill-factory-'+new Date().toISOString().slice(0,10)+(w?'':'-original')+'.html','text/html');toast('⬇ ডাউনলোড শুরু হয়েছে')}
-function dlTab(){var a=siteHtml(1),b=siteHtml(0);
-return'<div class="box"><h3>⬇ ওয়েবসাইট ডাউনলোড</h3><p style="color:var(--mut);font-size:14px;margin-top:0">পুরো ওয়েব পোর্টাল একটাই <b>.html</b> ফাইল হিসেবে নামিয়ে নিন। যেকোনো হোস্টিংয়ে আপলোড করলেই সাইট চালু হবে।</p>'+
-'<div class="ord" style="border-left:6px solid var(--p)"><b style="font-size:17px">📦 পুরো ওয়েবসাইট — বর্তমান সব তথ্যসহ</b><p style="margin:6px 0;color:var(--mut);font-size:14px">দোকানের তথ্য, ক্যাটাগরি, সাব-ক্যাটাগরি, নকশা ও ছবি, রিভিউ, সময়সূচি, রঙ ও পেমেন্ট পদ্ধতি — এখন যেমন আছে ঠিক তেমন।</p><button class="btn" onclick="dlSite(1)">⬇ ডাউনলোড (.html) · '+kb(a)+'</button></div>'+
-'<div class="ord" style="border-left:6px solid var(--a)"><b style="font-size:17px">📄 মূল ফাইল — শুধু কোড</b><p style="margin:6px 0;color:var(--mut);font-size:14px">আপনার করা পরিবর্তন ছাড়া, প্রথম অবস্থার ফাইল।</p><button class="btn s" onclick="dlSite(0)">⬇ ডাউনলোড (.html) · '+kb(b)+'</button></div>'+
-'<div class="sm"><b>জেনে রাখুন</b><br>• অর্ডার ও ভিজিটের তথ্য Google Drive-এ থাকে, ডাউনলোড ফাইলে যায় না।<br>• অ্যাডমিন আইডি ও পাসওয়ার্ড ফাইলে যায় না।<br>• ডাউনলোড ফাইলে অ্যাডমিন প্যানেল থাকে না — এটা শুধু পাবলিক সাইট।<br>• ফন্ট, ম্যাপ ও Drive সংযোগের জন্য ইন্টারনেট লাগবে।</div></div>'}
+function dlSite(w){var h=w===2?adminHtml():siteHtml(w);if(!h){toast('❌ ফাইল তৈরি করা যায়নি');return}dl(h,w===2?'admin.html':w?'index.html':'index-code-only.html','text/html');toast('⬇ ডাউনলোড শুরু হয়েছে')}
+function dlTab(){var a=siteHtml(1),b=siteHtml(0),c=adminHtml();
+return'<div class="box"><h3>⬇ ওয়েবসাইট ডাউনলোড</h3><p style="color:var(--mut);font-size:14px;margin-top:0">পাবলিক সাইট আর অ্যাডমিন প্যানেল — দুটো আলাদা <b>.html</b> ফাইল। দুটোই একই ফোল্ডারে আপলোড করলে সাইট চালু হবে, আর <b>.../#admin</b> লিংকে অ্যাডমিন খুলবে।</p>'+
+'<h4 style="margin:14px 0 6px">🌐 পাবলিক সাইট (index.html)</h4>'+
+'<div class="ord" style="border-left:6px solid var(--p)"><b style="font-size:17px">📦 বর্তমান সব তথ্যসহ</b><p style="margin:6px 0;color:var(--mut);font-size:14px">দোকানের তথ্য, ক্যাটাগরি, নকশা ও ছবি, রিভিউ, সময়সূচি, রঙ, পেমেন্ট পদ্ধতি, স্বাগত পপআপ ও স্ক্রলিং — এখন যেমন আছে ঠিক তেমন। এতে অ্যাডমিন কোড নেই।</p><button class="btn" onclick="dlSite(1)">⬇ index.html · '+kb(a)+'</button></div>'+
+'<div class="ord" style="border-left:6px solid var(--a)"><b style="font-size:17px">📄 শুধু কোড</b><p style="margin:6px 0;color:var(--mut);font-size:14px">আপনার করা তথ্য ও পরিবর্তন ছাড়া, প্রথম অবস্থার পাবলিক ফাইল।</p><button class="btn s" onclick="dlSite(0)">⬇ index-code-only.html · '+kb(b)+'</button></div>'+
+'<h4 style="margin:18px 0 6px">🔐 অ্যাডমিন প্যানেল (admin.html)</h4>'+
+'<div class="ord" style="border-left:6px solid #e03131"><b style="font-size:17px">🔐 অ্যাডমিন কোড</b><p style="margin:6px 0;color:var(--mut);font-size:14px">শুধু অ্যাডমিন প্যানেলের কোড। আইডি, পাসওয়ার্ড, অর্ডার বা ভিজিটের তথ্য এতে থাকে না — লগইন করলে Google Drive থেকে আসে।</p><button class="btn s" onclick="dlSite(2)">⬇ admin.html · '+kb(c)+'</button></div>'+
+'<div class="sm"><b>জেনে রাখুন</b><br>• অর্ডার ও ভিজিটের তথ্য Google Drive-এ থাকে, ডাউনলোড ফাইলে যায় না।<br>• অ্যাডমিন আইডি ও পাসওয়ার্ড কোনো ফাইলে যায় না।<br>• পাবলিক সাইটে <b>#admin</b> লিংক খুললে <b>admin.html</b>-এ নিয়ে যায়, তাই ফাইলের নামগুলো (index.html, admin.html) বদলাবেন না।<br>• ফন্ট, ম্যাপ ও Drive সংযোগের জন্য ইন্টারনেট লাগবে।</div></div>'}
+
+
+
 
 /* ===== ভিডিও আপলোড (watermark সহ) ===== */
 var VBUSY=0,VMAX=20,VW=640,VBR=650000,VMAXB=2e7;
