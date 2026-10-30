@@ -640,7 +640,7 @@ document.addEventListener('touchend',function(e){if(!(e.target.closest&&e.target
 function bannerEd(){var h='<label>হিরো ব্যানার (একাধিক ছবি দিলে স্লাইডার হবে)</label><input type="file" accept="image/*" multiple onchange="bnUp(this)">';S.banners.forEach(function(b,i){h+='<div class="row ord" style="margin-top:8px"><div class="th" style="background-image:url('+b.i+')"></div><span style="flex:1">ব্যানার '+bn(i+1)+'</span><button class="btn sm g" onclick="bnMv('+i+',-1)">↑</button><button class="btn sm g" onclick="bnMv('+i+',1)">↓</button><button class="btn sm r" onclick="rm(\'banners\','+i+')">মুছুন</button></div>'});return h+F('স্লাইড বদলের সময় (সেকেন্ড)','cfg.bnSec',{t:'number'})}
 function bnUp(el){var fs=Array.prototype.slice.call(el.files),n=0;if(!fs.length)return;fs.forEach(function(f){shrink(f,1000,function(d){S.banners.push({i:d});if(++n===fs.length){if(save())render()}},.7)})}
 function bnMv(i,d){var j=i+d;if(j<0||j>=S.banners.length)return;var t=S.banners[i];S.banners[i]=S.banners[j];S.banners[j]=t;save();render()}
-function fixTop(){if(A)return;var app=$('app'),els=[['.ann',S.cfg.stAnn],['header',S.cfg.stHdr],['.nv',S.cfg.stNav]],acc=0;els.forEach(function(x,i){var e=app.querySelector(x[0]);if(!e)return;if(x[1]){e.style.position='sticky';e.style.top=acc+'px';e.style.zIndex=30-i;acc+=e.offsetHeight}else{e.style.position=x[0]==='header'?'relative':'static'}})}
+function fixTop(){if(A)return;var app=$('app'),els=[['.ann',S.cfg.stAnn],['header',S.cfg.stHdr],['.nv',S.cfg.stNav]],acc=(GLU&&glOn()?46:0);els.forEach(function(x,i){var e=app.querySelector(x[0]);if(!e)return;if(x[1]){e.style.position='sticky';e.style.top=acc+'px';e.style.zIndex=30-i;acc+=e.offsetHeight}else{e.style.position=x[0]==='header'?'relative':'static'}})}
 window.addEventListener('resize',fixTop);window.addEventListener('load',fixTop);
 /* ===== খোলা থাকার সময় ===== */
 var DAYS=['সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার','রবিবার'];
@@ -916,18 +916,26 @@ function glFab() {
   g.className = 'gls' + (GLU ? ' gin' : '');
   g.innerHTML = GLU ? '<span onclick="glAcc(\'me\')" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:6px">' : '👤 ') + '<b>' + esc(GLU.name || '') + '</b></span><button class="btn sm glcart" onclick="glAcc(\'cart\')">🛒 কার্ট (' + GLU.cart.length + ')</button><button class="btn sm s" onclick="glAcc(\'wish\')">❤️ পছন্দ (' + GLU.wish.length + ')</button>' : '🔐 <b>Google দিয়ে লগইন করুন</b>'
 }
+function glBarOff() { var g = $('gls'); if (g && g.parentNode === document.body) g.remove(); document.body.classList.remove('gbar') }
 function glAfter() {
-  if (A) return; if (!glOn()) { document.querySelectorAll('.glc,#gls').forEach(function (e) { e.remove() }); glFab(); return } var h = document.querySelector('#app header');
+  if (A) { glBarOff(); return } if (!glOn()) { document.querySelectorAll('.glc,#gls').forEach(function (e) { e.remove() }); document.body.classList.remove('gbar'); glFab(); return } var h = document.querySelector('#app header');
   if (h && !GLU && !h.querySelector('.glc')) {
     var b = document.createElement('button'); b.className = 'hb glc'; b.onclick = function () { GLU ? glAcc() : glLogin() };
     b.innerHTML = GLU ? (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle">' : '👤') + '<span style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;margin-left:4px">' + esc((GLU.name || '').split(' ')[0]) + '</span>' : '🔐 লগইন';
     h.insertBefore(b, h.querySelector('a[href^="tel:"]'))
   }
-  var tb = document.querySelector('#app header, #app .dbar');
-  if (tb && !$('gls')) { var d = document.createElement('div'); d.id = 'gls'; d.className = 'gls'; d.onclick = function () { if (!GLU) glLogin() }; if (GLU && tb.parentNode.id !== 'hw') { var w = document.createElement('div'); w.id = 'hw'; tb.parentNode.insertBefore(w, tb); w.appendChild(tb) } tb.insertAdjacentElement('afterend', d) }
+  var g = $('gls');
+  if (GLU) {   // লগইন থাকলে কার্ট/পছন্দ বার সবসময় সবার উপরে ভাসমান
+    if (!g || g.parentNode !== document.body) { if (g) g.remove(); g = document.createElement('div'); g.id = 'gls'; g.className = 'gls'; document.body.appendChild(g) }
+    document.body.classList.add('gbar')
+  } else {
+    if (g && g.parentNode === document.body) { g.remove(); g = null } document.body.classList.remove('gbar');
+    var tb = document.querySelector('#app header, #app .dbar');
+    if (tb && !g) { var d = document.createElement('div'); d.id = 'gls'; d.className = 'gls'; d.onclick = function () { glLogin() }; tb.insertAdjacentElement('afterend', d) }
+  }
   glFab()
 }
-(function () { var st = document.createElement('style'); st.textContent = '.glcart{background:#2b8a3e!important;background-image:none!important;color:#fff!important;border:2px solid #fff;font-weight:700}.glcart:active{background:#237032!important}.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gls.gin{display:flex;align-items:center;gap:6px;box-shadow:0 3px 10px #0002}#hw{position:sticky;top:0;z-index:20}#hw>header,#hw>.dbar{position:static}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
+(function () { var st = document.createElement('style'); st.textContent = '.glcart{background:#2b8a3e!important;background-image:none!important;color:#fff!important;border:2px solid #fff;font-weight:700}.glcart:active{background:#237032!important}.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gls.gin{display:flex;align-items:center;gap:6px;position:fixed;top:0;left:0;right:0;height:46px;padding:0 14px;z-index:30;background:var(--card);border-bottom:2px solid var(--a);box-shadow:0 3px 12px #0003}body.gbar{padding-top:46px}body.gbar .dbar{top:46px}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
 var _glr = render; render = function () { _glr(); glAfter() };
 setTimeout(function () { if (GLT && glApi()) glCall({ action: 'me', tok: GLT }).then(function (d) { if (glChk(d)) { GLU = d.user; glSave(); glFab() } }).catch(function () {}) }, 1500);
 /* অ্যাডমিন ট্যাব */
