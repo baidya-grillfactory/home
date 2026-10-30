@@ -916,6 +916,8 @@ function glFab() {
   g.className = 'gls' + (GLU ? ' gin' : '');
   g.innerHTML = GLU ? '<span onclick="glAcc(\'me\')" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:6px">' : '👤 ') + '<b>' + esc(GLU.name || '') + '</b></span><button class="btn sm glcart" onclick="glAcc(\'cart\')">🛒 কার্ট (' + GLU.cart.length + ')</button><button class="btn sm s" onclick="glAcc(\'wish\')">❤️ পছন্দ (' + GLU.wish.length + ')</button>' : '🔐 <b>Google দিয়ে লগইন করুন</b>'
 }
+function glHh() { var tb = document.querySelector('#app header, #app .dbar'); if (tb) document.documentElement.style.setProperty('--hh', Math.round(tb.getBoundingClientRect().height) + 'px') }
+window.addEventListener('resize', glHh);
 function glAfter() {
   if (A) return; if (!glOn()) { document.querySelectorAll('.glc,#gls').forEach(function (e) { e.remove() }); glFab(); return } var h = document.querySelector('#app header');
   if (h && !GLU && !h.querySelector('.glc')) {
@@ -923,10 +925,11 @@ function glAfter() {
     b.innerHTML = GLU ? (GLU.photo ? '<img src="' + esc(GLU.photo) + '" referrerpolicy="no-referrer" alt="" style="width:22px;height:22px;border-radius:50%;vertical-align:middle">' : '👤') + '<span style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;margin-left:4px">' + esc((GLU.name || '').split(' ')[0]) + '</span>' : '🔐 লগইন';
     h.insertBefore(b, h.querySelector('a[href^="tel:"]'))
   }
-  if (h && !$('gls')) { var d = document.createElement('div'); d.id = 'gls'; d.className = 'gls'; d.onclick = function () { if (!GLU) glLogin() }; h.insertAdjacentElement('afterend', d) }
-  glFab()
+  var tb = document.querySelector('#app header, #app .dbar');
+  if (tb && !$('gls')) { var d = document.createElement('div'); d.id = 'gls'; d.className = 'gls'; d.onclick = function () { if (!GLU) glLogin() }; tb.insertAdjacentElement('afterend', d) }
+  glFab(); glHh()
 }
-(function () { var st = document.createElement('style'); st.textContent = '.glcart{background:#2b8a3e!important;background-image:none!important;color:#fff!important;border:2px solid #fff;font-weight:700}.glcart:active{background:#237032!important}.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gls.gin{display:flex;align-items:center;gap:6px}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
+(function () { var st = document.createElement('style'); st.textContent = '.glcart{background:#2b8a3e!important;background-image:none!important;color:#fff!important;border:2px solid #fff;font-weight:700}.glcart:active{background:#237032!important}.gls{display:none;background:var(--card);color:var(--tx);padding:7px 14px;font-size:14px;border-bottom:1px solid var(--bd);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gls.gin{display:flex;align-items:center;gap:6px;position:sticky;top:var(--hh,60px);z-index:19;box-shadow:0 3px 10px #0002}@media(max-width:520px){.glc{display:none!important}.gls{display:block}}'; document.head.appendChild(st) })();
 var _glr = render; render = function () { _glr(); glAfter() };
 setTimeout(function () { if (GLT && glApi()) glCall({ action: 'me', tok: GLT }).then(function (d) { if (glChk(d)) { GLU = d.user; glSave(); glFab() } }).catch(function () {}) }, 1500);
 /* অ্যাডমিন ট্যাব */
