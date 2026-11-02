@@ -384,8 +384,7 @@ m.ondblclick=function(){if(Z.s>1){Z.s=1;Z.x=0;Z.y=0}else Z.s=2.5;zt()};
 m.onpointerdown=function(e){if(e.target.tagName==='BUTTON')return;P[e.pointerId]={x:e.clientX,y:e.clientY};try{m.setPointerCapture(e.pointerId)}catch(x){}};
 m.onpointermove=function(e){var p=P[e.pointerId];if(!p)return;var ids=Object.keys(P);if(ids.length===2){var o=P[ids.filter(function(q){return q!=e.pointerId})[0]],d0=Math.hypot(p.x-o.x,p.y-o.y);p.x=e.clientX;p.y=e.clientY;var d1=Math.hypot(p.x-o.x,p.y-o.y);if(d0)zz(d1/d0)}else if(Z.s>1){Z.x+=e.clientX-p.x;Z.y+=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;zt()}else{p.x=e.clientX;p.y=e.clientY}};
 m.onpointerup=m.onpointercancel=function(e){delete P[e.pointerId]}}
-var GMH=0,GMD=0;function gx(){clearTimeout(GMT);var m=$('gm');if(m)m.remove();if(GMH){GMH=0;try{if(history.state&&history.state.gm)history.back()}catch(e){}}}
-window.addEventListener('popstate',function(){var m=$('gm');if(m){clearTimeout(GMT);m.remove()}GMH=0});
+var GMH=0,GMD=0;function gx(){clearTimeout(GMT);var m=$('gm');if(m)m.remove();}
 var GMT=null,GML=[],GMG=0;
 var GMK=0;
 function gmSwipe(m){var c=m.querySelector('#gmi');if(!c)return;var sx=0,sy=0,dx=0,on=0,lock=0;c.style.touchAction='pan-y';c.style.userSelect='none';
@@ -397,7 +396,7 @@ function gmAct(f){var n=Date.now();return(S.cfg.wps||[]).filter(function(p){if(!
 function gmGo(k){var c=$('gmi');if(!c||!GML.length)return;if(k<0)k=GML.length-1;if(k>=GML.length)k=0;var p=GML[k],sc=+p.sec||0;GMK=k;c.innerHTML='<img src="'+p.i+'" alt="" class="gmim" draggable="false">'+(p.c?'<div class="gmcp">'+esc(p.c)+'</div>':'')+(GML.length>1?'<div class="gmdt">'+GML.map(function(_,j){return'<i class="'+(j===k?'on':'')+'" onclick="gmGo('+j+')"></i>'}).join('')+'</div>':'')+(sc?'<div class="gmpb"><b style="animation-duration:'+sc+'s"></b></div>':'');clearTimeout(GMT);if(sc)GMT=setTimeout(function(){if(!$('gm'))return;if(k<GML.length-1)gmGo(k+1);else gx()},sc*1000)}
 function greet(f){if(!f&&(A||$('gm')||!S.cfg.wmOn))return;if(f)gx();else{if(GMD)return;GMD=1}
 var h=new Date().getHours(),g=h>=5&&h<12?['🌅','শুভ সকাল']:h>=12&&h<17?['☀️','শুভ দুপুর']:h>=17&&h<21?['🌇','শুভ সন্ধ্যা']:['🌙','শুভ রাত্রি'],c=S.cfg,m=document.createElement('div');GML=gmAct(f);m.id='gm';m.className='ov2 gm'+(GML.length?' gmp':'');m.onclick=function(e){if(e.target===m&&Date.now()-GMG>350)gx()};
-m.innerHTML=tr('<div class="mb"><button class="x" onclick="gx()">✕</button>'+(GML.length?'<div id="gmi" class="gmw"></div>':'<div style="font-size:54px;text-align:center">'+g[0]+'</div>')+'<h3 style="display:block;border:0;text-align:center;margin:4px 0">'+g[1]+'</h3><div style="text-align:center;font-weight:700">'+esc(X(c,'name'))+'</div><p style="text-align:center">'+esc(X(c,'wm'))+'</p>'+(c.wmWa===0?'':'<div style="text-align:center"><a class="btn wab" target="_blank" rel="noopener" href="'+waL()+'">'+WAI+' হোয়াটসঅ্যাপে মেসেজ করুন</a></div>')+'</div>');document.body.appendChild(m);if(GML.length){gmSwipe(m);gmGo(0)}if(!GMH){try{history.pushState({gm:1},'');GMH=1}catch(e){}}}
+m.innerHTML=tr('<div class="mb"><button class="x" onclick="gx()">✕</button>'+(GML.length?'<div id="gmi" class="gmw"></div>':'<div style="font-size:54px;text-align:center">'+g[0]+'</div>')+'<h3 style="display:block;border:0;text-align:center;margin:4px 0">'+g[1]+'</h3><div style="text-align:center;font-weight:700">'+esc(X(c,'name'))+'</div><p style="text-align:center">'+esc(X(c,'wm'))+'</p>'+(c.wmWa===0?'':'<div style="text-align:center"><a class="btn wab" target="_blank" rel="noopener" href="'+waL()+'">'+WAI+' হোয়াটসঅ্যাপে মেসেজ করুন</a></div>')+'</div>');document.body.appendChild(m);if(GML.length){gmSwipe(m);gmGo(0)}}
 /* ===== স্বাগত পপআপ অ্যাডমিন ট্যাব ===== */
 
 
@@ -497,6 +496,22 @@ function li(){var l=S.cfg.logo;if(l&&l!==LOGO0)return'<img src="'+l+'" alt="logo
 function grill(){var p='<path d="M10 200V70Q200 -50 390 70V200"/>';for(var i=0;i<9;i++)p+='<path style="animation-delay:'+(.3+i*.18)+'s" d="M'+(30+i*42.5)+' 200V70"/>';p+='<path style="animation-delay:2s" d="M10 120H390"/><path style="animation-delay:2.2s" d="M10 160H390"/>';return'<svg class="hg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" fill="none" stroke="#fff" stroke-width="3">'+p+'</svg>'}
 function route(){var h=location.hash,m=h.match(/^#designs\/(\d+)/);if(h==='#admin'){location.replace('admin.html');return}A=false;DP=(!A&&m&&S.products[+m[1]])?+m[1]:null;ckx();if(DP!==null&&DF.i!==DP)DF={i:DP,f:'',pr:'',so:'',th:dsTh(S.products[DP]),q:''};if(DP===null)NAV=0;render();if(DP===null&&!A&&HS!=null){window.scrollTo(0,HS);HS=null}else window.scrollTo(0,0);gx();if(!A&&DP===null)setTimeout(greet,800)}
 window.addEventListener('hashchange',route);
+/* ===== ব্যাক বাটন: পপআপ বন্ধ হবে, পেজ থেকে বেরোবে না ===== */
+var OVH=0,OVQ=0,OVT=null;
+var OVI=['nvm','mod','gm','glm','zm'];   /* নিচ থেকে উপরের ক্রমে */
+function ovEls(){return OVI.filter(function(id){return id==='nvm'?!!document.querySelector('.nvm.open'):!!$(id)})}
+function ovClose(id){if(id==='zm')zx();else if(id==='glm')glX();else if(id==='gm')gx();else if(id==='mod')ckx();else if(id==='nvm')nvT(0)}
+function ovSync(){var n=ovEls().length;while(OVH<n){try{history.pushState({ov:1},'')}catch(e){}OVH++}
+if(OVH>n){var d=OVH-n;OVH=n;if(history.state&&history.state.ov){OVQ=1;try{history.go(-d)}catch(e){OVQ=0}}}}
+function ovLater(){clearTimeout(OVT);OVT=setTimeout(ovSync,0)}
+window.addEventListener('popstate',function(e){var st=e.state;if(OVQ){OVQ=0;return}
+var o=ovEls();if(o.length){OVH=Math.max(0,OVH-1);ovClose(o[o.length-1]);return}
+OVH=0;
+if(st&&st.ov){try{history.back()}catch(x){}return}
+if(st&&st.base){try{history.pushState({trap:1},'')}catch(x){}}});
+try{new MutationObserver(ovLater).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']})}catch(e){}
+try{history.replaceState({base:1},'');history.pushState({trap:1},'')}catch(e){}
+
 window.addEventListener('scroll',function(){var y=(window.pageYOffset||0)>350,b=$('btt'),w=$('wlg');if(b)b.classList.toggle('on',y);if(w)w.classList.toggle('on',y)},{passive:true});
 function render(){applyTheme();document.documentElement.lang=L;$('app').innerHTML=A?admin()+svBar():tr(DP!==null&&S.products[DP]?dsPage():pub());if(!A&&DP!==null)dsTabCenter();rev();bnI=0;fixTop();bnStart()}
 function go(id){var e=$(id);if(e)e.scrollIntoView({behavior:'smooth'})}
