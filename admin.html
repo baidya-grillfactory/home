@@ -893,7 +893,7 @@ var l=devs();if(l.some(function(x){return x.id===id})){toast('আগে থে�
 function devRm(i){var l=API()?(DSV||[]):devs(),x=l[i];if(!x)return;var me=x.id===did();if(!confirm(me?'⚠️ এটি আপনার বর্তমান ডিভাইস! মুছলে এখান থেকে আর অ্যাডমিন খুলবে না। তবুও মুছবেন?':'এই ডিভাইসের অনুমতি তুলে নেবেন?'))return;
 if(API()){apiCall({action:'devRm',pass:pw(),id:x.id}).then(function(r){if(r.ok){DSV=r.list;DRQ=r.reqs||DRQ;if(me){DDEN=1;sessionStorage.removeItem('adm')}render();toast('🗑 অনুমতি তুলে নেওয়া হয়েছে')}else toast('❌ '+(r.error||'হয়নি'))}).catch(function(){toast('❌ হয়নি')});return}
 l.splice(i,1);save();if(me)sessionStorage.removeItem('adm');render();toast('🗑 অনুমতি তুলে নেওয়া হয়েছে')}
-function devAct(a,id){apiCall({action:a,id:id}).then(function(r){if(r.ok){DSV=r.list;DRQ=r.reqs||[];render();toast(a==='devAccept'?'✅ Accept হয়েছে':'🗑 বাতিল')}else toast('❌ '+(r.error||'হয়নি'))}).catch(function(){toast('❌ হয়নি')})}
+function devAct(a,id){apiCall({action:a,pass:pw(),id:id}).then(function(r){if(r.ok){DSV=r.list;DRQ=r.reqs||[];render();toast(a==='devAccept'?'✅ Accept হয়েছে':'🗑 বাতিল')}else toast('❌ '+(r.error||'হয়নি'))}).catch(function(){toast('❌ হয়নি')})}
 function devTab(){var me=did(),h='<div class="box"><h3>🔐 ডিভাইস অ্যাক্সেস</h3><p style="color:var(--mut);font-size:13px">তালিকার যেকোনো ডিভাইসই অন্য ডিভাইসকে Allow/Remove করতে পারে। শুধু নিচের তালিকার ডিভাইস থেকেই অ্যাডমিন প্যানেল খুলবে। পাবলিক সাইট সবার জন্য খোলা। (ব্রাউজার MAC অ্যাড্রেস দেখতে পারে না, তাই প্রতিটি ডিভাইসের ব্রাউজারের আলাদা আইডি ব্যবহার হয়।)</p><p>এই ডিভাইসের আইডি: <b style="user-select:all">'+me+'</b></p></div><br>';
 if(API()&&DSV===null){if(!DLD)devLoad();return h+'<div class="box">⏳ তালিকা আনা হচ্ছে…</div>'}
 var l=API()?DSV:devs();
