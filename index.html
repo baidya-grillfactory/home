@@ -824,6 +824,7 @@ function tc(){if(!API()){toast('আগে URL দিন');return}apiCall({action
 /* ===== ভিজিট ও লোকেশন ===== */
 var GEO=null,STATS=null,STL=false,STT=0;
 function vid(){try{var v=localStorage.getItem('boidya_vid');if(!v){v=Math.random().toString(36).slice(2,12)+Date.now().toString(36);localStorage.setItem('boidya_vid',v);return{id:v,nw:1}}return{id:v,nw:0}}catch(e){return{id:'x'+Math.random().toString(36).slice(2,8),nw:0}}}
+function did(){try{var v=localStorage.getItem('boidya_devid');if(!v){v='D'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();localStorage.setItem('boidya_devid',v)}return v}catch(e){return'NOID'}}
 function devInfo(){var u=navigator.userAgent,os=/Android/.test(u)?'Android':/iPhone|iPad|iPod/.test(u)?'iOS':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':/Linux/.test(u)?'Linux':'Other',br=/Edg\//.test(u)?'Edge':/OPR\/|Opera/.test(u)?'Opera':/Chrome\//.test(u)?'Chrome':/Safari\//.test(u)?'Safari':/Firefox\//.test(u)?'Firefox':'Other',dv=/iPad|Tablet/.test(u)?'ট্যাবলেট':/Mobi|Android|iPhone/.test(u)?'মোবাইল':'ডেস্কটপ';return{dv:dv,os:os,br:br}}
 function devTxt(){var d=devInfo();return d.dv+' · '+d.os+' · '+d.br+' · '+screen.width+'×'+screen.height+' · '+(navigator.language||'')}
 function geoTxt(){var g=GEO||{};return[g.city,g.reg,g.cn].filter(Boolean).join(', ')}
@@ -832,7 +833,7 @@ function trackVisit(){if(A||location.hash==='#admin'||!S.cfg.track){return}
 if(!API()){ipGeo(function(){});return}
 try{if(sessionStorage.getItem('adm'))return;if(sessionStorage.getItem('boidya_v')){ipGeo(function(){});return}sessionStorage.setItem('boidya_v','1')}catch(e){}
 var v=vid(),d=devInfo(),ref='সরাসরি';try{if(document.referrer)ref=new URL(document.referrer).hostname||'সরাসরি'}catch(e){}
-ipGeo(function(g){apiCall({action:'visit',v:{vid:v.id,nw:v.nw,dv:d.dv,os:d.os,br:d.br,city:(g.city||'')+(g.ip?' ('+g.ip+')':''),reg:g.reg||'',cn:g.cn||'',src:ref}}).catch(function(){})})}
+ipGeo(function(g){apiCall({action:'visit',v:{did:did(),vid:v.id,nw:v.nw,dv:d.dv,os:d.os,br:d.br,city:(g.city||'')+(g.ip?' ('+g.ip+')':''),reg:g.reg||'',cn:g.cn||'',src:ref}}).catch(function(){})})}
 function getGps(){cd();if(!navigator.geolocation){toast('এই ব্রাউজারে লোকেশন সুবিধা নেই');return}toast('লোকেশন নেওয়া হচ্ছে…');navigator.geolocation.getCurrentPosition(function(p){CK.gps={lat:p.coords.latitude.toFixed(6),lng:p.coords.longitude.toFixed(6)};ck()},function(){toast('লোকেশন পাওয়া যায়নি — অনুমতি দিন')},{enableHighAccuracy:true,timeout:15000})}
 
 
