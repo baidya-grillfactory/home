@@ -557,7 +557,7 @@ function sbFont(ff){var m={'Baloo Da 2':'Baloo+Da+2:wght@500;700','Anek Bangla':
 function sbSlide(c,s){var bg=tkCl(s.bg)||'#16324a',fg=tkCl(s.fg)||'#ffffff',ff='';SBF.forEach(function(f){if(f[0]&&f[0]===s.ff)ff=f[0]});sbFont(ff);var an=/^[a-z]+$/.test(s.an||'')?s.an:'fade',fs=Math.max(8,Math.min(30,+s.fs||13)),st='background:'+bg+';color:'+fg+';font-size:'+fs+'px;'+(ff?'font-family:'+ff+';':'')+tkFmt(s,'')+(s.B?'font-weight:800;':''),b='';
 if(s.k==='dt'){if(s.d!==0)b+='<div class="sbdd">'+sbDate()+'</div>';if(s.t!==0)b+='<div class="sbtm">'+sbTime()+'</div>'}
 else if(s.k==='text')b=esc(X(s,'x')||'');
-else if(s.k==='logo')b=li();
+else if(s.k==='logo')b=s.lm===0?li():li().replace('<img ','<img style="mix-blend-mode:multiply" ');
 return'<div class="sbs sba-'+an+'" style="'+st+'"><div>'+b+'</div></div>'}
 function sbList(c){return sbCfg(c).sbS.filter(function(s){return s&&/^(dt|text|logo|blank)$/.test(s.k)})}
 function sbBar(c){sbCfg(c);var q='<a onclick="openSr()"';var a=sbList(c),w=Math.max(25,Math.min(90,+c.sbW||55));
@@ -867,7 +867,7 @@ function apiCall(b){var u=API();if(!u)return Promise.reject(new Error('no api'))
 function pw(){try{return sessionStorage.getItem('adm')?(sessionStorage.getItem('admpw')||''):''}catch(e){return ''}}
 function pub_(){var c=cl(S.cfg);SECRET.forEach(function(k){delete c[k]});return{cfg:c,feats:S.feats,stats:S.stats,revs:S.revs,banners:S.banners,hrs:S.hrs,pay:S.pay,products:S.products,gal:S.gal,nav:S.nav}}
 function pushCfg(){if(!API()||!pw())return;clearTimeout(syncT);syncT=setTimeout(function(){apiCall({action:'saveConfig',pass:pw(),config:pub_()}).then(function(r){toast(r.ok?'☁️ Google Drive-এ সেভ হয়েছে':'❌ Drive: '+(r.error||'সমস্যা'));svSt(r.ok?'ok':'err')}).catch(function(){toast('❌ Drive-এ সেভ হয়নি');svSt('err')})},1200)}
-function pullCfg(){if(!API())return;var u=API();fetch(u+(u.indexOf('?')<0?'?':'&')+'action=config').then(function(r){return r.json()}).then(function(d){if(!d||!d.cfg)return;var keep={ah:S.cfg.ah,api:S.cfg.api};['feats','stats','revs','banners','hrs','pay','products','gal','nav'].forEach(function(a){if(d[a])S[a]=d[a]});for(var k in d.cfg)S.cfg[k]=d.cfg[k];for(var k2 in keep)S.cfg[k2]=keep[k2];mig();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}lastJ=JSON.stringify(pub_());render()}).catch(function(){}).then(trackVisit).then(function(){gFetch();setTimeout(migW,300)})}
+function pullCfg(){if(!API())return;var u=API();fetch(u+(u.indexOf('?')<0?'?':'&')+'action=config&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.cfg)return;var keep={ah:S.cfg.ah,api:S.cfg.api};['feats','stats','revs','banners','hrs','pay','products','gal','nav'].forEach(function(a){if(d[a])S[a]=d[a]});for(var k in d.cfg)S.cfg[k]=d.cfg[k];for(var k2 in keep)S.cfg[k2]=keep[k2];mig();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}lastJ=JSON.stringify(pub_());render()}).catch(function(){}).then(trackVisit).then(function(){gFetch();setTimeout(migW,300)})}
 
 
 
