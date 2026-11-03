@@ -851,7 +851,10 @@ function tc(){if(!API()){toast('আগে URL দিন');return}apiCall({action
 /* ===== ভিজিট ও লোকেশন ===== */
 var GEO=null,STATS=null,STL=false,STT=0;
 function vid(){try{var v=localStorage.getItem('boidya_vid');if(!v){v=Math.random().toString(36).slice(2,12)+Date.now().toString(36);localStorage.setItem('boidya_vid',v);return{id:v,nw:1}}return{id:v,nw:0}}catch(e){return{id:'x'+Math.random().toString(36).slice(2,8),nw:0}}}
-function did(){try{var v=localStorage.getItem('boidya_devid');if(!v){v='D'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();localStorage.setItem('boidya_devid',v)}return v}catch(e){return'NOID'}}
+function did(){var v='',c='';try{v=localStorage.getItem('boidya_devid')||''}catch(e){}try{var m=document.cookie.match(/(?:^|; )boidya_devid=([A-Z0-9]+)/);c=m?m[1]:''}catch(e){}
+if(!v)v=c;if(!v){v='D'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase()}
+try{localStorage.setItem('boidya_devid',v)}catch(e){}try{document.cookie='boidya_devid='+v+';max-age=34560000;path=/;SameSite=Lax'+(location.protocol==='https:'?';Secure':'')}catch(e){}
+try{if(navigator.storage&&navigator.storage.persist&&!window.__pst){window.__pst=1;navigator.storage.persist()}}catch(e){}return v}
 function devInfo(){var u=navigator.userAgent,os=/Android/.test(u)?'Android':/iPhone|iPad|iPod/.test(u)?'iOS':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':/Linux/.test(u)?'Linux':'Other',br=/Edg\//.test(u)?'Edge':/OPR\/|Opera/.test(u)?'Opera':/Chrome\//.test(u)?'Chrome':/Safari\//.test(u)?'Safari':/Firefox\//.test(u)?'Firefox':'Other',dv=/iPad|Tablet/.test(u)?'ট্যাবলেট':/Mobi|Android|iPhone/.test(u)?'মোবাইল':'ডেস্কটপ';return{dv:dv,os:os,br:br}}
 function devTxt(){var d=devInfo();return d.dv+' · '+d.os+' · '+d.br+' · '+screen.width+'×'+screen.height+' · '+(navigator.language||'')}
 function geoTxt(){var g=GEO||{};return[g.city,g.reg,g.cn].filter(Boolean).join(', ')}
