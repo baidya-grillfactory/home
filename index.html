@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="bn"><head>
 <!-- সাধারণ ভিজিটরের জন্য: এতে অ্যাডমিন প্যানেলের কোড নেই --><meta charset="utf-8">
+<meta name="build" content="B20261104a">
+<script>(function(){try{var m=document.querySelector('meta[name=build]');if(!m)return;var cur=m.content,u=location.pathname;fetch(u+'?_='+Date.now(),{cache:'no-store',headers:{Range:'bytes=0-1500'}}).then(function(r){return r.text()}).then(function(t){var x=t.match(/<meta name="build" content="([^"]+)"/);if(x&&x[1]!==cur&&sessionStorage.getItem('rlb')!==x[1]){sessionStorage.setItem('rlb',x[1]);location.replace(u+'?v='+encodeURIComponent(x[1])+location.hash)}}).catch(function(){})}catch(e){}})();</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#16324a">
 <title>বৈদ্য গ্রিল ফ্যাক্টরি</title>
@@ -373,9 +376,9 @@ function UBs(p){var u={};(p.ds||[]).forEach(function(d){u[d.unit||p.unit||'kg']=
 function nums(d){var m=dn(d.pr||'').replace(/,/g,'').match(/\d+(\.\d+)?/);return m?+m[0]:null}
 var FD=[['sz','সাইজ'],['mt','লোহার ধরন / উপাদান'],['wt','ওজন'],['fn','রঙ / ফিনিশ'],['wr','ওয়ারেন্টি / গ্যারান্টি'],['nt','অতিরিক্ত বিবরণ']];
 function dspec(d,k){var v=d&&d[k];if(v)return v;var m={sz:'dsz',mt:'dmt',fn:'dfn'}[k];return m?(X(S.cfg,m)||''):''}
-function IMG2(u,e){return u?'<img src="'+u+'" alt="">':esc(e||'🔧')}
+function IMG2(u,e,w){return u?'<img src="'+tu(u,w||700)+'" alt="" loading="lazy" decoding="async">':esc(e||'🔧')}
 function cvr(p){if(p.i)return p.i;var r='';(p.ds||[]).some(function(d){r=gal(d)[0]||'';return r});return r}
-function gal(d){return [d.i].concat(d.gal||[]).filter(function(u){return u&&u.length>200})}
+function gal(d){return [d.i].concat(d.gal||[]).filter(function(u){return u&&(u.length>200||/^https?:\/\//.test(u))})}
 function openDt(i,j,k){k=k||0;var p=S.products[i],d=p.ds[j],g=gal(d),m=$('mod');if(!m){m=document.createElement('div');m.id='mod';document.body.appendChild(m)}m.className='ov2';var R=FD.map(function(f){return[f[1],dspec(d,f[0])]}).filter(function(r){return r[1]});if(d.no)R.unshift(['কোড',bn(d.no)]);
 m.innerHTML=tr('<div class="mb"><button class="x" onclick="ckx()">✕</button><h3>'+esc(X(p,'n'))+' — '+esc(X(d,'n'))+'</h3>'+(g.length?'<div class="im2 zi" onclick="openZ('+i+','+j+','+k+')"><img src="'+g[k]+'" alt=""></div>'+(g.length>1?'<div class="thg">'+g.map(function(u,n){return'<div class="'+(n===k?'on':'')+'" onclick="openDt('+i+','+j+','+n+')"><img src="'+u+'" alt=""></div>'}).join('')+'</div>':''):'<div class="im2">'+esc(p.e||'🔧')+'</div>')+vidBox(d)+(d.pr?'<div style="color:var(--p);font-weight:700;font-size:20px;margin:8px 0">'+esc(d.pr)+'</div>':'')+(R.length?'<table class="dtb">'+R.map(function(r){return'<tr><td>'+r[0]+'</td><td>'+esc(r[1])+'</td></tr>'}).join('')+'</table>':'')+(estT(p)?'<div class="sm">🚚 '+estT(p)+'</div>':'')+'<button class="btn s sm" onclick="glDlD('+i+','+j+','+k+')">⬇ ডাউনলোড</button> '+glAdd(i,j)+'<button class="btn sm" onclick="openCk('+i+','+j+')">অর্ডার করুন</button> '+'<a class="btn wab sm" target="_blank" rel="noopener" href="'+waL2(p,d)+'">'+WAI+' WhatsApp</a>'+waPh(i,j)+' <button class="btn s sm" onclick="'+(FRM==='g'?'openGal(GC)':'openDs('+i+',\'\')')+'">'+(FRM==='g'?'← গ্যালারি':'← সব নকশা')+'</button></div>')}
 var Z={g:[],k:0,s:1,x:0,y:0},P={};
@@ -551,6 +554,11 @@ function tkCl(v){return/^#[0-9a-f]{3,8}$/i.test(v||'')?v:''}
 function tkFmt(c,k){return(c[k+'B']?'font-weight:800;':'')+(c[k+'I']?'font-style:italic;':'')+(c[k+'U']?'text-decoration:underline;':'')}
 function tkSp(v){v=parseFloat(v);if(!(v>0))v=24;return Math.max(3,Math.min(300,v))}
 
+var PULLD=0,LASTP=Date.now();
+function tu(u,w){return /^https:\/\/lh3\.googleusercontent\.com\/d\/[\w-]+$/.test(u||'')?u+'=w'+w:u}
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&!A&&Date.now()-LASTP>45000){LASTP=Date.now();pullCfg(1)}});
+setInterval(function(){if(!document.hidden&&!A&&Date.now()-LASTP>150000){LASTP=Date.now();pullCfg(1)}},60000);
+
 /* ===== সার্চ বারের পাশের ঘুরন্ত বক্স ===== */
 var SBI=0,SBT=null,SBF=[['','ডিফল্ট (Hind Siliguri)'],['"Baloo Da 2",sans-serif','Baloo Da 2 (মোটা গোল)'],['"Anek Bangla",sans-serif','Anek Bangla'],['"Noto Serif Bengali",serif','Noto Serif Bengali (সেরিফ)'],['Galada,cursive','Galada (হাতের লেখা)'],['Atma,cursive','Atma'],['Orbitron,monospace','Orbitron (ডিজিটাল)'],['monospace','Monospace'],['Georgia,serif','Serif'],['cursive','Cursive']],SBA=[['fade','ফেড (ধীরে ফুটে ওঠা)'],['slide','ডান থেকে স্লাইড'],['up','নিচ থেকে উঠে আসা'],['zoom','জুম ইন'],['flip','ফ্লিপ'],['bounce','বাউন্স'],['rot','ঘুরে আসা'],['pulse','পালস (স্পন্দন)'],['blink','ব্লিংক'],['glow','গ্লো'],['none','কোনোটাই না']],SBM=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'],SBME=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function sbDef(){return[{k:'dt',s:2,bg:'#16324a',fg:'#ffffff',an:'fade',d:1,t:1,B:1},{k:'text',s:2,x:'বৈদ্য গ্রিল ফ্যাক্টরি',x_en:'Baidya Grill Factory',bg:'#d9480f',fg:'#ffffff',an:'slide',B:1}]}
@@ -588,8 +596,8 @@ var sp=['🔥@8%@18%@0s','⚙️@85%@12%@1s','✨@14%@70%@2s','🔩@90%@65%@.5s'
 h+=sbBar(S.cfg);
 h+='<div class="hero" style="'+(bnList().length?'animation:none;background:#16324a':'')+'">'+bnHtml()+grill()+sp+'<div class="hl la-'+esc(c.lgAnim||'')+'">'+li()+'</div><h2>'+esc(X(c,'name'))+'</h2><p>'+esc(X(c,'tag'))+'</p><div class="bt2"><a class="btn" onclick="openCk(-1)">এখনই অর্ডার করুন</a> <a class="btn w" target="_blank" rel="noopener" href="'+waLink()+'">WhatsApp</a></div></div>';
 if(GS().length)h+='<div class="st rv">'+GS().map(function(s,i){return'<div class="rvc" style="--i:'+i+'">'+stI(s)+'<small>'+esc(X(s,'l'))+'</small></div>'}).join('')+'</div>';
-h+='<div class="cats">'+pOrd().map(function(i){var p=S.products[i];return'<a onclick="pick('+i+')"><span style="border-color:'+pcol(p,i)+';'+(p.i?'background-image:url('+p.i+')':'background:'+pcol(p,i)+'26')+'">'+(p.i?'':esc(p.e||'🔧'))+'</span>'+esc(X(p,'n'))+'</a>'}).join('')+'</div>';
-h+='<section id="prods"><h3>আমাদের কাজ</h3><div class="grid rv">'+pOrd().map(function(i){var p=S.products[i];return'<div class="card c'+(i%5)+'" style="--i:'+i+';border-top-color:'+pcol(p,i)+'"><div class="imw"><div class="im" style="'+(p.i?'background-image:url('+p.i+')':'')+'">'+(p.i?'':esc(p.e||'🔧'))+'</div></div><div class="b"><b>'+esc(X(p,'n'))+'</b><small>'+esc(X(p,'d'))+'</small>'+subTags(p)+''+(hl1(p)?'<div style="font-size:12px;color:var(--mut);margin-top:4px">'+esc(hl1(p))+'</div>':'')+(p.p?'<div style="color:var(--p);font-weight:700">'+esc(p.p)+'</div>':'')+(hl2(p)?'<div style="font-size:12px;margin-top:6px;color:#2b8a3e">'+esc(hl2(p))+'</div>':'')+'<button class="q" onclick="pick('+i+')">সব নকশা দেখুন ('+bn((p.ds||[]).length)+')</button></div></div>'}).join('')+'</div></section>';
+h+='<div class="cats">'+pOrd().map(function(i){var p=S.products[i];return'<a onclick="pick('+i+')"><span style="border-color:'+pcol(p,i)+';'+(p.i?'background-image:url('+tu(p.i,160)+')':'background:'+pcol(p,i)+'26')+'">'+(p.i?'':esc(p.e||'🔧'))+'</span>'+esc(X(p,'n'))+'</a>'}).join('')+'</div>';
+h+='<section id="prods"><h3>আমাদের কাজ</h3><div class="grid rv">'+pOrd().map(function(i){var p=S.products[i];return'<div class="card c'+(i%5)+'" style="--i:'+i+';border-top-color:'+pcol(p,i)+'"><div class="imw"><div class="im" style="'+(p.i?'background-image:url('+tu(p.i,700)+')':'')+'">'+(p.i?'':esc(p.e||'🔧'))+'</div></div><div class="b"><b>'+esc(X(p,'n'))+'</b><small>'+esc(X(p,'d'))+'</small>'+subTags(p)+''+(hl1(p)?'<div style="font-size:12px;color:var(--mut);margin-top:4px">'+esc(hl1(p))+'</div>':'')+(p.p?'<div style="color:var(--p);font-weight:700">'+esc(p.p)+'</div>':'')+(hl2(p)?'<div style="font-size:12px;margin-top:6px;color:#2b8a3e">'+esc(hl2(p))+'</div>':'')+'<button class="q" onclick="pick('+i+')">সব নকশা দেখুন ('+bn((p.ds||[]).length)+')</button></div></div>'}).join('')+'</div></section>';
 h+=gSec();if(S.feats.length)h+='<section id="why"><h3>কেন আমাদের বেছে নেবেন?</h3><div class="fe rv">'+S.feats.map(function(f,i){return'<div style="--i:'+i+'"><i>'+esc(f.e)+'</i><b>'+esc(X(f,'t'))+'</b><small>'+esc(X(f,'d'))+'</small></div>'}).join('')+'</div></section>';
 if(rvShow())h+=rvSec();
 h+='<section id="about" class="rv"><h3>আমাদের সম্পর্কে</h3><div class="box wel"><div>'+esc(X(c,'about'))+'<br><a class="abmini" style="margin-top:10px" onclick="openAb()">🏭 কারখানার পরিচিতি ›</a></div><a class="btn" onclick="openCk(-1)">অর্ডার করুন</a></div></section>';
@@ -872,7 +880,7 @@ function apiCall(b){var u=API();if(!u)return Promise.reject(new Error('no api'))
 function pw(){try{return sessionStorage.getItem('adm')?(sessionStorage.getItem('admpw')||''):''}catch(e){return ''}}
 function pub_(){var c=cl(S.cfg);SECRET.forEach(function(k){delete c[k]});return{cfg:c,feats:S.feats,stats:S.stats,revs:S.revs,banners:S.banners,hrs:S.hrs,pay:S.pay,products:S.products,gal:S.gal,nav:S.nav}}
 function pushCfg(){if(!API()||!pw())return;clearTimeout(syncT);syncT=setTimeout(function(){apiCall({action:'saveConfig',pass:pw(),config:pub_()}).then(function(r){toast(r.ok?'☁️ Google Drive-এ সেভ হয়েছে':'❌ Drive: '+(r.error||'সমস্যা'));svSt(r.ok?'ok':'err')}).catch(function(){toast('❌ Drive-এ সেভ হয়নি');svSt('err')})},1200)}
-function pullCfg(){if(!API())return;var u=API();fetch(u+(u.indexOf('?')<0?'?':'&')+'action=config&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.cfg)return;var keep={ah:S.cfg.ah,api:S.cfg.api};['feats','stats','revs','banners','hrs','pay','products','gal','nav'].forEach(function(a){if(d[a])S[a]=d[a]});for(var k in d.cfg)S.cfg[k]=d.cfg[k];for(var k2 in keep)S.cfg[k2]=keep[k2];mig();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}lastJ=JSON.stringify(pub_());render()}).catch(function(){}).then(trackVisit).then(function(){gFetch();setTimeout(migW,300)})}
+function pullCfg(q){if(!API())return;var u=API();fetch(u+(u.indexOf('?')<0?'?':'&')+'action=config&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.cfg)return;var before=JSON.stringify(pub_()),keep={ah:S.cfg.ah,api:S.cfg.api};['feats','stats','revs','banners','hrs','pay','products','gal','nav'].forEach(function(a){if(d[a])S[a]=d[a]});for(var k in d.cfg)S.cfg[k]=d.cfg[k];for(var k2 in keep)S.cfg[k2]=keep[k2];mig();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}var after=JSON.stringify(pub_());lastJ=after;if(before!==after||!PULLD){PULLD=1;render()}}).catch(function(){}).then(function(){return q?0:trackVisit()}).then(function(){if(!q){gFetch();setTimeout(migW,300);setTimeout(function(){if(window.imgMig)imgMig()},3500)}})}
 
 
 
@@ -906,7 +914,7 @@ try { var _g = JSON.parse(localStorage.getItem('boidya_gl') || 'null'); if (_g &
 function glDlU(u, n) {
   if (!u) return; fetch(u).then(function (r) { return r.blob() }).then(function (b) {
     var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (n || 'baidya-grill') + (/mp4/.test(b.type) ? '.mp4' : /webm/.test(b.type) ? '.webm' : '.jpg'); document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href) }, 4000); toast('⬇ ডাউনলোড শুরু হয়েছে')
-  }).catch(function () { toast('❌ ডাউনলোড হয়নি') })
+  }).catch(function () { if (/^https?:/.test(u)) { window.open(u, '_blank'); return } toast('❌ ডাউনলোড হয়নি') })
 }
 function glNm(d) { return ((X(d, 'n') || 'design').replace(/[^\w\u0980-\u09FF]+/g, '_')) + (d.no ? '-' + d.no : '') }
 function glDlD(i, j, k) { var d = S.products[i].ds[j]; glDlU(gal(d)[k], 'baidya-grill-' + glNm(d)) }
