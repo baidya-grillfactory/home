@@ -120,6 +120,7 @@ input,select,textarea{width:100%;padding:11px;border:1px solid var(--bd);border-
 input:focus,select:focus,textarea:focus{outline:2px solid var(--a);border-color:transparent}
 input[type=color]{height:46px;padding:3px}input[type=file]{padding:8px;font-size:14px}
 footer{background:var(--nv);color:#dde6ee;text-align:center;padding:26px 14px calc(90px + env(safe-area-inset-bottom));font-size:14px}
+.ftw{max-width:1100px;margin:0 auto 18px;text-align:left}.ftg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 18px;padding-bottom:16px;border-bottom:1px solid #ffffff22}.ftc h4{margin:0 0 10px;font-size:12px;font-weight:600;letter-spacing:.8px;color:#9fb0c3;text-transform:uppercase}.ftc a,.ftc span{display:block;color:#fff;font-size:14px;line-height:1.45;margin:0 0 9px;cursor:pointer;word-break:break-word}.ftc span{color:#cfd9e4;font-size:13px;margin-bottom:5px}.ftc a.ftp{font-size:16px;font-weight:700;color:#ffd166;white-space:nowrap}.ftad{grid-column:span 2}.ftb{padding:14px 0 2px}.ftbt{font-size:12px;color:#9fb0c3;margin-bottom:8px}.ftbl{display:flex;flex-wrap:wrap;gap:8px}.ftbi{display:flex!important;align-items:center;justify-content:center;background:#fff;border-radius:8px;padding:4px 8px;height:34px;margin:0!important}.ftbi img{height:24px;width:auto;max-width:84px;object-fit:contain;display:block}@media(max-width:560px){.ftg{grid-template-columns:1fr 1fr}.ftml{grid-column:1/-1}.ftad{grid-column:1/-1}}
 footer a{color:var(--p2);text-decoration:none}footer a.calbtn{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:11px 22px;border-radius:26px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;font-weight:700;box-shadow:0 4px 14px #0004}footer a.calbtn:active{transform:scale(.97)}.soc a{display:inline-block;margin:4px 6px;background:#ffffff1a;padding:6px 14px;border-radius:20px;color:#fff}
 /* floating */
 .wa{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;width:58px;height:58px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px #0006;animation:wp 2.2s infinite}
@@ -545,6 +546,42 @@ function stI(s){var x=dn(s.n),m=/\d[,.]\d/.test(x)?null:x.match(/^(\D*?)(\d+)(.*
 var WAI='<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
 function pick(i){openDs(i)}
 /* ===== ক্যালেন্ডার/নিউজ/আবহাওয়া বাটন (লগইনের পর, একদম নিচে) ===== */
+
+/* ===== ফুটার ===== */
+var FTD={mail:'baidya.grill.factory@gmail.com',about:[{t:'যোগাযোগ',u:'#loc'},{t:'আমাদের সম্পর্কে',u:'#about'},{t:'ক্যারিয়ার',u:'#career'}],pol:[],brT:'আমরা যেসব কোম্পানির লোহা ব্যবহার করি',br:[],hA:'আমাদের সম্পর্কে',hH:'সহায়তা',t24:'২৪×৭ কল করুন',wal:'💬 WhatsApp',hP:'নীতিমালা',hM:'ইমেইল করুন',hAd:'দোকানের ঠিকানা'};
+function ftC(c){var f=c.ft||{},o={};['mail','about','pol','brT','br','hA','hH','t24','wal','hP','hM','hAd'].forEach(function(k){o[k]=f[k]!=null?f[k]:FTD[k]});o.p24=f.p24!=null?f.p24:(c.phone||'');o.addr=f.addr!=null?f.addr:(c.addr||'');o.cp=f.cp!=null?f.cp:'© '+X(c,'name');o.on=f.on!==0&&f.on!=='0';return o}
+function ftLn(it,i,kind){var u=String(it.u||'').trim(),t=esc(it.t||'');if(!t)return'';
+if(u==='#career'||u.indexOf('wa:নমস্কার, আমি আপনাদের কারখানায়')===0)return'<a onclick="ftJob()">'+t+'</a>';
+if(u==='#about')return'<a onclick="openAb()">'+t+'</a>';
+if(u.indexOf('wa:')===0)return'<a target="_blank" rel="noopener" href="'+esc(waLink(u.slice(3)))+'">'+t+'</a>';
+if(/^#[\w-]+$/.test(u))return'<a href="'+u+'">'+t+'</a>';
+if(/^(https?:|mailto:|tel:)/i.test(u))return'<a '+(/^https?:/i.test(u)?'target="_blank" rel="noopener" ':'')+'href="'+esc(u)+'">'+t+'</a>';
+if(it.d)return'<a onclick="ftPop(\''+kind+'\','+i+')">'+t+'</a>';
+return'<span>'+t+'</span>'}
+function ftPop(k,i){var f=ftC(S.cfg),it=f[k][i];if(!it)return;var m=$('mod');if(!m){m=document.createElement('div');m.id='mod';document.body.appendChild(m)}m.className='ov2';m.innerHTML=tr('<div class="mb wide"><button class="x" onclick="ckx()">✕</button><h3>'+esc(it.t)+'</h3><p style="white-space:pre-wrap">'+esc(it.d)+'</p></div>')}
+/* ক্যারিয়ার ফর্ম — Google লগইন বাধ্যতামূলক */
+function ftJob(){if(!GLU){toast('ক্যারিয়ারের আবেদনের জন্য আগে Google দিয়ে লগইন করুন');glLogin();return}
+glM('<h3>💼 কাজের জন্য আবেদন</h3><label>আপনার নাম *</label><input id="jb_n" value="'+esc(GLU.name||'')+'"><label>মোবাইল নম্বর *</label><input id="jb_m" type="tel" inputmode="numeric" value="'+esc(GLU.mobile||'')+'"><label>কোন কাজ করতে চান? *</label><input id="jb_w" placeholder="যেমন: ওয়েল্ডার, হেল্পার, ডেলিভারি…"><label>অভিজ্ঞতা</label><input id="jb_e" placeholder="যেমন: ২ বছর"><label>এলাকা / ঠিকানা</label><input id="jb_a" value="'+esc(GLU.address||'')+'"><label>আরও কিছু জানাতে চাইলে</label><textarea id="jb_t" rows="2"></textarea><button class="btn" style="margin-top:10px;width:100%" onclick="ftJobSend()">📨 WhatsApp-এ আবেদন পাঠান</button>')}
+function ftJobSend(){var n=($('jb_n').value||'').trim(),m=dn($('jb_m').value||'').replace(/\D/g,''),w=($('jb_w').value||'').trim();if(n.length<2||m.length<10||!w){toast('নাম, মোবাইল ও কাজের ধরন দিন');return}
+var t=['নমস্কার, আমি কাজের জন্য আবেদন করছি।','নাম: '+n,'মোবাইল: '+m,'কাজ: '+w,'অভিজ্ঞতা: '+($('jb_e').value||'—'),'ঠিকানা: '+($('jb_a').value||'—')];if(GLU.email)t.push('ইমেইল: '+GLU.email);if(($('jb_t').value||'').trim())t.push('বার্তা: '+$('jb_t').value.trim());
+glX();window.open(waLink(t.join('\n')),'_blank');toast('✅ WhatsApp খুলছে — সেখানে "Send" চাপুন')}
+function ftH(c){var f=ftC(c);if(!f.on)return'';var tel=String(f.p24).replace(/[^\d+]/g,''),h='<div class="ftw"><div class="ftg">';
+var ab=(f.about||[]).map(function(x,i){return ftLn(x,i,'about')}).filter(Boolean);
+if(ab.length)h+='<div class="ftc">'+(f.hA?'<h4>'+esc(f.hA)+'</h4>':'')+ab.join('')+'</div>';
+var hl=(tel&&f.p24?(f.t24?'<span>'+esc(f.t24)+'</span>':'')+'<a class="ftp" href="tel:'+esc(tel)+'">📞 '+esc(f.p24)+'</a>':'')+(f.wal?'<a target="_blank" rel="noopener" href="'+esc(waLink())+'">'+esc(f.wal)+'</a>':'');
+if(hl)h+='<div class="ftc">'+(f.hH?'<h4>'+esc(f.hH)+'</h4>':'')+hl+'</div>';
+var po=(f.pol||[]).map(function(x,i){return ftLn(x,i,'pol')}).filter(Boolean);
+if(po.length)h+='<div class="ftc">'+(f.hP?'<h4>'+esc(f.hP)+'</h4>':'')+po.join('')+'</div>';
+if(f.mail)h+='<div class="ftc ftml">'+(f.hM?'<h4>'+esc(f.hM)+'</h4>':'')+'<a href="mailto:'+esc(f.mail)+'">✉️ '+esc(f.mail)+'</a></div>';
+if(f.addr)h+='<div class="ftc ftad">'+(f.hAd?'<h4>'+esc(f.hAd)+'</h4>':'')+'<a target="_blank" rel="noopener" href="https://maps.google.com/?q='+encodeURIComponent(c.ll||f.addr)+'">📍 '+esc(f.addr)+'</a></div>';
+if(!/<div class="ftc/.test(h)){return''}
+h+='</div>';
+var br=(f.br||[]).filter(function(b){return b&&b.i});
+if(br.length)h+='<div class="ftb">'+(f.brT?'<div class="ftbt">'+esc(f.brT)+'</div>':'')+'<div class="ftbl">'+br.map(function(b){var im='<img src="'+tu(b.i,160)+'" alt="'+esc(b.n||'')+'" loading="lazy" decoding="async">';return/^https?:/i.test(b.u||'')?'<a class="ftbi" target="_blank" rel="noopener" href="'+esc(b.u)+'">'+im+'</a>':'<span class="ftbi">'+im+'</span>'}).join('')+'</div></div>';
+return h+'</div>'}
+function ftBot(c){var f=ftC(c);if(!f.on)return calBtn()?'<footer style="padding-top:20px">'+calBtn()+'</footer>':'<div style="height:90px"></div>';
+var so=(c.fb?'<a target="_blank" rel="noopener" href="'+esc(c.fb)+'">📘 Facebook</a>':'')+(c.ig?'<a target="_blank" rel="noopener" href="'+esc(c.ig)+'">📸 Instagram</a>':'')+(c.yt?'<a target="_blank" rel="noopener" href="'+esc(c.yt)+'">▶️ YouTube</a>':'');
+return'<footer>'+ftH(c)+(so?'<div class="soc">'+so+'</div><br>':'')+(f.cp?esc(f.cp):'')+(c.credit?'<div style="margin-top:6px;font-size:13px;color:'+(/^#[0-9a-f]{6}$/i.test(c.creditC||'')?c.creditC:'#cbd5e1')+'">'+esc(c.credit)+'</div>':'')+calBtn()+'</footer>'}
 function calBtn(){var c=S.cfg;if(!GLU||c.calOn===0)return'';var u=String(c.calU||'CALENDER.html').trim();if(!/^(https?:\/\/[^\s"'<>]+|[\w.\/-]+)$/.test(u))return'';return'<div><a class="calbtn" target="_blank" rel="noopener" href="'+esc(u)+'">📅 '+esc(X(c,'cal')||'ক্যালেন্ডার • সংবাদ • আবহাওয়া')+'</a></div>'}
 
 
@@ -605,7 +642,7 @@ var ll=c.ll||c.addr;
 h+='<div class="two"><section id="order" class="rv"><h3>অর্ডার করুন</h3><div class="box"><label>কী তৈরি করাতে চান?</label><select id="ot">'+S.products.map(function(p){return'<option>'+esc(X(p,'n'))+'</option>'}).join('')+'</select><br><br><button class="btn" onclick="openCk($(\'ot\').selectedIndex)">অর্ডার করুন</button> <a class="btn w" target="_blank" rel="noopener" href="'+waLink()+'">WhatsApp</a> <a class="btn s" href="tel:'+esc(c.phone)+'">📞 ফোন</a></div></section>';
 h+='<section id="loc" class="rv"><h3>আমাদের লোকেশন</h3><div class="box"><iframe loading="lazy" title="map" src="https://maps.google.com/maps?q='+encodeURIComponent(ll)+'&amp;z=15&amp;output=embed" style="border:0;width:100%;height:210px;border-radius:12px;margin-bottom:12px"></iframe>📍 '+esc(X(c,'addr'))+'<br>📞 '+esc(c.phone)+'<br><br>⏰ <b>খোলা থাকার সময়</b>'+hrsBox()+'<a class="btn s" target="_blank" rel="noopener" href="'+(c.map?esc(c.map):'https://www.google.com/maps?q='+encodeURIComponent(ll))+'">📍 গুগল ম্যাপ</a> <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&amp;destination='+encodeURIComponent(ll)+'">🧭 রুট দেখুন</a></div></section></div>';
 var so=(c.fb?'<a target="_blank" rel="noopener" href="'+esc(c.fb)+'">📘 Facebook</a>':'')+(c.ig?'<a target="_blank" rel="noopener" href="'+esc(c.ig)+'">📸 Instagram</a>':'')+(c.yt?'<a target="_blank" rel="noopener" href="'+esc(c.yt)+'">▶️ YouTube</a>':'');
-h+='<footer>'+(so?'<div class="soc">'+so+'</div><br>':'')+'© '+esc(X(c,'name'))+''+(c.credit?'<div style="margin-top:6px;font-size:13px;color:'+(/^#[0-9a-f]{6}$/i.test(c.creditC||'')?c.creditC:'#cbd5e1')+'">'+esc(c.credit)+'</div>':'')+calBtn()+'</footer>';
+h+=ftBot(c);
 h+='<a class="wa" target="_blank" rel="noopener" href="'+waLink()+'" aria-label="WhatsApp">'+WAI+'<span class="wl">WhatsApp-এ কথা বলুন</span></a><button id="wlg" class="wlg" onclick="window.scrollTo({top:0,behavior:\'smooth\'})" aria-label="Top">'+li()+'</button><button id="btt" class="bt" onclick="window.scrollTo({top:0,behavior:\'smooth\'})" aria-label="উপরে যান">↑</button>';
 return h}
 /* checkout */
