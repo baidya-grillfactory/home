@@ -1208,7 +1208,8 @@ route();setTimeout(gFetch,1200);if(!API())setTimeout(migW,1500);document.addEven
 
 function admin(){return''}function login(){}
 </script><script>
-function apkGo(){try{var d=document.createElement('div');d.className='apkm';
+function apkGo(){try{if(typeof API==='function'&&API()){var di=devInfo();apiCall({action:'apkDl',did:did(),dv:di.dv,os:di.os,br:di.br}).catch(function(){})}}catch(e){}
+try{var d=document.createElement('div');d.className='apkm';
 d.innerHTML='<div><h4>ডাউনলোড শুরু হয়েছে ✅</h4><ol><li>ডাউনলোড শেষ হলে ফোনের নোটিফিকেশনে <b>BaidyaGrillFactory.apk</b>-এ ট্যাপ করুন (বা Downloads থেকে খুলুন)।</li><li>ইনস্টল স্ক্রিনে <b>Install</b> চাপুন।</li><li>প্রথমবার "Install unknown apps" বললে <b>Settings</b> খুলে এই ব্রাউজারকে <b>Allow</b> করুন, তারপর ফিরে এসে <b>Install</b> চাপুন।</li></ol><button type="button">ঠিক আছে</button></div>';
 d.onclick=function(e){if(e.target===d||e.target.tagName==='BUTTON')d.remove()};document.body.appendChild(d)}catch(e){}}
 </script>
