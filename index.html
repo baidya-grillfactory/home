@@ -125,15 +125,16 @@ h3:after{content:"";position:absolute;left:0;bottom:0;height:4px;width:60%;borde
 .box{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sh);border-top:4px solid var(--a)}
 .wel{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.wel>div:first-child{flex:1;min-width:240px}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;max-width:1000px;margin:0 auto;padding:10px 14px 30px}.two section{padding:20px 0;margin:0;max-width:none}
-.apkc{display:flex;align-items:center;gap:12px;margin-top:16px;padding:14px 16px;border-radius:16px;border:1px solid rgba(37,211,102,.45);text-decoration:none;color:var(--tx);animation:apkBlink 1.6s ease-in-out infinite}
+.apkc{display:flex;align-items:center;gap:12px;margin-top:16px;padding:14px 16px;border-radius:16px;border:1px solid rgba(37,211,102,.45);text-decoration:none;color:var(--tx);animation:apkColor 7s linear infinite}
 .apkc .ai{font-size:30px;line-height:1}.apkc .at{flex:1;min-width:0}.apkc .at b{display:block;font-size:16px}.apkc .at small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px}
-.apkc .ab{background:#25d366;color:#fff;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;white-space:nowrap}
+.apkc .ab{animation:apkBtn 7s linear infinite;background:#25d366;color:#fff;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;white-space:nowrap}
 .apkm{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px}
 .apkm>div{background:var(--card);color:var(--tx);border-radius:18px;padding:20px;max-width:380px;width:100%;box-shadow:var(--sh);border-top:4px solid #25d366}
 .apkm h4{margin:0 0 10px;font-size:18px}.apkm ol{margin:0 0 14px;padding-left:20px;font-size:14.5px;line-height:1.6}.apkm li{margin-bottom:6px}
 .apkm button{width:100%;border:0;background:#25d366;color:#fff;font:inherit;font-weight:700;padding:11px;border-radius:999px;cursor:pointer}
-@keyframes apkBlink{0%,100%{background:rgba(37,211,102,.08);box-shadow:0 0 0 0 rgba(37,211,102,.0)}50%{background:rgba(37,211,102,.26);box-shadow:0 0 18px 3px rgba(37,211,102,.35)}}
-@media (prefers-reduced-motion:reduce){.apkc{animation:none;background:rgba(37,211,102,.15)}}
+@keyframes apkColor{0%{background:rgba(37,211,102,.22);border-color:rgba(37,211,102,.7);box-shadow:0 0 16px 2px rgba(37,211,102,.45)}14.28%{background:rgba(59,130,246,.22);border-color:rgba(59,130,246,.7);box-shadow:0 0 16px 2px rgba(59,130,246,.45)}28.57%{background:rgba(168,85,247,.22);border-color:rgba(168,85,247,.7);box-shadow:0 0 16px 2px rgba(168,85,247,.45)}42.85%{background:rgba(236,72,153,.22);border-color:rgba(236,72,153,.7);box-shadow:0 0 16px 2px rgba(236,72,153,.45)}57.14%{background:rgba(249,115,22,.22);border-color:rgba(249,115,22,.7);box-shadow:0 0 16px 2px rgba(249,115,22,.45)}71.43%{background:rgba(234,179,8,.22);border-color:rgba(234,179,8,.7);box-shadow:0 0 16px 2px rgba(234,179,8,.45)}85.71%{background:rgba(20,184,166,.22);border-color:rgba(20,184,166,.7);box-shadow:0 0 16px 2px rgba(20,184,166,.45)}100%{background:rgba(37,211,102,.22);border-color:rgba(37,211,102,.7);box-shadow:0 0 16px 2px rgba(37,211,102,.45)}}
+@keyframes apkBtn{0%{background:rgb(37,211,102)}14.28%{background:rgb(59,130,246)}28.57%{background:rgb(168,85,247)}42.85%{background:rgb(236,72,153)}57.14%{background:rgb(249,115,22)}71.43%{background:rgb(234,179,8)}85.71%{background:rgb(20,184,166)}100%{background:rgb(37,211,102)}}
+@media (prefers-reduced-motion:reduce){.apkc,.apkc .ab{animation:none}.apkc{background:rgba(37,211,102,.15)}}
 
 label{display:block;font-size:14px;margin:12px 0 4px;color:var(--mut)}
 input,select,textarea{width:100%;padding:11px;border:1px solid var(--bd);border-radius:10px;font:inherit;font-size:16px;background:var(--bg);color:var(--tx)}
