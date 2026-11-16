@@ -2,7 +2,7 @@
 <html lang="bn"><head>
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer"><meta charset="utf-8">
-<meta name="build" content="B20261116b">
+<meta name="build" content="B20261116c">
 <script>(function(){try{var m=document.querySelector('meta[name=build]');if(!m)return;var cur=m.content,u=location.pathname;fetch(u+'?_='+Date.now(),{cache:'no-store',headers:{Range:'bytes=0-1500'}}).then(function(r){return r.text()}).then(function(t){var x=t.match(/<meta name="build" content="([^"]+)"/);if(x&&x[1]!==cur&&sessionStorage.getItem('rlb')!==x[1]){sessionStorage.setItem('rlb',x[1]);location.replace(u+'?v='+encodeURIComponent(x[1])+location.hash)}}).catch(function(){})}catch(e){}})();</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -301,6 +301,11 @@ img{-webkit-user-drag:none;-webkit-touch-callout:none}
 .lc{grid-template-columns:190px 1fr 132px!important;align-items:start}.lc .lt{height:190px!important}.lc .lb{grid-column:3;grid-row:1;flex-direction:column;gap:6px;align-self:start;align-content:flex-start}.lc .lb .btn{flex:none;width:100%;box-sizing:border-box;justify-content:center;text-align:center;white-space:nowrap}.lc .ls{grid-row:2}
 @media(max-width:520px){.lc{grid-template-columns:1fr 98px!important;gap:8px!important}.lc .lt{grid-column:1/-1;height:min(78vw,300px)!important;border-radius:10px}.lc .lt img{object-fit:cover}.lc .lb{grid-column:2;grid-row:2;gap:5px}.lc .lb .btn{font-size:11.5px;padding:7px 4px;min-width:0}.lc .ls{grid-row:3}}
 .pe-mv{display:flex;gap:4px;margin-left:6px;font-style:normal}.pe-mv u{text-decoration:none;font-size:11px;padding:2px 6px;border-radius:8px;background:#0002;cursor:pointer}.pe-mv u:hover{background:#0004}
+
+#nsb{position:fixed;right:14px;bottom:68px;z-index:120;min-width:170px;max-width:80vw;padding:9px 16px;border-radius:26px;color:#fff;font-weight:700;font-size:14px;text-align:center;box-shadow:0 6px 20px #0005;cursor:pointer;user-select:none;transition:background .3s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#nsb.on{background:#2f9e44}#nsb.off{background:#e03131}
+#nsb .nsi{display:inline-block;animation:nsf .4s both}
+@keyframes nsf{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style><link rel="icon" href="logo_1.png"></head><body><div id="app"></div>
 <script>
 var KEY='boidya_demo_v2';
@@ -363,7 +368,7 @@ function vPage(a){var m=Math.max(1,Math.ceil(a.length/VN));if(VP>=m)VP=m-1;retur
 function vGo(n){VP=n;render()}
 function vPager(n){var m=Math.ceil(n/VN);if(m<2)return'<p style="color:var(--mut);font-size:13px">মোট '+bn(n)+' টি ভিজিট</p>';var p=[],i;for(i=0;i<m;i++)if(i===0||i===m-1||Math.abs(i-VP)<=2)p.push(i);var h='<p style="color:var(--mut);font-size:13px;margin:10px 0 6px">মোট '+bn(n)+' টি ভিজিট · পাতা '+bn(VP+1)+'/'+bn(m)+'</p><div class="row" style="gap:6px;flex-wrap:wrap">';if(VP>0)h+='<button class="btn sm" onclick="vGo('+(VP-1)+')">‹</button>';var last=-1;p.forEach(function(x){if(last>=0&&x-last>1)h+='<span style="align-self:center">…</span>';h+='<button class="btn sm" style="'+(x===VP?'background:var(--p);color:#fff':'')+'" onclick="vGo('+x+')">'+bn(x+1)+'</button>';last=x});if(VP<m-1)h+='<button class="btn sm" onclick="vGo('+(VP+1)+')">›</button>';return h+'</div>'}
 
-function svBar(){return sessionStorage.getItem('adm')?'<div id="svb"><button class="btn'+(DIRTY?' dirty':'')+'" id="svbtn" onclick="svNow()">'+(DIRTY?'💾 সেভ করুন ● (সেভ হয়নি)':'💾 সেভ করুন')+'</button></div>':''}
+function svBar(){return sessionStorage.getItem('adm')?nsHtml()+'<div id="svb"><button class="btn'+(DIRTY?' dirty':'')+'" id="svbtn" onclick="svNow()">'+(DIRTY?'💾 সেভ করুন ● (সেভ হয়নি)':'💾 সেভ করুন')+'</button></div>':''}
 function svSt(s){var b=$('svbtn');if(!b)return;if(s===''&&DIRTY)s='dirty';clearTimeout(b._h);b.className='btn'+(s==='busy'?' busy':s==='ok'?' ok':s==='err'?' er':s==='dirty'?' dirty':'');b.textContent=s==='dirty'?'💾 সেভ করুন ● (সেভ হয়নি)':s==='busy'?'⏳ সেভ হচ্ছে… অপেক্ষা করুন':s==='ok'?'✅ সেভ হয়েছে':s==='err'?'❌ সেভ হয়নি':'💾 সেভ করুন';if(s==='busy')b._h=setTimeout(function(){svSt('err')},20000);if(s==='ok'||s==='err')b._h=setTimeout(function(){svSt('')},2200)}
 function peSave(){toast('💾 সেভ হচ্ছে…');svNow()}
 function svNow(){var a=document.activeElement;if(a&&a.blur)a.blur();svSt('busy');setTimeout(function(){lastJ='';SVF=1;var ok=false;try{ok=save()}finally{SVF=0}if(ok){DIRTY=0;try{localStorage.removeItem('boidya_draft')}catch(e){}}if(!ok)svSt('err')},400)}
@@ -1392,6 +1397,42 @@ function glTab() {
   return h
 }
 
+
+/* ===== 📡 ফ্লোটিং নেটওয়ার্ক স্ট্যাটাস (সেভ বাটনের উপরে) ===== */
+var NS={on:navigator.onLine,ms:null,dl:null,ip:'',isp:'',city:'',bat:'',i:0};
+function nsAdm(){try{return !!sessionStorage.getItem('adm')}catch(e){return false}}
+function nsItems(){var c=navigator.connection||{},d=devInfo(),n=new Date(),a=[];
+a.push(NS.on?'🟢 Online':'🔴 Offline');
+a.push('⏱ Ping: '+(NS.ms==null?(NS.on?'মাপা হচ্ছে…':'—'):NS.ms+' ms'));
+a.push('🚀 Speed: '+(NS.dl!=null?NS.dl+' Mbps':(c.downlink?'~'+c.downlink+' Mbps':'মাপা হচ্ছে…')));
+a.push('🌐 IP: '+(NS.ip||'…'));
+if(NS.isp)a.push('🏢 ISP: '+NS.isp);
+if(NS.city)a.push('📍 '+NS.city);
+a.push('🆔 Device ID: '+did());
+a.push('📱 '+d.dv+' · '+d.os+' · '+d.br);
+a.push('📶 নেটওয়ার্ক: '+(c.effectiveType?c.effectiveType.toUpperCase():'—')+(c.type?' · '+c.type:'')+(c.rtt?' · RTT '+c.rtt+'ms':'')+(c.saveData?' · DataSaver':''));
+if(NS.bat)a.push('🔋 ব্যাটারি: '+NS.bat);
+a.push('🖥 স্ক্রিন: '+screen.width+'×'+screen.height);
+a.push('🕒 '+n.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata'}));
+a.push('☁️ Drive: '+(API()?'যুক্ত আছে':'যুক্ত নেই'));
+return a}
+function nsHtml(){var it=nsItems();return'<div id="nsb" class="'+(NS.on?'on':'off')+'" onclick="nsNext()" title="চাপলে পরেরটা দেখাবে"><span class="nsi">'+esc(it[NS.i%it.length])+'</span></div>'}
+function nsPaint(){var b=$('nsb');if(!b)return;var it=nsItems();b.className=NS.on?'on':'off';var s=b.firstChild;if(!s){return}var t=it[NS.i%it.length];if(s.textContent!==t){var n=s.cloneNode(false);n.textContent=t;b.replaceChild(n,s)}}
+function nsNext(){NS.i++;nsPaint()}
+function nsPing(){if(!nsAdm())return;if(!navigator.onLine){NS.on=false;NS.ms=null;nsPaint();return}
+var t=performance.now(),c=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(c)c.abort()},4000);
+fetch('https://www.gstatic.com/generate_204?_='+Date.now(),{mode:'no-cors',cache:'no-store',signal:c?c.signal:undefined}).then(function(){clearTimeout(tm);NS.ms=Math.round(performance.now()-t);NS.on=true;nsPaint()}).catch(function(){clearTimeout(tm);NS.ms=null;NS.on=false;nsPaint()})}
+function nsSpeed(){if(!nsAdm()||!NS.on)return;var t=performance.now();
+fetch('https://speed.cloudflare.com/__down?bytes=300000&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.blob()}).then(function(b){var s=(performance.now()-t)/1000;if(s>0)NS.dl=Math.round(b.size*8/s/1e5)/10}).catch(function(){})}
+function nsIp(){if(!nsAdm()||!NS.on)return;
+fetch('https://ipwho.is/?fields=success,ip,city,region,country,connection').then(function(r){return r.json()}).then(function(d){if(d&&d.success){NS.ip=d.ip||'';NS.isp=(d.connection&&d.connection.isp)||'';NS.city=[d.city,d.region,d.country].filter(Boolean).join(', ')}}).catch(function(){})}
+function nsBat(){try{if(navigator.getBattery)navigator.getBattery().then(function(b){NS.bat=Math.round(b.level*100)+'%'+(b.charging?' ⚡':'')})}catch(e){}}
+window.addEventListener('online',function(){NS.on=true;nsPaint();nsPing();nsIp()});
+window.addEventListener('offline',function(){NS.on=false;NS.ms=null;nsPaint()});
+setInterval(function(){if(!nsAdm())return;NS.i++;nsPaint()},2000);
+setInterval(nsPing,2000);
+setInterval(nsSpeed,45000);setInterval(nsIp,300000);setInterval(nsBat,30000);
+setTimeout(function(){nsPing();nsSpeed();nsIp();nsBat()},1500);
 lastJ=JSON.stringify(pub_());
 
 /* ===== বাটনে চাপার পর "অপেক্ষা করুন…" দেখানো (সব বাটনে) ===== */
