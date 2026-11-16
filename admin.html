@@ -544,7 +544,7 @@ function draftApply(x){var d=x.d||{products:x.products,gal:x.gal};['feats','stat
 function draftChk(){if(DCK2||!sessionStorage.getItem('adm'))return;var raw=null;try{raw=localStorage.getItem('boidya_draft')}catch(e){}if(!raw)return;DCK2=1;var x;try{x=JSON.parse(raw)}catch(e){try{localStorage.removeItem('boidya_draft')}catch(y){}return}
 if(!x||!(x.d||x.products))return;
 if(confirm('📝 সেভ-না-করা কাজ পাওয়া গেছে ('+new Date(x.t).toLocaleString('bn-BD')+')।\n\nOK = ফিরিয়ে আনুন (তারপর "সেভ করুন" চাপুন)\nCancel = বাদ দিন')){draftApply(x);DIRTY=1;render();svSt('dirty');toast('✅ ফিরে এসেছে — এবার নিচে "💾 সেভ করুন" চাপুন')}else{try{localStorage.removeItem('boidya_draft')}catch(e){}}}
-function goTab(t){tab=t;render()}
+function goTab(t){tab=t;render();window.scrollTo(0,0)}
 window.addEventListener('beforeunload',function(e){var pd=0;try{pd=sessionStorage.getItem('adm')&&localStorage.getItem('boidya_pend')==='1'&&API()}catch(x){}if(DIRTY||pd){e.preventDefault();e.returnValue=''}});
 var _toast0=toast;toast=function(m){if(DIRTY&&A&&/সেভ হয়েছে|যোগ হয়েছে|বদলেছে|সরানো হয়েছে/.test(m)&&!/Drive|Google/.test(m))m='✏️ পরিবর্তন হয়েছে — নিচের "💾 সেভ করুন" চাপুন';_toast0(m)};
 function upShow(t,p,ind,hide){var b=$('upb');if(!b){b=document.createElement('div');b.id='upb';b.innerHTML='<div class="upt"><span id="upt"></span><b id="upp"></b></div><div class="upk"><div class="upf" id="upf"></div></div>';document.body.appendChild(b)}
