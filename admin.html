@@ -1429,7 +1429,7 @@ fetch('https://ipwho.is/?fields=success,ip,city,region,country,connection').then
 function nsBat(){try{if(navigator.getBattery)navigator.getBattery().then(function(b){NS.bat=Math.round(b.level*100)+'%'+(b.charging?' ⚡':'')})}catch(e){}}
 window.addEventListener('online',function(){NS.on=true;nsPaint();nsPing();nsIp()});
 window.addEventListener('offline',function(){NS.on=false;NS.ms=null;nsPaint()});
-setInterval(function(){if(!nsAdm())return;NS.i++;nsPaint()},2000);
+setInterval(function(){if(!nsAdm())return;NS.i++;nsPaint()},3000);
 setInterval(nsPing,2000);
 setInterval(nsSpeed,45000);setInterval(nsIp,300000);setInterval(nsBat,30000);
 setTimeout(function(){nsPing();nsSpeed();nsIp();nsBat()},1500);
