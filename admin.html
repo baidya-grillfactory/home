@@ -302,7 +302,7 @@ img{-webkit-user-drag:none;-webkit-touch-callout:none}
 @media(max-width:520px){.lc{grid-template-columns:1fr 98px!important;gap:8px!important}.lc .lt{grid-column:1/-1;height:min(78vw,300px)!important;border-radius:10px}.lc .lt img{object-fit:cover}.lc .lb{grid-column:2;grid-row:2;gap:5px}.lc .lb .btn{font-size:11.5px;padding:7px 4px;min-width:0}.lc .ls{grid-row:3}}
 .pe-mv{display:flex;gap:4px;margin-left:6px;font-style:normal}.pe-mv u{text-decoration:none;font-size:11px;padding:2px 6px;border-radius:8px;background:#0002;cursor:pointer}.pe-mv u:hover{background:#0004}
 
-#nsb{position:fixed;right:14px;bottom:68px;z-index:120;min-width:170px;max-width:80vw;padding:9px 16px;border-radius:26px;color:#fff;font-weight:700;font-size:14px;text-align:center;box-shadow:0 6px 20px #0005;cursor:pointer;user-select:none;transition:background .3s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#nsb{position:fixed;right:14px;bottom:68px;z-index:120;min-width:170px;max-width:92vw;padding:9px 16px;border-radius:26px;color:#fff;font-weight:700;font-size:14px;text-align:center;box-shadow:0 6px 20px #0005;cursor:pointer;user-select:none;transition:background .3s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #nsb.on{background:#2f9e44}#nsb.off{background:#e03131}
 #nsb .nsi{display:inline-block;animation:nsf .4s both}
 @keyframes nsf{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -1399,12 +1399,22 @@ function glTab() {
 
 
 /* ===== 📡 ফ্লোটিং নেটওয়ার্ক স্ট্যাটাস (সেভ বাটনের উপরে) ===== */
-var NS={on:navigator.onLine,ms:null,dl:null,ip:'',isp:'',city:'',bat:'',i:0};
+var NS={on:navigator.onLine,ms:null,dl:null,ul:null,ip:'',isp:'',city:'',bat:'',i:0,lat:null,lon:null,wx:null,wxT:0,aq:null,hist:[],fail:0,tot:0,since:Date.now(),t0:Date.now(),stor:''};
 function nsAdm(){try{return !!sessionStorage.getItem('adm')}catch(e){return false}}
+function nsWxDesc(c){var m={0:['☀️','পরিষ্কার আকাশ'],1:['🌤','প্রায় পরিষ্কার'],2:['⛅','আংশিক মেঘলা'],3:['☁️','মেঘলা'],45:['🌫','কুয়াশা'],48:['🌫','ঘন কুয়াশা'],51:['🌦','হালকা গুঁড়ি বৃষ্টি'],53:['🌦','গুঁড়ি বৃষ্টি'],55:['🌦','ঘন গুঁড়ি বৃষ্টি'],56:['🌧','ঠান্ডা গুঁড়ি বৃষ্টি'],57:['🌧','ঠান্ডা গুঁড়ি বৃষ্টি'],61:['🌧','হালকা বৃষ্টি'],63:['🌧','মাঝারি বৃষ্টি'],65:['🌧','ভারী বৃষ্টি'],66:['🌧','ঠান্ডা বৃষ্টি'],67:['🌧','ঠান্ডা ভারী বৃষ্টি'],71:['❄️','হালকা তুষার'],73:['❄️','তুষারপাত'],75:['❄️','ভারী তুষারপাত'],77:['❄️','তুষার কণা'],80:['🌦','হালকা ঝড়ো বৃষ্টি'],81:['🌧','মাঝারি ঝড়ো বৃষ্টি'],82:['⛈','প্রবল বর্ষণ'],85:['❄️','তুষার ঝড়'],86:['❄️','ভারী তুষার ঝড়'],95:['⛈','বজ্রসহ বৃষ্টি'],96:['⛈','শিলাবৃষ্টিসহ বজ্রঝড়'],99:['⛈','প্রবল শিলাবৃষ্টি ও বজ্রঝড়']};return m[c]||['🌡','আবহাওয়া']}
+function nsAqDesc(v){return v<=50?'ভালো':v<=100?'মাঝারি':v<=150?'সংবেদনশীলদের জন্য খারাপ':v<=200?'অস্বাস্থ্যকর':v<=300?'খুব অস্বাস্থ্যকর':'বিপজ্জনক'}
+function nsUvDesc(v){return v<3?'কম':v<6?'মাঝারি':v<8?'বেশি':v<11?'খুব বেশি':'চরম'}
+function nsWindDir(d){var a=['উত্তর','উত্তর-পূর্ব','পূর্ব','দক্ষিণ-পূর্ব','দক্ষিণ','দক্ষিণ-পশ্চিম','পশ্চিম','উত্তর-পশ্চিম'];return a[Math.round(d/45)%8]}
+function nsHM(t){if(!t)return'—';var h=+t.slice(11,13),m=t.slice(14,16),ap=h>=12?'PM':'AM';return(h%12||12)+':'+m+' '+ap}
+function nsDur(ms){var s=Math.max(0,Math.round(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+' ঘণ্টা '+m+' মিনিট':m?m+' মিনিট '+(s%60)+' সেকেন্ড':s+' সেকেন্ড'}
 function nsItems(){var c=navigator.connection||{},d=devInfo(),n=new Date(),a=[];
 a.push(NS.on?'🟢 Online':'🔴 Offline');
 a.push('⏱ Ping: '+(NS.ms==null?(NS.on?'মাপা হচ্ছে…':'—'):NS.ms+' ms'));
+if(NS.hist.length>2){var h=NS.hist,mn=Math.min.apply(null,h),mx=Math.max.apply(null,h),av=Math.round(h.reduce(function(x,y){return x+y},0)/h.length);a.push('📊 Ping গড়: '+av+' ms (সর্বনিম্ন '+mn+' · সর্বোচ্চ '+mx+')');a.push('〰️ জিটার: '+(mx-mn)+' ms')}
+if(NS.tot>2)a.push('📉 প্যাকেট লস: '+Math.round(NS.fail*100/NS.tot)+'% ('+NS.tot+' টেস্টে '+NS.fail+' ফেল)');
 a.push('🚀 Speed: '+(NS.dl!=null?NS.dl+' Mbps':(c.downlink?'~'+c.downlink+' Mbps':'মাপা হচ্ছে…')));
+if(NS.ul!=null)a.push('⬆️ Upload: '+NS.ul+' Mbps');
+a.push((NS.on?'⏳ অনলাইন আছে: ':'⏳ অফলাইন: ')+nsDur(Date.now()-NS.since));
 a.push('🌐 IP: '+(NS.ip||'…'));
 if(NS.isp)a.push('🏢 ISP: '+NS.isp);
 if(NS.city)a.push('📍 '+NS.city);
@@ -1412,8 +1422,34 @@ a.push('🆔 Device ID: '+did());
 a.push('📱 '+d.dv+' · '+d.os+' · '+d.br);
 a.push('📶 নেটওয়ার্ক: '+(c.effectiveType?c.effectiveType.toUpperCase():'—')+(c.type?' · '+c.type:'')+(c.rtt?' · RTT '+c.rtt+'ms':'')+(c.saveData?' · DataSaver':''));
 if(NS.bat)a.push('🔋 ব্যাটারি: '+NS.bat);
-a.push('🖥 স্ক্রিন: '+screen.width+'×'+screen.height);
+a.push('🖥 স্ক্রিন: '+screen.width+'×'+screen.height+(window.devicePixelRatio?' @'+window.devicePixelRatio+'x':''));
+if(navigator.hardwareConcurrency||navigator.deviceMemory)a.push('🧠 CPU: '+(navigator.hardwareConcurrency||'?')+' কোর'+(navigator.deviceMemory?' · RAM ~'+navigator.deviceMemory+' GB':''));
+if(NS.stor)a.push('🗄 ব্রাউজার স্টোরেজ: '+NS.stor);
 a.push('🕒 '+n.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata'}));
+try{a.push('📅 '+n.toLocaleDateString('bn-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Kolkata'}))}catch(e){}
+var w=NS.wx;
+if(w&&w.cur){var cu=w.cur,dd=nsWxDesc(cu.weather_code),dy=w.day||{},pl=(S.cfg.area||'')||'আপনার এলাকা';
+a.push('🌡 তাপমাত্রা: '+Math.round(cu.temperature_2m)+'°C (অনুভূত '+Math.round(cu.apparent_temperature)+'°C)');
+a.push(dd[0]+' '+pl+': '+dd[1]);
+if(dy.tmax!=null)a.push('🔺 আজ সর্বোচ্চ '+Math.round(dy.tmax)+'°C · 🔻 সর্বনিম্ন '+Math.round(dy.tmin)+'°C');
+a.push('💧 আর্দ্রতা: '+Math.round(cu.relative_humidity_2m)+'%');
+a.push('💨 বাতাস: '+Math.round(cu.wind_speed_10m)+' km/h'+(cu.wind_direction_10m!=null?' ('+nsWindDir(cu.wind_direction_10m)+' থেকে)':''));
+if(cu.precipitation>0)a.push('🌧 এখন বৃষ্টি: '+cu.precipitation+' mm');
+if(dy.pp!=null)a.push('☔ আজ বৃষ্টির সম্ভাবনা: '+Math.round(dy.pp)+'%');
+if(cu.cloud_cover!=null)a.push('☁️ মেঘ: '+Math.round(cu.cloud_cover)+'%');
+if(cu.surface_pressure!=null)a.push('🧭 বায়ুচাপ: '+Math.round(cu.surface_pressure)+' hPa');
+if(dy.uv!=null)a.push('🕶 UV সূচক (আজ সর্বোচ্চ): '+Math.round(dy.uv*10)/10+' ('+nsUvDesc(dy.uv)+')');
+if(dy.sr)a.push('🌅 সূর্যোদয়: '+nsHM(dy.sr));
+if(dy.ss)a.push('🌇 সূর্যাস্ত: '+nsHM(dy.ss));
+if(cu.is_day===0)a.push('🌙 এখন রাত');
+a.push('🔄 আবহাওয়া আপডেট: '+nsDur(Date.now()-NS.wxT)+' আগে')}
+else a.push(NS.on?'🌡 আবহাওয়া: লোড হচ্ছে…':'🌡 আবহাওয়া: অফলাইন');
+if(NS.aq&&NS.aq.us_aqi!=null)a.push('😷 বায়ুর মান (AQI): '+Math.round(NS.aq.us_aqi)+' — '+nsAqDesc(NS.aq.us_aqi)+(NS.aq.pm2_5!=null?' · PM2.5 '+Math.round(NS.aq.pm2_5):''));
+try{a.push('💾 সেভ: '+(typeof DIRTY!=='undefined'&&DIRTY?'⚠️ বাকি আছে':'সব সেভ আছে ✅'))}catch(e){}
+try{var pc=S.products.length,dc=S.products.reduce(function(t,p){return t+((p.ds||[]).length)},0);a.push('📦 '+pc+' ক্যাটাগরি · '+dc+' নকশা')}catch(e){}
+try{a.push('🔄 শেষ সিঙ্ক: '+nsDur(Date.now()-LASTP)+' আগে')}catch(e){}
+a.push('⏰ অ্যাডমিন খোলা: '+nsDur(Date.now()-NS.t0));
+a.push('🌍 '+(navigator.language||'')+' · '+(Intl.DateTimeFormat().resolvedOptions().timeZone||''));
 a.push('☁️ Drive: '+(API()?'যুক্ত আছে':'যুক্ত নেই'));
 return a}
 function nsHtml(){var it=nsItems();return'<div id="nsb" class="'+(NS.on?'on':'off')+'" onclick="nsNext()" title="চাপলে পরেরটা দেখাবে"><span class="nsi">'+esc(it[NS.i%it.length])+'</span></div>'}
@@ -1421,18 +1457,28 @@ function nsPaint(){var b=$('nsb');if(!b)return;var it=nsItems();b.className=NS.o
 function nsNext(){NS.i++;nsPaint()}
 function nsPing(){if(!nsAdm())return;if(!navigator.onLine){NS.on=false;NS.ms=null;nsPaint();return}
 var t=performance.now(),c=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(c)c.abort()},4000);
-fetch('https://www.gstatic.com/generate_204?_='+Date.now(),{mode:'no-cors',cache:'no-store',signal:c?c.signal:undefined}).then(function(){clearTimeout(tm);NS.ms=Math.round(performance.now()-t);NS.on=true;nsPaint()}).catch(function(){clearTimeout(tm);NS.ms=null;NS.on=false;nsPaint()})}
+NS.tot++;
+fetch('https://www.gstatic.com/generate_204?_='+Date.now(),{mode:'no-cors',cache:'no-store',signal:c?c.signal:undefined}).then(function(){clearTimeout(tm);NS.ms=Math.round(performance.now()-t);if(!NS.on)NS.since=Date.now();NS.on=true;NS.hist.push(NS.ms);if(NS.hist.length>30)NS.hist.shift();nsPaint()}).catch(function(){clearTimeout(tm);NS.ms=null;NS.fail++;if(NS.on)NS.since=Date.now();NS.on=false;nsPaint()})}
 function nsSpeed(){if(!nsAdm()||!NS.on)return;var t=performance.now();
-fetch('https://speed.cloudflare.com/__down?bytes=300000&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.blob()}).then(function(b){var s=(performance.now()-t)/1000;if(s>0)NS.dl=Math.round(b.size*8/s/1e5)/10}).catch(function(){})}
+fetch('https://speed.cloudflare.com/__down?bytes=300000&_='+Date.now(),{cache:'no-store'}).then(function(r){return r.blob()}).then(function(b){var s=(performance.now()-t)/1000;if(s>0)NS.dl=Math.round(b.size*8/s/1e5)/10;nsUp()}).catch(function(){})}
+function nsUp(){if(!nsAdm()||!NS.on)return;var t=performance.now(),body=new Blob([new Uint8Array(100000)]);
+fetch('https://speed.cloudflare.com/__up',{method:'POST',body:body,cache:'no-store'}).then(function(){var s=(performance.now()-t)/1000;if(s>0)NS.ul=Math.round(body.size*8/s/1e5)/10}).catch(function(){})}
 function nsIp(){if(!nsAdm()||!NS.on)return;
-fetch('https://ipwho.is/?fields=success,ip,city,region,country,connection').then(function(r){return r.json()}).then(function(d){if(d&&d.success){NS.ip=d.ip||'';NS.isp=(d.connection&&d.connection.isp)||'';NS.city=[d.city,d.region,d.country].filter(Boolean).join(', ')}}).catch(function(){})}
+fetch('https://ipwho.is/?fields=success,ip,city,region,country,connection,latitude,longitude').then(function(r){return r.json()}).then(function(d){if(d&&d.success){NS.ip=d.ip||'';NS.lat=d.latitude;NS.lon=d.longitude;NS.isp=(d.connection&&d.connection.isp)||'';NS.city=[d.city,d.region,d.country].filter(Boolean).join(', ')}}).catch(function(){})}
+function nsLL(){var q=String((S.cfg&&S.cfg.ll)||'').split(',');var a=parseFloat(q[0]),b=parseFloat(q[1]);if(isFinite(a)&&isFinite(b))return[a,b];if(NS.lat!=null&&NS.lon!=null)return[NS.lat,NS.lon];return null}
+function nsWx(){if(!nsAdm()||!navigator.onLine)return;var ll=nsLL();if(!ll)return;
+var u='https://api.open-meteo.com/v1/forecast?latitude='+ll[0]+'&longitude='+ll[1]+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,surface_pressure,wind_speed_10m,wind_direction_10m,is_day&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset&timezone=Asia%2FKolkata&forecast_days=1';
+fetch(u,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.current)return;var q=d.daily||{};NS.wx={cur:d.current,day:{tmax:q.temperature_2m_max&&q.temperature_2m_max[0],tmin:q.temperature_2m_min&&q.temperature_2m_min[0],pp:q.precipitation_probability_max&&q.precipitation_probability_max[0],uv:q.uv_index_max&&q.uv_index_max[0],sr:q.sunrise&&q.sunrise[0],ss:q.sunset&&q.sunset[0]}};NS.wxT=Date.now();nsPaint()}).catch(function(){})}
+function nsAq(){if(!nsAdm()||!navigator.onLine)return;var ll=nsLL();if(!ll)return;
+fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude='+ll[0]+'&longitude='+ll[1]+'&current=us_aqi,pm2_5&timezone=Asia%2FKolkata',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(d&&d.current)NS.aq=d.current}).catch(function(){})}
+function nsStore(){try{if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){var f=function(b){return b>1048576?(b/1048576).toFixed(1)+' MB':Math.round(b/1024)+' KB'};NS.stor=f(e.usage||0)+(e.quota?' / '+(e.quota/1073741824).toFixed(1)+' GB':'')})}catch(e){}}
 function nsBat(){try{if(navigator.getBattery)navigator.getBattery().then(function(b){NS.bat=Math.round(b.level*100)+'%'+(b.charging?' ⚡':'')})}catch(e){}}
-window.addEventListener('online',function(){NS.on=true;nsPaint();nsPing();nsIp()});
-window.addEventListener('offline',function(){NS.on=false;NS.ms=null;nsPaint()});
+window.addEventListener('online',function(){NS.on=true;NS.since=Date.now();nsPaint();nsPing();nsIp();nsWx()});
+window.addEventListener('offline',function(){NS.on=false;NS.ms=null;NS.since=Date.now();nsPaint()});
 setInterval(function(){if(!nsAdm())return;NS.i++;nsPaint()},3000);
 setInterval(nsPing,2000);
-setInterval(nsSpeed,45000);setInterval(nsIp,300000);setInterval(nsBat,30000);
-setTimeout(function(){nsPing();nsSpeed();nsIp();nsBat()},1500);
+setInterval(nsSpeed,45000);setInterval(nsIp,300000);setInterval(nsBat,30000);setInterval(nsWx,600000);setInterval(nsAq,900000);setInterval(nsStore,120000);
+setTimeout(function(){nsPing();nsSpeed();nsIp();nsBat();nsStore();nsWx();nsAq();setTimeout(function(){if(!NS.wx){nsWx();nsAq()}},4000)},1500);
 lastJ=JSON.stringify(pub_());
 
 /* ===== বাটনে চাপার পর "অপেক্ষা করুন…" দেখানো (সব বাটনে) ===== */
