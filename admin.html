@@ -1419,26 +1419,34 @@ route();setTimeout(gFetch,1200);if(!API())setTimeout(migW,1500);document.addEven
 var PN={t:'',b:'',i:'',u:'',tp:'all',tk:''},PH=null,PS=null,PG=1,PLD=0,PBZ=0;
 var PTPL=[['🎉 নতুন অফার','নতুন অফার চালু!','অর্ডারে বিশেষ ছাড় — আজই কল বা হোয়াটসঅ্যাপ করুন।'],['🌅 শুভ সকাল','শুভ সকাল! 🌅','বৈদ্য গ্রিল ফ্যাক্টরির পক্ষ থেকে আপনাকে শুভ সকাল। আপনার দিনটি ভালো কাটুক।'],['☀️ শুভ দুপুর','শুভ দুপুর! ☀️','বৈদ্য গ্রিল ফ্যাক্টরির পক্ষ থেকে শুভ দুপুর। গেট, গ্রিল বা শাটারের কাজে যোগাযোগ করুন।'],['🌇 শুভ সন্ধ্যা','শুভ সন্ধ্যা! 🌇','বৈদ্য গ্রিল ফ্যাক্টরির পক্ষ থেকে আপনাকে শুভ সন্ধ্যা। ভালো থাকুন, সুস্থ থাকুন।'],['🛠 নতুন ডিজাইন','নতুন গ্রিল ডিজাইন','আমাদের গ্যালারিতে নতুন ডিজাইন যোগ হয়েছে — এখনই দেখুন।'],['🕒 দোকান বন্ধ','দোকান বন্ধের বিজ্ঞপ্তি','কিছু সময়ের জন্য দোকান বন্ধ থাকবে। অসুবিধার জন্য দুঃখিত।']];
 function pnIn(k,v){PN[k]=v;var a=$('pvt'),b=$('pvb'),c=$('pvi');if(a)a.textContent=PN.t||'শিরোনাম এখানে';if(b)b.textContent=PN.b||'আপনার বার্তা এখানে দেখাবে';if(c){c.style.display=/^https:\/\//.test(PN.i)?'block':'none';c.src=/^https:\/\//.test(PN.i)?PN.i:''}}
-function ptCust(){try{return JSON.parse(localStorage.getItem('boidya_ptpl')||'[]')}catch(e){return[]}}
-function ptSave(l){try{localStorage.setItem('boidya_ptpl',JSON.stringify(l))}catch(e){toast('সেভ হয়নি')}}
-function ptAll(){return PTPL.concat(ptCust())}
+var PTK='boidya_ptpl2';
+function ptSave(l){try{localStorage.setItem(PTK,JSON.stringify(l))}catch(e){toast('সেভ হয়নি')}}
+function ptAll(){var l=null;try{l=JSON.parse(localStorage.getItem(PTK)||'null')}catch(e){}
+if(!Array.isArray(l)){var old=[];try{old=JSON.parse(localStorage.getItem('boidya_ptpl')||'[]')}catch(e){}if(!Array.isArray(old))old=[];l=PTPL.concat(old);ptSave(l)}
+return l}
 var PTM=null;
-function ptOpen(){PTM={n:'',t:PN.t||'',b:PN.b||''};render()}
+function ptOpen(){PTM={n:'',t:PN.t||'',b:PN.b||'',e:-1};render()}
 function ptClose(){PTM=null;render()}
 function ptIn(k,v){if(PTM)PTM[k]=v}
-function ptAdd(){var n=(PTM.n||'').trim(),t=(PTM.t||'').trim(),b=(PTM.b||'').trim();if(!n||!t||!b){toast('নাম, শিরোনাম ও বার্তা লিখুন');return}var l=ptCust();if(l.length>=30){toast('সর্বোচ্চ ৩০টি টেমপ্লেট রাখা যাবে');return}l.push(['⭐ '+n.slice(0,30),t.slice(0,60),b.slice(0,200)]);ptSave(l);PTM={n:'',t:'',b:''};toast('✅ টেমপ্লেট সেভ হয়েছে');render()}
-function ptDel(i){if(!confirm('এই টেমপ্লেট মুছবেন?'))return;var l=ptCust();l.splice(i,1);ptSave(l);render()}
+function ptEdit(i){var x=ptAll()[i];if(!x)return;PTM={n:x[0],t:x[1],b:x[2],e:i};render()}
+function ptCancel(){PTM={n:'',t:'',b:'',e:-1};render()}
+function ptAdd(){var n=(PTM.n||'').trim(),t=(PTM.t||'').trim(),b=(PTM.b||'').trim();if(!n||!t||!b){toast('নাম, শিরোনাম ও বার্তা লিখুন');return}var l=ptAll();
+if(PTM.e>=0&&l[PTM.e]){l[PTM.e]=[n.slice(0,30),t.slice(0,60),b.slice(0,200)];toast('✅ টেমপ্লেট আপডেট হয়েছে')}
+else{if(l.length>=40){toast('সর্বোচ্চ ৪০টি টেমপ্লেট রাখা যাবে');return}l.push(['⭐ '+n.slice(0,30),t.slice(0,60),b.slice(0,200)]);toast('✅ টেমপ্লেট সেভ হয়েছে')}
+ptSave(l);PTM={n:'',t:'',b:'',e:-1};render()}
+function ptDel(i){if(!confirm('এই টেমপ্লেট মুছবেন?'))return;var l=ptAll();l.splice(i,1);ptSave(l);if(PTM){if(PTM.e===i)PTM={n:'',t:'',b:'',e:-1};else if(PTM.e>i)PTM.e--}render()}
+function ptReset(){if(!confirm('সব টেমপ্লেট মুছে শুরুর ৬টি টেমপ্লেট ফিরিয়ে আনবেন?'))return;ptSave(PTPL.slice());PTM={n:'',t:'',b:'',e:-1};render()}
 function pnTpl(i){var x=ptAll()[i];if(!x)return;PN.t=x[1];PN.b=x[2];render()}
-function ptPop(){if(!PTM)return '';var l=ptCust(),h='<div style="position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)ptClose()"><div style="background:var(--card,#fff);color:var(--tx);border-radius:18px;padding:18px;max-width:440px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.35)">';
-h+='<div class="row" style="justify-content:space-between"><h3 style="margin:0">➕ নতুন টেমপ্লেট</h3><button class="btn sm s" onclick="ptClose()">✖</button></div>';
-h+='<label>টেমপ্লেটের নাম (বাটনে যা দেখাবে)</label><input maxlength="30" value="'+esc(PTM.n)+'" oninput="ptIn(\'n\',this.value)" placeholder="যেমন: ঈদ মোবারক">';
+function ptPop(){if(!PTM)return '';var l=ptAll(),ed=PTM.e>=0,h='<div style="position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)ptClose()"><div style="background:var(--card,#fff);color:var(--tx);border-radius:18px;padding:18px;max-width:440px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.35)">';
+h+='<div class="row" style="justify-content:space-between"><h3 style="margin:0">'+(ed?'✏️ টেমপ্লেট এডিট':'➕ নতুন টেমপ্লেট')+'</h3><button class="btn sm s" onclick="ptClose()">✖</button></div>';
+h+='<label>টেমপ্লেটের নাম (বাটনে যা দেখাবে)</label><input maxlength="30" value="'+esc(PTM.n)+'" oninput="ptIn(\'n\',this.value)" placeholder="যেমন: দুর্গা পূজার শুভেচ্ছা">';
 h+='<label>শিরোনাম (সর্বোচ্চ ৬০ অক্ষর)</label><input maxlength="60" value="'+esc(PTM.t)+'" oninput="ptIn(\'t\',this.value)">';
 h+='<label>বার্তা (সর্বোচ্চ ২০০ অক্ষর)</label><textarea rows="3" maxlength="200" oninput="ptIn(\'b\',this.value)">'+esc(PTM.b)+'</textarea>';
-h+='<button class="btn" style="margin-top:12px;width:100%" onclick="ptAdd()">💾 টেমপ্লেট সেভ করুন</button>';
-h+='<h4 style="margin:16px 0 6px">⭐ আপনার সেভ করা টেমপ্লেট</h4>';
-if(!l.length)h+='<small style="color:var(--mut)">এখনও কিছু সেভ করা নেই।</small>';
-l.forEach(function(x,i){h+='<div class="ord" style="margin-bottom:6px;display:flex;gap:8px;align-items:center;justify-content:space-between"><div style="min-width:0"><b>'+esc(x[0])+'</b><div style="font-size:12.5px;color:var(--mut)">'+esc(x[1])+'</div></div><button class="btn sm s" onclick="ptDel('+i+')">🗑</button></div>'});
-return h+'<small style="color:var(--mut);display:block;margin-top:10px">টেমপ্লেট এই ডিভাইসের ব্রাউজারে সেভ থাকে।</small></div></div>'}
+h+='<div class="row" style="margin-top:12px"><button class="btn" style="flex:1" onclick="ptAdd()">'+(ed?'💾 আপডেট করুন':'💾 টেমপ্লেট সেভ করুন')+'</button>'+(ed?'<button class="btn s" onclick="ptCancel()">বাতিল</button>':'')+'</div>';
+h+='<h4 style="margin:16px 0 6px">📋 সব টেমপ্লেট ('+l.length+')</h4>';
+if(!l.length)h+='<small style="color:var(--mut)">কোনো টেমপ্লেট নেই।</small>';
+l.forEach(function(x,i){h+='<div class="ord" style="margin-bottom:6px;display:flex;gap:8px;align-items:center;justify-content:space-between'+(PTM.e===i?';outline:2px solid #0b9e92':'')+'"><div style="min-width:0"><b>'+esc(x[0])+'</b><div style="font-size:12.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(x[1])+'</div></div><div style="display:flex;gap:6px;flex:none"><button class="btn sm s" onclick="ptEdit('+i+')">✏️</button><button class="btn sm s" onclick="ptDel('+i+')">🗑</button></div></div>'});
+return h+'<button class="btn sm s" style="margin-top:8px" onclick="ptReset()">↩️ শুরুর টেমপ্লেটগুলো ফিরিয়ে আনুন</button><small style="color:var(--mut);display:block;margin-top:10px">টেমপ্লেট এই ডিভাইসের ব্রাউজারে সেভ থাকে।</small></div></div>'}
 function pnPg(n){PG=n;render()}
 function pnRef(){PH=null;PS=null;render()}
 function pnLoad(){PLD=1;apiCall({action:'pushList',pass:pw()}).then(function(r){PLD=0;if(r&&r.ok){PH=r.list||[];PS=r.stats||null;var mx=Math.max(1,Math.ceil(PH.length/5));if(PG>mx)PG=mx}else{PH=[];if(r&&r.error&&r.error!=='device')toast('❌ '+r.error)}if(tab==='push'&&A)render()}).catch(function(){PLD=0;PH=[];if(tab==='push'&&A)render()})}
@@ -1464,7 +1472,7 @@ h+='<label>ছবির লিংক (ঐচ্ছিক, https:// দিয়�
 h+='<label>ট্যাপ করলে যে লিংক খুলবে (ঐচ্ছিক)</label><input id="pnu" value="'+esc(PN.u)+'" oninput="pnIn(\'u\',this.value)" placeholder="https://baidya-grillfactory.github.io/home/">';
 h+='<label>কাদের পাঠাবেন (টপিক) — সবাই হলে <b>all</b></label><input id="pntp" value="'+esc(PN.tp)+'" oninput="pnIn(\'tp\',this.value)" placeholder="all">';
 h+='<label>🧪 শুধু একটি ফোনে টেস্ট (ঐচ্ছিক) — ডিভাইস টোকেন দিলে শুধু ওই ফোনে যাবে</label><input id="pntk" value="'+esc(PN.tk)+'" oninput="pnIn(\'tk\',this.value)" placeholder="ফাঁকা থাকলে টপিকের সবাইকে যাবে">';
-h+='<div style="margin-top:14px;background:var(--bg);border:1px solid var(--bd);border-radius:14px;padding:12px"><small style="color:var(--mut)">প্রিভিউ</small><div style="display:flex;gap:10px;align-items:center;margin-top:6px"><div style="font-size:26px">🔔</div><div style="min-width:0"><b id="pvt">'+esc(PN.t||'শিরোনাম এখানে')+'</b><div id="pvb" style="font-size:13px;color:var(--mut)">'+esc(PN.b||'আপনার বার্তা এখানে দেখাবে')+'</div></div></div><img id="pvi" alt="" style="display:'+(/^https:\/\//.test(PN.i)?'block':'none')+';max-width:100%;border-radius:10px;margin-top:8px" src="'+(/^https:\/\//.test(PN.i)?esc(PN.i):'')+'"></div>';
+h+='<div style="margin-top:14px"><small style="color:var(--mut)">📱 প্রিভিউ (ফোনে যেমন দেখাবে)</small><div style="margin:8px auto 0;max-width:340px;border:6px solid #111;border-radius:30px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.28);background:linear-gradient(160deg,#16324a 0%,#0b9e92 52%,#ff8a3d 100%);padding:10px 12px 18px;color:#fff"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;opacity:.95"><span>'+(function(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)})()+'</span><span>📶 🔋</span></div><div style="text-align:center;margin:14px 0 16px"><div style="font-size:44px;font-weight:300;line-height:1">'+(function(){var d=new Date(),h=d.getHours()%12||12;return ('0'+h).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)})()+'</div><div style="font-size:12px;opacity:.9;margin-top:4px">'+(function(){try{return new Date().toLocaleDateString('bn-IN',{weekday:'long',day:'numeric',month:'long'})}catch(e){return ''}})()+'</div></div><div style="background:rgba(255,255,255,.96);color:#1c1c1e;border-radius:20px;padding:11px 13px;box-shadow:0 4px 14px rgba(0,0,0,.25)"><div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#5f6368"><img src="'+(S.cfg.logo||LOGO0)+'" alt="" style="width:20px;height:20px;border-radius:6px;object-fit:cover;background:#fff"><span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(S.cfg.name||'বৈদ্য গ্রিল ফ্যাক্টরি')+'</span><span>• এখন</span><span style="margin-left:auto">⌄</span></div><div style="display:flex;gap:10px;margin-top:7px"><div style="min-width:0;flex:1"><b id="pvt" style="font-size:14.5px;display:block;word-break:break-word">'+esc(PN.t||'শিরোনাম এখানে')+'</b><div id="pvb" style="font-size:13px;color:#3c4043;margin-top:2px;word-break:break-word">'+esc(PN.b||'আপনার বার্তা এখানে দেখাবে')+'</div></div></div><img id="pvi" alt="" style="display:'+(/^https:\/\//.test(PN.i)?'block':'none')+';width:100%;border-radius:12px;margin-top:9px" src="'+(/^https:\/\//.test(PN.i)?esc(PN.i):'')+'"></div><div style="width:90px;height:4px;background:rgba(255,255,255,.7);border-radius:4px;margin:18px auto 0"></div></div></div>';
 h+='<button class="btn" style="margin-top:14px" onclick="pnSend()"'+(PBZ?' disabled':'')+'>'+(PBZ?'⏳ পাঠানো হচ্ছে…':'📤 নোটিফিকেশন পাঠান')+'</button></div>';
 h+='<div class="box" style="margin-top:12px"><h3>🕘 আগের নোটিফিকেশন <small style="color:var(--mut);font-weight:400">(সর্বশেষ ৩০টি, প্রতি পাতায় ৫টি)</small></h3>';
 if(PH===null)h+='⏳ আনা হচ্ছে…';else if(!PH.length)h+='<small style="color:var(--mut)">এখনও কিছু পাঠানো হয়নি।</small>';
